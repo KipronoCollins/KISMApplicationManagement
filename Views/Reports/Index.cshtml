@@ -1,0 +1,2428 @@
+@using KISMApplicationManagement.Constants
+@using System.Globalization
+@model KISMApplicationManagement.Models.ReportViewModels.ReportsDashboardViewModel
+
+@{
+    ViewData["Title"] = "Reports Dashboard";
+
+    var selectedIntake = Model.Intakes
+        .FirstOrDefault(item => item.IntakeId == Model.IntakeId);
+
+    var filterDescription = selectedIntake == null
+        ? "All intakes"
+        : $"{selectedIntake.IntakeName}";
+
+    if (Model.FromDate.HasValue || Model.ToDate.HasValue)
+    {
+        var fromText = Model.FromDate.HasValue
+            ? Model.FromDate.Value.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
+            : "Beginning";
+
+        var toText = Model.ToDate.HasValue
+            ? Model.ToDate.Value.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
+            : "Today";
+
+        filterDescription += $" · {fromText} – {toText}";
+    }
+
+    var applicationStatusLabels = Model.ApplicationStatusChart
+        .Select(item => item.Status)
+        .ToList();
+
+    var applicationStatusValues = Model.ApplicationStatusChart
+        .Select(item => item.Count)
+        .ToList();
+
+    var applicationTrendLabels = Model.ApplicationTrend
+        .Select(item => item.Label)
+        .ToList();
+
+    var applicationTrendValues = Model.ApplicationTrend
+        .Select(item => item.Count)
+        .ToList();
+
+    var submittedTrendValues = Model.ApplicationTrend
+        .Select(item => item.SubmittedCount)
+        .ToList();
+
+    var intakeLabels = Model.IntakeApplicationChart
+        .Select(item => item.IntakeName)
+        .ToList();
+
+    var intakeTotalValues = Model.IntakeApplicationChart
+        .Select(item => item.TotalApplications)
+        .ToList();
+
+    var intakeDraftValues = Model.IntakeApplicationChart
+        .Select(item => item.DraftApplications)
+        .ToList();
+
+    var intakePendingValues = Model.IntakeApplicationChart
+        .Select(item => item.PendingReviewApplications)
+        .ToList();
+
+    var intakeCommitteeValues = Model.IntakeApplicationChart
+        .Select(item => item.CommitteeDecisions)
+        .ToList();
+
+    var committeeDecisionLabels = Model.CommitteeDecisionChart
+        .Select(item => item.Decision)
+        .ToList();
+
+    var committeeDecisionValues = Model.CommitteeDecisionChart
+        .Select(item => item.Count)
+        .ToList();
+
+    var committeeIntakeLabels = Model.CommitteeResultsByIntake
+        .Select(item => item.IntakeName)
+        .ToList();
+
+    var recommendedByIntakeValues = Model.CommitteeResultsByIntake
+        .Select(item => item.RecommendedCount)
+        .ToList();
+
+    var notRecommendedByIntakeValues = Model.CommitteeResultsByIntake
+        .Select(item => item.NotRecommendedCount)
+        .ToList();
+
+    var deferredByIntakeValues = Model.CommitteeResultsByIntake
+        .Select(item => item.DeferredCount)
+        .ToList();
+
+    var programmeLabels = Model.ProgrammeDemandChart
+        .Take(12)
+        .Select(item => item.ProgrammeLabel)
+        .ToList();
+
+    var programmeTotalValues = Model.ProgrammeDemandChart
+        .Take(12)
+        .Select(item => item.TotalChoices)
+        .ToList();
+
+    var programmeFirstChoiceValues = Model.ProgrammeDemandChart
+        .Take(12)
+        .Select(item => item.FirstChoiceCount)
+        .ToList();
+
+    var programmeSecondChoiceValues = Model.ProgrammeDemandChart
+        .Take(12)
+        .Select(item => item.SecondChoiceCount)
+        .ToList();
+
+    var programmeComparisonLabels = Model.ProgrammeChoiceComparison
+        .Take(12)
+        .Select(item => item.ProgrammeLabel)
+        .ToList();
+
+    var programmeComparisonFirstValues = Model.ProgrammeChoiceComparison
+        .Take(12)
+        .Select(item => item.FirstChoiceCount)
+        .ToList();
+
+    var programmeComparisonSecondValues = Model.ProgrammeChoiceComparison
+        .Take(12)
+        .Select(item => item.SecondChoiceCount)
+        .ToList();
+}
+
+<div class="reports-page">
+
+    <!-- ============================================================
+         HERO
+         ============================================================ -->
+
+    <div class="reports-hero mb-4">
+        <div class="reports-hero-content">
+            <div class="reports-eyebrow">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                Management Reporting
+            </div>
+
+            <h1 class="reports-title">
+                Reports Dashboard
+            </h1>
+
+            <p class="reports-subtitle">
+                Monitor applications, programme demand, intake performance
+                and committee outcomes from one place.
+            </p>
+
+            <div class="reports-filter-summary">
+                <i class="bi bi-funnel-fill"></i>
+                @filterDescription
+            </div>
+        </div>
+
+        <div class="reports-hero-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+         FILTERS
+         ============================================================ -->
+
+    <div class="kism-card mb-4">
+        <div class="kism-card-header">
+            <div>
+                <div class="section-icon">
+                    <i class="bi bi-funnel-fill"></i>
+                </div>
+
+                <div class="section-heading">
+                    <h5>Report Filters</h5>
+                    <span>Filter the dashboard by intake and application date.</span>
+                </div>
+            </div>
+
+            <a asp-action="Index"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                Clear Filters
+            </a>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Index"
+                  method="get"
+                  class="row g-3 align-items-end">
+
+                <div class="col-lg-4 col-md-6">
+                    <label for="intakeId" class="form-label">
+                        Intake
+                    </label>
+
+                    <select id="intakeId"
+                            name="intakeId"
+                            class="form-select">
+
+                        <option value="">
+                            All Intakes
+                        </option>
+
+                        @foreach (var intake in Model.Intakes)
+                        {
+                            <option value="@intake.IntakeId"
+                                    selected="@(Model.IntakeId == intake.IntakeId)">
+                                @intake.IntakeName
+                                @if (!string.IsNullOrWhiteSpace(intake.AcademicYear))
+                                {
+                                    <text> · @intake.AcademicYear</text>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(intake.IntakePeriod))
+                                {
+                                    <text> · @intake.IntakePeriod</text>
+                                }
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label for="fromDate" class="form-label">
+                        From Date
+                    </label>
+
+                    <input type="date"
+                           id="fromDate"
+                           name="fromDate"
+                           value="@(Model.FromDate?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label for="toDate" class="form-label">
+                        To Date
+                    </label>
+
+                    <input type="date"
+                           id="toDate"
+                           name="toDate"
+                           value="@(Model.ToDate?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <button type="submit"
+                            class="btn btn-kism w-100">
+                        <i class="bi bi-filter-circle-fill me-1"></i>
+                        Apply
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+         APPLICATION SUMMARY
+         ============================================================ -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon magenta">
+                    <i class="bi bi-files"></i>
+                </div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Total Applications
+                    </span>
+
+                    <strong class="stat-value">
+                        @Model.TotalApplications.ToString("N0")
+                    </strong>
+
+                    <small>
+                        Applications in selected scope
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon gray">
+                    <i class="bi bi-file-earmark"></i>
+                </div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Draft Applications
+                    </span>
+
+                    <strong class="stat-value">
+                        @Model.DraftApplications.ToString("N0")
+                    </strong>
+
+                    <small>
+                        Not yet submitted
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon yellow">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Pending Review
+                    </span>
+
+                    <strong class="stat-value">
+                        @Model.PendingReviewApplications.ToString("N0")
+                    </strong>
+
+                    <small>
+                        Awaiting committee process
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+
+                <div class="stat-content">
+                    <span class="stat-label">
+                        Committee Decisions
+                    </span>
+
+                    <strong class="stat-value">
+                        @Model.ApplicationsWithCommitteeDecision.ToString("N0")
+                    </strong>
+
+                    <small>
+                        Finalized committee decisions
+                    </small>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         COMMITTEE SUMMARY
+         ============================================================ -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-4">
+            <div class="decision-card recommended">
+                <div class="decision-icon">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+
+                <div>
+                    <span>
+                        Recommended for Admission
+                    </span>
+
+                    <strong>
+                        @Model.RecommendedApplications.ToString("N0")
+                    </strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="decision-card not-recommended">
+                <div class="decision-icon">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+
+                <div>
+                    <span>
+                        Not Recommended
+                    </span>
+
+                    <strong>
+                        @Model.NotRecommendedApplications.ToString("N0")
+                    </strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="decision-card deferred">
+                <div class="decision-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div>
+                    <span>
+                        Deferred
+                    </span>
+
+                    <strong>
+                        @Model.DeferredApplications.ToString("N0")
+                    </strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         MAIN CHARTS
+         ============================================================ -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- APPLICATION STATUS -->
+
+        <div class="col-xl-5">
+            <div class="kism-card chart-card h-100">
+
+                <div class="kism-card-header">
+                    <div>
+                        <div class="section-icon">
+                            <i class="bi bi-pie-chart-fill"></i>
+                        </div>
+
+                        <div class="section-heading">
+                            <h5>Application Status</h5>
+                            <span>
+                                Distribution of applications by current status.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container chart-container-doughnut">
+                    @if (Model.ApplicationStatusChart.Any())
+                    {
+                        <canvas id="applicationStatusChart"></canvas>
+                    }
+                    else
+                    {
+                        <div class="chart-empty-state">
+                            <i class="bi bi-pie-chart"></i>
+                            <span>No application status data available.</span>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- APPLICATIONS BY INTAKE -->
+
+        <div class="col-xl-7">
+            <div class="kism-card chart-card h-100">
+
+                <div class="kism-card-header">
+                    <div>
+                        <div class="section-icon">
+                            <i class="bi bi-bar-chart-fill"></i>
+                        </div>
+
+                        <div class="section-heading">
+                            <h5>Applications by Intake</h5>
+                            <span>
+                                Application volume and workflow position by intake.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    @if (Model.IntakeApplicationChart.Any())
+                    {
+                        <canvas id="intakeApplicationsChart"></canvas>
+                    }
+                    else
+                    {
+                        <div class="chart-empty-state">
+                            <i class="bi bi-bar-chart"></i>
+                            <span>No intake data available.</span>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         APPLICATION TREND
+         ============================================================ -->
+
+    <div class="kism-card chart-card mb-4">
+
+        <div class="kism-card-header">
+            <div>
+                <div class="section-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+
+                <div class="section-heading">
+                    <h5>Application Activity Over Time</h5>
+                    <span>
+                        Applications created and applications with a submission date.
+                    </span>
+                </div>
+            </div>
+
+            <span class="chart-header-badge">
+                <i class="bi bi-calendar3 me-1"></i>
+                Trend Analysis
+            </span>
+        </div>
+
+        <div class="chart-container chart-container-trend">
+            @if (Model.ApplicationTrend.Any())
+            {
+                <canvas id="applicationTrendChart"></canvas>
+            }
+            else
+            {
+                <div class="chart-empty-state">
+                    <i class="bi bi-graph-up"></i>
+                    <span>No trend data available.</span>
+                </div>
+            }
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         PROGRAMME DEMAND + COMMITTEE DECISIONS
+         ============================================================ -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- PROGRAMME DEMAND -->
+
+        <div class="col-xl-7">
+            <div class="kism-card chart-card h-100">
+
+                <div class="kism-card-header">
+                    <div>
+                        <div class="section-icon">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+
+                        <div class="section-heading">
+                            <h5>Programme Demand</h5>
+                            <span>
+                                Top programme choices across applications.
+                            </span>
+                        </div>
+                    </div>
+
+                    <span class="chart-header-badge">
+                        Top 12
+                    </span>
+                </div>
+
+                <div class="chart-container programme-chart-container">
+                    @if (Model.ProgrammeDemandChart.Any())
+                    {
+                        <canvas id="programmeDemandChart"></canvas>
+                    }
+                    else
+                    {
+                        <div class="chart-empty-state">
+                            <i class="bi bi-mortarboard"></i>
+                            <span>No programme demand data available.</span>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- COMMITTEE DECISIONS -->
+
+        <div class="col-xl-5">
+            <div class="kism-card chart-card h-100">
+
+                <div class="kism-card-header">
+                    <div>
+                        <div class="section-icon">
+                            <i class="bi bi-clipboard-data-fill"></i>
+                        </div>
+
+                        <div class="section-heading">
+                            <h5>Committee Decisions</h5>
+                            <span>
+                                Finalized committee decision distribution.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container chart-container-doughnut">
+                    @if (Model.CommitteeDecisionChart.Any(item => item.Count > 0))
+                    {
+                        <canvas id="committeeDecisionChart"></canvas>
+                    }
+                    else
+                    {
+                        <div class="chart-empty-state">
+                            <i class="bi bi-clipboard-data"></i>
+                            <span>No committee decision data available.</span>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         COMMITTEE RESULTS BY INTAKE
+         ============================================================ -->
+
+    <div class="kism-card chart-card mb-4">
+
+        <div class="kism-card-header">
+            <div>
+                <div class="section-icon">
+                    <i class="bi bi-bar-chart-steps"></i>
+                </div>
+
+                <div class="section-heading">
+                    <h5>Committee Results by Intake</h5>
+                    <span>
+                        Comparison of finalized committee outcomes across intakes.
+                    </span>
+                </div>
+            </div>
+
+            <span class="chart-header-badge">
+                Finalized Results
+            </span>
+        </div>
+
+        <div class="chart-container chart-container-large">
+            @if (Model.CommitteeResultsByIntake.Any())
+            {
+                <canvas id="committeeResultsChart"></canvas>
+            }
+            else
+            {
+                <div class="chart-empty-state">
+                    <i class="bi bi-bar-chart-steps"></i>
+                    <span>No finalized committee results available.</span>
+                </div>
+            }
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         FIRST CHOICE VS SECOND CHOICE
+         ============================================================ -->
+
+    <div class="kism-card chart-card mb-4">
+
+        <div class="kism-card-header">
+            <div>
+                <div class="section-icon">
+                    <i class="bi bi-arrow-left-right"></i>
+                </div>
+
+                <div class="section-heading">
+                    <h5>Programme Choice Analysis</h5>
+                    <span>
+                        First-choice versus second-choice demand.
+                    </span>
+                </div>
+            </div>
+
+            <span class="chart-header-badge">
+                Top 12 Programmes
+            </span>
+        </div>
+
+        <div class="chart-container chart-container-large">
+            @if (Model.ProgrammeChoiceComparison.Any())
+            {
+                <canvas id="programmeChoiceComparisonChart"></canvas>
+            }
+            else
+            {
+                <div class="chart-empty-state">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>No programme choice data available.</span>
+                </div>
+            }
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         APPLICATION STATUS DETAIL
+         ============================================================ -->
+
+    <div class="kism-card mb-4">
+
+        <div class="kism-card-header">
+            <div>
+                <div class="section-icon">
+                    <i class="bi bi-list-check"></i>
+                </div>
+
+                <div class="section-heading">
+                    <h5>Application Status Breakdown</h5>
+                    <span>
+                        Detailed numerical breakdown of application statuses.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.StatusSummary.Any())
+            {
+                @foreach (var status in Model.StatusSummary)
+                {
+                    var progressClass =
+                        status.Status == ApplicationStatuses.Draft
+                            ? "status-draft"
+                            : status.Status == ApplicationStatuses.PendingReview
+                                ? "status-pending"
+                                : "status-other";
+
+                    <div class="status-progress mb-4">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>
+                                    @status.Status
+                                </strong>
+                            </div>
+
+                            <div class="status-progress-value">
+                                @status.Count.ToString("N0")
+                                <span>
+                                    (@status.Percentage.ToString("0.0")%)
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="progress">
+                            <div class="progress-bar @progressClass"
+                                 role="progressbar"
+                                 style="width: @status.Percentage%;"
+                                 aria-valuenow="@status.Percentage"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h6>No Application Data</h6>
+                    <p>
+                        There are no applications matching the selected filters.
+                    </p>
+                </div>
+            }
+
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+         APPLICATIONS BY INTAKE TABLE
+         ============================================================ -->
+
+    <div class="kism-card mb-4">
+
+        <div class="kism-card-header">
+            <div>
+                <div class="section-icon">
+                    <i class="bi bi-table"></i>
+                </div>
+
+                <div class="section-heading">
+                    <h5>Applications by Intake</h5>
+                    <span>
+                        Detailed intake-level application and committee statistics.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table report-table align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Intake</th>
+                        <th>Academic Year</th>
+                        <th>Period</th>
+                        <th class="text-center">Total</th>
+                        <th class="text-center">Draft</th>
+                        <th class="text-center">Pending</th>
+                        <th class="text-center">Decisions</th>
+                        <th class="text-center">Recommended</th>
+                        <th class="text-center">Not Recommended</th>
+                        <th class="text-center">Deferred</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model.IntakeSummary.Any())
+                    {
+                        foreach (var intake in Model.IntakeSummary)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>
+                                        @intake.IntakeName
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    @intake.AcademicYear
+                                </td>
+
+                                <td>
+                                    @intake.IntakePeriod
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge badge-total">
+                                        @intake.TotalApplications.ToString("N0")
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @intake.DraftApplications.ToString("N0")
+                                </td>
+
+                                <td class="text-center">
+                                    @intake.PendingReviewApplications.ToString("N0")
+                                </td>
+
+                                <td class="text-center">
+                                    @intake.CommitteeDecisions.ToString("N0")
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge badge-recommended">
+                                        @intake.RecommendedApplications.ToString("N0")
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @intake.NotRecommendedApplications.ToString("N0")
+                                </td>
+
+                                <td class="text-center">
+                                    @intake.DeferredApplications.ToString("N0")
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10">
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <h6>No Intake Data</h6>
+                                    <p>
+                                        No applications match the selected filters.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+         RECENT APPLICATIONS
+         ============================================================ -->
+
+    <div class="kism-card">
+
+        <div class="kism-card-header">
+            <div>
+                <div class="section-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div class="section-heading">
+                    <h5>Recent Applications</h5>
+                    <span>
+                        The latest applications within the selected reporting scope.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table report-table align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Application</th>
+                        <th>Applicant</th>
+                        <th>Intake</th>
+                        <th>First Choice</th>
+                        <th>Second Choice</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model.RecentApplications.Any())
+                    {
+                        foreach (var application in Model.RecentApplications)
+                        {
+                            var statusClass =
+                                application.Status == ApplicationStatuses.Draft
+                                    ? "draft"
+                                    : application.Status == ApplicationStatuses.PendingReview
+                                        ? "pending"
+                                        : "other";
+
+                            <tr>
+
+                                <td>
+                                    <span class="application-number">
+                                        @application.ApplicationNumber
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        @application.ApplicantName
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    @application.IntakeName
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(application.FirstChoice))
+                                    {
+                                        <span>
+                                            @application.FirstChoice
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(application.SecondChoice))
+                                    {
+                                        <span>
+                                            @application.SecondChoice
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="status-badge @statusClass">
+                                        @application.Status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="text-muted small">
+                                        @application.CreatedAtUtc.ToLocalTime()
+                                            .ToString(
+                                                "dd MMM yyyy HH:mm",
+                                                CultureInfo.InvariantCulture)
+                                    </span>
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <h6>No Recent Applications</h6>
+                                    <p>
+                                        No applications match the selected filters.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ================================================================
+     CHART.JS
+     ================================================================ -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const kismMagenta = "#d800b8";
+        const kismMagentaDark = "#ad0093";
+        const kismYellow = "#edff0f";
+
+        const neutral = "#6c757d";
+        const success = "#198754";
+        const danger = "#dc3545";
+        const warning = "#f0ad00";
+        const info = "#0d6efd";
+
+        const gridColor = "rgba(0, 0, 0, 0.06)";
+        const textColor = "#495057";
+
+
+        // ============================================================
+        // GLOBAL CHART DEFAULTS
+        // ============================================================
+
+        Chart.defaults.font.family =
+            "'Inter', 'Segoe UI', Arial, sans-serif";
+
+        Chart.defaults.color = textColor;
+
+        Chart.defaults.animation.duration = 700;
+
+
+        // ============================================================
+        // COMMON TOOLTIP
+        // ============================================================
+
+        const commonTooltip = {
+            backgroundColor: "#212529",
+            titleColor: "#ffffff",
+            bodyColor: "#ffffff",
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true
+        };
+
+
+        // ============================================================
+        // APPLICATION STATUS DOUGHNUT
+        // ============================================================
+
+        const applicationStatusCanvas =
+            document.getElementById("applicationStatusChart");
+
+        if (applicationStatusCanvas) {
+
+            new Chart(applicationStatusCanvas, {
+                type: "doughnut",
+
+                data: {
+                    labels: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            applicationStatusLabels)),
+
+                    datasets: [{
+                        data: @Html.Raw(
+                            System.Text.Json.JsonSerializer.Serialize(
+                                applicationStatusValues)),
+
+                        backgroundColor: [
+                            kismMagenta,
+                            kismYellow,
+                            "#6c757d",
+                            "#0d6efd",
+                            "#198754",
+                            "#dc3545"
+                        ],
+
+                        borderColor: "#ffffff",
+
+                        borderWidth: 3,
+
+                        hoverOffset: 8
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: "65%",
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+
+                                padding: 18,
+
+                                boxWidth: 10
+                            }
+                        },
+
+                        tooltip: commonTooltip
+                    }
+                }
+            });
+        }
+
+
+        // ============================================================
+        // APPLICATIONS BY INTAKE
+        // ============================================================
+
+        const intakeCanvas =
+            document.getElementById("intakeApplicationsChart");
+
+        if (intakeCanvas) {
+
+            new Chart(intakeCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            intakeLabels)),
+
+                    datasets: [
+                        {
+                            label: "Total Applications",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    intakeTotalValues)),
+
+                            backgroundColor: kismMagenta,
+
+                            borderRadius: 6,
+
+                            borderSkipped: false
+                        },
+
+                        {
+                            label: "Draft",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    intakeDraftValues)),
+
+                            backgroundColor: neutral,
+
+                            borderRadius: 6,
+
+                            borderSkipped: false
+                        },
+
+                        {
+                            label: "Pending Review",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    intakePendingValues)),
+
+                            backgroundColor: warning,
+
+                            borderRadius: 6,
+
+                            borderSkipped: false
+                        },
+
+                        {
+                            label: "Committee Decisions",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    intakeCommitteeValues)),
+
+                            backgroundColor: success,
+
+                            borderRadius: 6,
+
+                            borderSkipped: false
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
+                    },
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+
+                                padding: 18,
+
+                                boxWidth: 10
+                            }
+                        },
+
+                        tooltip: commonTooltip
+                    },
+
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        },
+
+                        y: {
+                            beginAtZero: true,
+
+                            grid: {
+                                color: gridColor
+                            },
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // ============================================================
+        // APPLICATION TREND
+        // ============================================================
+
+        const trendCanvas =
+            document.getElementById("applicationTrendChart");
+
+        if (trendCanvas) {
+
+            new Chart(trendCanvas, {
+                type: "line",
+
+                data: {
+                    labels: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            applicationTrendLabels)),
+
+                    datasets: [
+                        {
+                            label: "Applications Created",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    applicationTrendValues)),
+
+                            borderColor: kismMagenta,
+
+                            backgroundColor:
+                                "rgba(216, 0, 184, 0.10)",
+
+                            borderWidth: 3,
+
+                            pointRadius: 3,
+
+                            pointHoverRadius: 6,
+
+                            pointBackgroundColor:
+                                kismMagenta,
+
+                            pointBorderColor: "#ffffff",
+
+                            pointBorderWidth: 2,
+
+                            fill: true,
+
+                            tension: 0.35
+                        },
+
+                        {
+                            label: "Submitted",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    submittedTrendValues)),
+
+                            borderColor: success,
+
+                            backgroundColor:
+                                "rgba(25, 135, 84, 0.06)",
+
+                            borderWidth: 2,
+
+                            pointRadius: 2,
+
+                            pointHoverRadius: 5,
+
+                            pointBackgroundColor:
+                                success,
+
+                            fill: true,
+
+                            tension: 0.35
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
+                    },
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+
+                                padding: 18,
+
+                                boxWidth: 10
+                            }
+                        },
+
+                        tooltip: commonTooltip
+                    },
+
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+                                maxTicksLimit: 14
+                            }
+                        },
+
+                        y: {
+                            beginAtZero: true,
+
+                            grid: {
+                                color: gridColor
+                            },
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // ============================================================
+        // PROGRAMME DEMAND
+        // ============================================================
+
+        const programmeCanvas =
+            document.getElementById("programmeDemandChart");
+
+        if (programmeCanvas) {
+
+            new Chart(programmeCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            programmeLabels)),
+
+                    datasets: [
+                        {
+                            label: "Total Choices",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    programmeTotalValues)),
+
+                            backgroundColor: kismMagenta,
+
+                            borderRadius: 6,
+
+                            borderSkipped: false
+                        }
+                    ]
+                },
+
+                options: {
+                    indexAxis: "y",
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+
+                        tooltip: commonTooltip
+                    },
+
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+
+                            grid: {
+                                color: gridColor
+                            },
+
+                            ticks: {
+                                precision: 0
+                            }
+                        },
+
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // ============================================================
+        // COMMITTEE DECISIONS DOUGHNUT
+        // ============================================================
+
+        const committeeDecisionCanvas =
+            document.getElementById("committeeDecisionChart");
+
+        if (committeeDecisionCanvas) {
+
+            new Chart(committeeDecisionCanvas, {
+                type: "doughnut",
+
+                data: {
+                    labels: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            committeeDecisionLabels)),
+
+                    datasets: [{
+                        data: @Html.Raw(
+                            System.Text.Json.JsonSerializer.Serialize(
+                                committeeDecisionValues)),
+
+                        backgroundColor: [
+                            success,
+                            danger,
+                            warning
+                        ],
+
+                        borderColor: "#ffffff",
+
+                        borderWidth: 3,
+
+                        hoverOffset: 8
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: "65%",
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+
+                                padding: 18,
+
+                                boxWidth: 10
+                            }
+                        },
+
+                        tooltip: commonTooltip
+                    }
+                }
+            });
+        }
+
+
+        // ============================================================
+        // COMMITTEE RESULTS BY INTAKE
+        // ============================================================
+
+        const committeeResultsCanvas =
+            document.getElementById("committeeResultsChart");
+
+        if (committeeResultsCanvas) {
+
+            new Chart(committeeResultsCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            committeeIntakeLabels)),
+
+                    datasets: [
+                        {
+                            label: "Recommended",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    recommendedByIntakeValues)),
+
+                            backgroundColor: success,
+
+                            borderRadius: 5
+                        },
+
+                        {
+                            label: "Not Recommended",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    notRecommendedByIntakeValues)),
+
+                            backgroundColor: danger,
+
+                            borderRadius: 5
+                        },
+
+                        {
+                            label: "Deferred",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    deferredByIntakeValues)),
+
+                            backgroundColor: warning,
+
+                            borderRadius: 5
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
+                    },
+
+                    scales: {
+                        x: {
+                            stacked: true,
+
+                            grid: {
+                                display: false
+                            }
+                        },
+
+                        y: {
+                            stacked: true,
+
+                            beginAtZero: true,
+
+                            grid: {
+                                color: gridColor
+                            },
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+
+                                padding: 18,
+
+                                boxWidth: 10
+                            }
+                        },
+
+                        tooltip: commonTooltip
+                    }
+                }
+            });
+        }
+
+
+        // ============================================================
+        // FIRST CHOICE VS SECOND CHOICE
+        // ============================================================
+
+        const choiceComparisonCanvas =
+            document.getElementById(
+                "programmeChoiceComparisonChart");
+
+        if (choiceComparisonCanvas) {
+
+            new Chart(choiceComparisonCanvas, {
+                type: "bar",
+
+                data: {
+                    labels: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            programmeComparisonLabels)),
+
+                    datasets: [
+                        {
+                            label: "First Choice",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    programmeComparisonFirstValues)),
+
+                            backgroundColor: kismMagenta,
+
+                            borderRadius: 6,
+
+                            borderSkipped: false
+                        },
+
+                        {
+                            label: "Second Choice",
+
+                            data: @Html.Raw(
+                                System.Text.Json.JsonSerializer.Serialize(
+                                    programmeComparisonSecondValues)),
+
+                            backgroundColor: kismYellow,
+
+                            borderColor: "#c9d500",
+
+                            borderWidth: 1,
+
+                            borderRadius: 6,
+
+                            borderSkipped: false
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
+                    },
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+
+                                padding: 18,
+
+                                boxWidth: 10
+                            }
+                        },
+
+                        tooltip: commonTooltip
+                    },
+
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        },
+
+                        y: {
+                            beginAtZero: true,
+
+                            grid: {
+                                color: gridColor
+                            },
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+    });
+</script>
+
+
+<style>
+    /* ============================================================
+       REPORTS PAGE
+       ============================================================ */
+
+    .reports-page {
+        padding-bottom: 40px;
+    }
+
+    .reports-hero {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 34px 38px;
+        border-radius: 18px;
+        background: linear-gradient(
+            135deg,
+            #d800b8 0%,
+            #b5009c 60%,
+            #8f007c 100%
+        );
+        color: #ffffff;
+        box-shadow: 0 10px 30px rgba(216, 0, 184, 0.18);
+    }
+
+    .reports-hero::after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -80px;
+        top: -100px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .reports-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .reports-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 8px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #edff0f;
+    }
+
+    .reports-title {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .reports-subtitle {
+        max-width: 760px;
+        margin: 8px 0 14px;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 0.96rem;
+    }
+
+    .reports-filter-summary {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+    .reports-hero-icon {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 92px;
+        height: 92px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #edff0f;
+        font-size: 3rem;
+    }
+
+
+    /* ============================================================
+       CARDS
+       ============================================================ */
+
+    .kism-card {
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #f0e8ef;
+        border-radius: 15px;
+        box-shadow: 0 5px 18px rgba(43, 31, 42, 0.055);
+    }
+
+    .kism-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 18px 21px;
+        border-bottom: 1px solid #f1edf0;
+    }
+
+    .kism-card-header > div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: #fff0fc;
+        color: #d800b8;
+        font-size: 1.05rem;
+    }
+
+    .section-heading h5 {
+        margin: 0;
+        color: #29232a;
+        font-size: 0.98rem;
+        font-weight: 750;
+    }
+
+    .section-heading span {
+        display: block;
+        margin-top: 3px;
+        color: #8a8188;
+        font-size: 0.78rem;
+    }
+
+    .chart-header-badge {
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #fff8fe;
+        color: #ad0093;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+
+    /* ============================================================
+       FILTER FORM
+       ============================================================ */
+
+    .reports-page .form-label {
+        margin-bottom: 6px;
+        color: #4b444a;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .reports-page .form-control,
+    .reports-page .form-select {
+        min-height: 42px;
+        border-color: #ded8dd;
+        border-radius: 9px;
+        font-size: 0.87rem;
+    }
+
+    .reports-page .form-control:focus,
+    .reports-page .form-select:focus {
+        border-color: #d800b8;
+        box-shadow: 0 0 0 0.2rem rgba(216, 0, 184, 0.10);
+    }
+
+    .btn-kism {
+        min-height: 42px;
+        border: 0;
+        border-radius: 9px;
+        background: #d800b8;
+        color: #ffffff;
+        font-size: 0.84rem;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(216, 0, 184, 0.16);
+    }
+
+    .btn-kism:hover,
+    .btn-kism:focus {
+        background: #ad0093;
+        color: #ffffff;
+    }
+
+
+    /* ============================================================
+       STAT CARDS
+       ============================================================ */
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-height: 125px;
+        padding: 20px;
+        border: 1px solid #f0e8ef;
+        border-radius: 15px;
+        background: #ffffff;
+        box-shadow: 0 5px 18px rgba(43, 31, 42, 0.055);
+    }
+
+    .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        font-size: 1.3rem;
+    }
+
+    .stat-icon.magenta {
+        background: #fff0fc;
+        color: #d800b8;
+    }
+
+    .stat-icon.gray {
+        background: #f2f3f5;
+        color: #6c757d;
+    }
+
+    .stat-icon.yellow {
+        background: #fdffe0;
+        color: #9ca700;
+    }
+
+    .stat-icon.green {
+        background: #eaf8f0;
+        color: #198754;
+    }
+
+    .stat-content {
+        min-width: 0;
+    }
+
+    .stat-label {
+        display: block;
+        color: #6f676d;
+        font-size: 0.76rem;
+        font-weight: 700;
+    }
+
+    .stat-value {
+        display: block;
+        margin-top: 3px;
+        color: #29232a;
+        font-size: 1.65rem;
+        line-height: 1.1;
+        font-weight: 800;
+    }
+
+    .stat-content small {
+        display: block;
+        margin-top: 5px;
+        color: #9a9298;
+        font-size: 0.7rem;
+    }
+
+
+    /* ============================================================
+       DECISION CARDS
+       ============================================================ */
+
+    .decision-card {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-height: 88px;
+        padding: 17px 19px;
+        border-radius: 14px;
+        border: 1px solid transparent;
+    }
+
+    .decision-card > div:last-child {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .decision-card span {
+        color: #655d63;
+        font-size: 0.76rem;
+        font-weight: 700;
+    }
+
+    .decision-card strong {
+        margin-top: 2px;
+        color: #29232a;
+        font-size: 1.55rem;
+        font-weight: 800;
+    }
+
+    .decision-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        font-size: 1.15rem;
+    }
+
+    .decision-card.recommended {
+        background: #effaf4;
+        border-color: #d8f1e2;
+    }
+
+    .decision-card.recommended .decision-icon {
+        background: #dff5e8;
+        color: #198754;
+    }
+
+    .decision-card.not-recommended {
+        background: #fff3f3;
+        border-color: #f6dddd;
+    }
+
+    .decision-card.not-recommended .decision-icon {
+        background: #fde1e1;
+        color: #dc3545;
+    }
+
+    .decision-card.deferred {
+        background: #fffced;
+        border-color: #f3ebc3;
+    }
+
+    .decision-card.deferred .decision-icon {
+        background: #fff2b8;
+        color: #a17f00;
+    }
+
+
+    /* ============================================================
+       CHARTS
+       ============================================================ */
+
+    .chart-card {
+        min-height: 100%;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 340px;
+        padding: 20px;
+    }
+
+    .chart-container-doughnut {
+        height: 360px;
+    }
+
+    .chart-container-trend {
+        height: 380px;
+    }
+
+    .programme-chart-container {
+        height: 440px;
+    }
+
+    .chart-container-large {
+        height: 420px;
+    }
+
+    .chart-empty-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        height: 100%;
+        gap: 8px;
+        color: #9a9298;
+        text-align: center;
+    }
+
+    .chart-empty-state i {
+        color: #d800b8;
+        font-size: 2rem;
+        opacity: 0.45;
+    }
+
+    .chart-empty-state span {
+        font-size: 0.82rem;
+    }
+
+
+    /* ============================================================
+       STATUS PROGRESS
+       ============================================================ */
+
+    .status-progress strong {
+        color: #40383f;
+        font-size: 0.82rem;
+    }
+
+    .status-progress-value {
+        color: #5f575d;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .status-progress-value span {
+        color: #999198;
+        font-weight: 500;
+    }
+
+    .status-progress .progress {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #f1edf0;
+    }
+
+    .status-progress .progress-bar {
+        border-radius: 999px;
+    }
+
+    .status-draft {
+        background: #6c757d;
+    }
+
+    .status-pending {
+        background: #d800b8;
+    }
+
+    .status-other {
+        background: #edc900;
+    }
+
+
+    /* ============================================================
+       TABLES
+       ============================================================ */
+
+    .report-table {
+        min-width: 1050px;
+    }
+
+    .report-table thead th {
+        padding: 13px 15px;
+        border-bottom: 1px solid #ebe6e9;
+        background: #fcfafc;
+        color: #777078;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+
+    .report-table tbody td {
+        padding: 14px 15px;
+        border-color: #f0ecef;
+        color: #4c454b;
+        font-size: 0.79rem;
+        vertical-align: middle;
+    }
+
+    .report-table tbody tr:hover {
+        background: #fffaff;
+    }
+
+    .badge-total,
+    .badge-recommended {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        padding: 5px 8px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 750;
+    }
+
+    .badge-total {
+        background: #fff0fc;
+        color: #ad0093;
+    }
+
+    .badge-recommended {
+        background: #eaf8f0;
+        color: #198754;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 0.69rem;
+        font-weight: 750;
+    }
+
+    .status-badge.draft {
+        background: #f0f1f2;
+        color: #60676d;
+    }
+
+    .status-badge.pending {
+        background: #fff0fc;
+        color: #ad0093;
+    }
+
+    .status-badge.other {
+        background: #fff9d7;
+        color: #8a7300;
+    }
+
+    .application-number {
+        color: #d800b8;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+
+    /* ============================================================
+       EMPTY STATE
+       ============================================================ */
+
+    .empty-state {
+        padding: 35px 20px;
+        text-align: center;
+        color: #928a90;
+    }
+
+    .empty-state i {
+        display: block;
+        margin-bottom: 8px;
+        color: #d800b8;
+        font-size: 2rem;
+        opacity: 0.45;
+    }
+
+    .empty-state h6 {
+        margin-bottom: 4px;
+        color: #514950;
+        font-weight: 750;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 0.8rem;
+    }
+
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+
+    @@media (max-width: 991.98px) {
+
+        .reports-hero {
+            padding: 28px;
+        }
+
+        .reports-hero-icon {
+            width: 72px;
+            height: 72px;
+            font-size: 2.2rem;
+        }
+
+        .chart-container,
+        .chart-container-doughnut {
+            height: 330px;
+        }
+
+        .programme-chart-container {
+            height: 420px;
+        }
+
+        .chart-container-large {
+            height: 380px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+
+        .reports-hero {
+            padding: 24px 21px;
+        }
+
+        .reports-title {
+            font-size: 1.55rem;
+        }
+
+        .reports-subtitle {
+            font-size: 0.84rem;
+        }
+
+        .reports-hero-icon {
+            display: none;
+        }
+
+        .kism-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .chart-header-badge {
+            align-self: flex-start;
+        }
+
+        .stat-card {
+            min-height: 105px;
+        }
+
+        .chart-container,
+        .chart-container-doughnut {
+            height: 300px;
+            padding: 15px;
+        }
+
+        .programme-chart-container {
+            height: 390px;
+        }
+
+        .chart-container-large {
+            height: 350px;
+        }
+    }
+</style>

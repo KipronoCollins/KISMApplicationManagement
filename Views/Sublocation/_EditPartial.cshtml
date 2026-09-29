@@ -1,0 +1,236 @@
+@model KISMApplicationManagement.Models.Sublocation
+
+@using KISMApplicationManagement.Models
+
+@{
+    var location =
+        ViewBag.Locations is IEnumerable<Location> locations
+            ? locations.FirstOrDefault(
+                l => l.LocationId == Model.LocationId)
+            : null;
+}
+
+
+<form asp-action="Edit"
+      asp-controller="Sublocation"
+      asp-route-id="@Model.SublocationId"
+      method="post"
+      id="editSublocationForm">
+
+    @Html.AntiForgeryToken()
+
+
+    <input type="hidden"
+           asp-for="SublocationId" />
+
+
+    <!--
+        LocationId is submitted as a hidden value because
+        the parent hierarchy is read-only during editing.
+    -->
+
+    <input type="hidden"
+           asp-for="LocationId" />
+
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         role="alert">
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- COUNTY - READ ONLY -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-geo-alt me-1"></i>
+
+            County
+
+        </label>
+
+        <input type="text"
+               class="form-control"
+               value="@(location?.Division?.Subcounty?.County == null
+                   ? string.Empty
+                   : location.Division.Subcounty.County.CountyNumber
+                     + " - "
+                     + location.Division.Subcounty.County.CountyName)"
+               readonly />
+
+        <div class="form-text">
+            County cannot be changed when editing a sublocation.
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SUBCOUNTY - READ ONLY -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-2 me-1"></i>
+
+            Subcounty
+
+        </label>
+
+        <input type="text"
+               class="form-control"
+               value="@location?.Division?.Subcounty?.SubcountyName"
+               readonly />
+
+        <div class="form-text">
+            Subcounty cannot be changed when editing a sublocation.
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- DIVISION - READ ONLY -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-3 me-1"></i>
+
+            Division
+
+        </label>
+
+        <input type="text"
+               class="form-control"
+               value="@location?.Division?.DivisionName"
+               readonly />
+
+        <div class="form-text">
+            Division cannot be changed when editing a sublocation.
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- LOCATION - READ ONLY -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-geo me-1"></i>
+
+            Location
+
+        </label>
+
+        <input type="text"
+               class="form-control"
+               value="@location?.LocationName"
+               readonly />
+
+        <div class="form-text">
+            Location cannot be changed when editing a sublocation.
+        </div>
+
+        <span asp-validation-for="LocationId"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SUBLOCATION NAME -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label asp-for="SublocationName"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-pin-map me-1"></i>
+
+            Sublocation Name
+
+        </label>
+
+        <input asp-for="SublocationName"
+               class="form-control"
+               placeholder="Enter sublocation name"
+               autocomplete="off"
+               maxlength="100"
+               required />
+
+        <span asp-validation-for="SublocationName"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- STATUS -->
+    <!-- ========================================================= -->
+
+    <div class="form-check form-switch mb-3">
+
+        <input asp-for="IsActive"
+               class="form-check-input"
+               role="switch"
+               id="editSublocationIsActive" />
+
+        <label class="form-check-label fw-semibold"
+               for="editSublocationIsActive">
+
+            Active
+
+        </label>
+
+        <div class="form-text">
+            Active sublocations will be available for selection
+            in the application system.
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTIONS -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex justify-content-end gap-2 pt-2">
+
+        <button type="button"
+                class="btn btn-light border"
+                data-bs-dismiss="modal">
+
+            Cancel
+
+        </button>
+
+
+        <button type="submit"
+                class="btn btn-kism-primary"
+                id="editSublocationSubmit">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            Save Changes
+
+        </button>
+
+    </div>
+
+</form>

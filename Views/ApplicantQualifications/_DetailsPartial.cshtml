@@ -1,0 +1,425 @@
+@model KISMApplicationManagement.ViewModels.ApplicantQualifications.ApplicantQualificationDetailsViewModel
+
+@{
+    var route = Model.QualificationRoute?.Trim().ToUpperInvariant() ?? string.Empty;
+
+    var isKcse = route == "KCSE";
+    var isKnec = route == "KNEC";
+
+    var status = Model.VerificationStatus?.Trim() ?? "Pending";
+
+    var statusClass = status.Equals("Verified", StringComparison.OrdinalIgnoreCase)
+        ? "bg-success-subtle text-success"
+        : status.Equals("Rejected", StringComparison.OrdinalIgnoreCase)
+            ? "bg-danger-subtle text-danger"
+            : status.Equals("Pending", StringComparison.OrdinalIgnoreCase)
+                ? "bg-warning-subtle text-warning-emphasis"
+                : "bg-secondary-subtle text-secondary";
+
+    var routeTitle = isKcse
+        ? "KCSE"
+        : isKnec
+            ? "KNEC"
+            : Model.QualificationRoute;
+}
+
+<div>
+
+    <!-- Header Summary -->
+    <div class="details-section">
+
+        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="qualification-route-icon">
+                    <i class="bi @(isKcse ? "bi-journal-text" : "bi-award-fill")"></i>
+                </div>
+
+                <div>
+
+                    <div class="fw-bold fs-5">
+                        @routeTitle Qualification
+                    </div>
+
+                    <div class="text-muted small">
+                        Qualification year: @Model.QualificationYear
+                    </div>
+
+                </div>
+
+            </div>
+
+            <span class="badge rounded-pill px-3 py-2 @statusClass">
+                <i class="bi bi-shield-check me-1"></i>
+                @status
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- Basic Information -->
+    <div class="details-section">
+
+        <div class="fw-bold mb-3">
+            <i class="bi bi-info-circle me-1 text-kism"></i>
+            Qualification Information
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+
+                <div class="details-label">
+                    Qualification Route
+                </div>
+
+                <div class="details-value">
+                    @routeTitle
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="details-label">
+                    Qualification Year
+                </div>
+
+                <div class="details-value">
+                    @Model.QualificationYear
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="details-label">
+                    Verification Status
+                </div>
+
+                <div class="details-value">
+                    @status
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @if (isKcse)
+    {
+        <!-- KCSE Information -->
+        <div class="details-section">
+
+            <div class="fw-bold mb-3">
+                <i class="bi bi-journal-text me-1 text-kism"></i>
+                KCSE Details
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="details-label">
+                        Examination Index Number
+                    </div>
+
+                    <div class="details-value">
+                        @(string.IsNullOrWhiteSpace(Model.ExaminationIndexNumber)
+                            ? "Not provided"
+                            : Model.ExaminationIndexNumber)
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="details-label">
+                        Mean Grade
+                    </div>
+
+                    <div class="details-value">
+                        @(string.IsNullOrWhiteSpace(Model.MeanGrade)
+                            ? "Not provided"
+                            : Model.MeanGrade)
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- KCSE Subjects -->
+        <div class="details-section">
+
+            <div class="d-flex align-items-center justify-content-between mb-3">
+
+                <div class="fw-bold">
+                    <i class="bi bi-book me-1 text-kism"></i>
+                    KCSE Subjects
+                </div>
+
+                <span class="badge bg-light text-dark border">
+                    @(Model.Subjects?.Count ?? 0) subject(s)
+                </span>
+
+            </div>
+
+            @if (Model.Subjects != null && Model.Subjects.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-sm table-hover subject-table mb-0">
+
+                        <thead>
+
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Subject</th>
+                                <th style="width: 180px;">Subject Code</th>
+                                <th style="width: 120px;">Grade</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var subject in Model.Subjects.OrderBy(s => s.DisplayOrder))
+                            {
+                                <tr>
+
+                                    <td class="text-muted">
+                                        @(subject.DisplayOrder > 0
+                                            ? subject.DisplayOrder
+                                            : Model.Subjects.IndexOf(subject) + 1)
+                                    </td>
+
+                                    <td class="fw-semibold">
+                                        @subject.SubjectName
+                                    </td>
+
+                                    <td>
+                                        @(string.IsNullOrWhiteSpace(subject.SubjectCode)
+                                            ? "-"
+                                            : subject.SubjectCode)
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            @subject.Grade
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="text-muted small">
+                    No KCSE subjects have been recorded.
+                </div>
+            }
+
+        </div>
+    }
+
+    @if (isKnec)
+    {
+        <!-- KNEC Information -->
+        <div class="details-section">
+
+            <div class="fw-bold mb-3">
+                <i class="bi bi-award-fill me-1 text-kism"></i>
+                KNEC Qualification Details
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="details-label">
+                        Qualification Type
+                    </div>
+
+                    <div class="details-value">
+                        @(string.IsNullOrWhiteSpace(Model.QualificationType)
+                            ? "Not provided"
+                            : Model.QualificationType)
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="details-label">
+                        Certificate Number
+                    </div>
+
+                    <div class="details-value">
+                        @(string.IsNullOrWhiteSpace(Model.CertificateNumber)
+                            ? "Not provided"
+                            : Model.CertificateNumber)
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="details-label">
+                        Institution
+                    </div>
+
+                    <div class="details-value">
+                        @(string.IsNullOrWhiteSpace(Model.InstitutionName)
+                            ? "Not provided"
+                            : Model.InstitutionName)
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="details-label">
+                        Field of Study
+                    </div>
+
+                    <div class="details-value">
+                        @(string.IsNullOrWhiteSpace(Model.FieldOfStudy)
+                            ? "Not provided"
+                            : Model.FieldOfStudy)
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Description -->
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="details-section">
+
+                <div class="fw-bold mb-3">
+                    <i class="bi bi-card-text me-1 text-kism"></i>
+                    Additional Description
+                </div>
+
+                <div class="text-muted" style="white-space: pre-line;">
+                    @Model.Description
+                </div>
+
+            </div>
+        }
+    }
+
+    <!-- Verification Information -->
+    <div class="alert alert-light border rounded-3 mb-0">
+
+        <div class="d-flex gap-2">
+
+            <i class="bi bi-shield-check text-kism fs-5"></i>
+
+            <div>
+
+                <div class="fw-semibold">
+                    Verification
+                </div>
+
+                @if (status.Equals("Verified", StringComparison.OrdinalIgnoreCase))
+                {
+                    <div class="small text-muted">
+                        This qualification has been verified by KISM admissions staff.
+                        @if (Model.VerifiedAtUtc.HasValue)
+                        {
+                            <span>
+                                Verification date:
+                                @Model.VerifiedAtUtc.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm").
+                            </span>
+                        }
+                    </div>
+                }
+                else if (status.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+                {
+                    <div class="small text-muted">
+                        This qualification has not been accepted during verification.
+                    </div>
+                }
+                else
+                {
+                    <div class="small text-muted">
+                        This qualification is currently awaiting verification by
+                        KISM admissions staff.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    .text-kism {
+        color: #d800b8 !important;
+    }
+
+    .qualification-route-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(216, 0, 184, .10);
+        color: #d800b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .details-section {
+        border: 1px solid #ececf2;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #fff;
+    }
+
+    .details-label {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #85869a;
+        font-weight: 700;
+    }
+
+    .details-value {
+        color: #292a3c;
+        font-weight: 600;
+        margin-top: .2rem;
+    }
+
+    .subject-table th {
+        font-size: .78rem;
+        color: #717386;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        font-weight: 700;
+    }
+
+    .subject-table td {
+        vertical-align: middle;
+    }
+</style>

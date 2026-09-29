@@ -1,0 +1,1230 @@
+@model IEnumerable<KISMApplicationManagement.Models.ApplicationViewModels.ApplicationListViewModel>
+
+@{
+    ViewData["Title"] = "My Applications";
+}
+
+<div class="container-fluid px-0">
+
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-file-earmark-text me-2" style="color: #d800b8;"></i>
+                My Applications
+            </h2>
+
+            <p class="text-muted mb-0">
+                View, manage and track your KISM applications.
+            </p>
+        </div>
+
+        <div>
+            <button type="button"
+                    class="btn kism-primary-btn px-4"
+                    id="btnCreateApplication">
+                <i class="bi bi-plus-circle me-2"></i>
+                New Application
+            </button>
+        </div>
+    </div>
+
+    <!-- Information Alert -->
+    <div class="alert kism-info-alert border-0 shadow-sm rounded-4 mb-4">
+        <div class="d-flex align-items-start gap-3">
+            <div class="kism-alert-icon">
+                <i class="bi bi-info-circle-fill"></i>
+            </div>
+
+            <div>
+                <div class="fw-semibold mb-1">
+                    Application Information
+                </div>
+
+                <div class="small">
+                    Draft applications can be edited before submission.
+                    Once submitted, an application enters the review process
+                    and can no longer be edited.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <div class="card-header bg-white border-0 px-4 py-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        <i class="bi bi-list-check me-2" style="color: #d800b8;"></i>
+                        Application History
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Your applications and their current status.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-body px-4 pb-4">
+
+            <div class="table-responsive">
+                <table id="applicationsTable"
+                       class="table table-hover align-middle w-100">
+
+                    <thead>
+                        <tr>
+                            <th>Application No.</th>
+                            <th>Intake</th>
+                            <th>Academic Year</th>
+                            <th>Period</th>
+                            <th>First Choice</th>
+                            <th>Second Choice</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Created</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var application in Model)
+                        {
+                            <tr data-application-id="@application.ApplicationId">
+
+                                <td>
+                                    <span class="fw-semibold"
+                                          style="color: #d800b8;">
+                                        @application.ApplicationNumber
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="fw-semibold">
+                                        @application.IntakeName
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @application.AcademicYear
+                                </td>
+
+                                <td>
+                                    @application.IntakePeriod
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(application.FirstChoiceProgramme))
+                                    {
+                                        <span>
+                                            @application.FirstChoiceProgramme
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(application.SecondChoiceProgramme))
+                                    {
+                                        <span>
+                                            @application.SecondChoiceProgramme
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @switch (application.Status)
+                                    {
+                                        case "Draft":
+                                            <span class="badge rounded-pill kism-status-draft">
+                                                <i class="bi bi-pencil-square me-1"></i>
+                                                Draft
+                                            </span>
+                                            break;
+
+                                        case "Pending Review":
+                                            <span class="badge rounded-pill kism-status-pending">
+                                                <i class="bi bi-hourglass-split me-1"></i>
+                                                Pending Review
+                                            </span>
+                                            break;
+
+                                        case "Passed":
+                                            <span class="badge rounded-pill kism-status-passed">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Passed
+                                            </span>
+                                            break;
+
+                                        case "Failed":
+                                            <span class="badge rounded-pill kism-status-failed">
+                                                <i class="bi bi-x-circle me-1"></i>
+                                                Failed
+                                            </span>
+                                            break;
+
+                                        default:
+                                            <span class="badge rounded-pill bg-secondary">
+                                                @application.Status
+                                            </span>
+                                            break;
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (application.SubmittedAtUtc.HasValue)
+                                    {
+                                        <span>
+                                            @application.SubmittedAtUtc.Value.ToLocalTime().ToString("dd MMM yyyy")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not submitted</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @application.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy")
+                                </td>
+
+                                <td class="text-center text-nowrap">
+
+                                    <div class="btn-group" role="group">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary btn-view-application"
+                                                data-id="@application.ApplicationId"
+                                                title="View application">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        @if (application.Status == "Draft")
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary btn-edit-application"
+                                                    data-id="@application.ApplicationId"
+                                                    title="Edit application">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-success btn-submit-application"
+                                                    data-id="@application.ApplicationId"
+                                                    data-number="@application.ApplicationNumber"
+                                                    title="Submit application">
+                                                <i class="bi bi-send"></i>
+                                            </button>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     CREATE APPLICATION MODAL
+     ============================================================ -->
+
+<div class="modal fade"
+     id="createApplicationModal"
+     tabindex="-1"
+     aria-labelledby="createApplicationModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <div class="modal-header kism-modal-header">
+                <div>
+                    <h5 class="modal-title fw-bold"
+                        id="createApplicationModalLabel">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        New Application
+                    </h5>
+
+                    <div class="small opacity-75 mt-1">
+                        Create a new application draft.
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body p-4"
+                 id="createApplicationModalBody">
+
+                <div class="text-center py-5">
+                    <div class="spinner-border"
+                         role="status"
+                         style="color: #d800b8;">
+                    </div>
+
+                    <div class="small text-muted mt-3">
+                        Loading application form...
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ============================================================
+     EDIT APPLICATION MODAL
+     ============================================================ -->
+
+<div class="modal fade"
+     id="editApplicationModal"
+     tabindex="-1"
+     aria-labelledby="editApplicationModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <div class="modal-header kism-modal-header">
+                <div>
+                    <h5 class="modal-title fw-bold"
+                        id="editApplicationModalLabel">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Edit Application
+                    </h5>
+
+                    <div class="small opacity-75 mt-1">
+                        Update your application choices.
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body p-4"
+                 id="editApplicationModalBody">
+
+                <div class="text-center py-5">
+                    <div class="spinner-border"
+                         role="status"
+                         style="color: #d800b8;">
+                    </div>
+
+                    <div class="small text-muted mt-3">
+                        Loading application...
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ============================================================
+     DETAILS APPLICATION MODAL
+     ============================================================ -->
+
+<div class="modal fade"
+     id="detailsApplicationModal"
+     tabindex="-1"
+     aria-labelledby="detailsApplicationModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <div class="modal-header kism-modal-header">
+                <div>
+                    <h5 class="modal-title fw-bold"
+                        id="detailsApplicationModalLabel">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        Application Details
+                    </h5>
+
+                    <div class="small opacity-75 mt-1">
+                        View your application information.
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body p-4"
+                 id="detailsApplicationModalBody">
+
+                <div class="text-center py-5">
+                    <div class="spinner-border"
+                         role="status"
+                         style="color: #d800b8;">
+                    </div>
+
+                    <div class="small text-muted mt-3">
+                        Loading application details...
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section Styles {
+
+    <style>
+
+        :root {
+            --kism-magenta: #d800b8;
+            --kism-yellow: #edff0f;
+            --kism-light-magenta: #fff8fe;
+        }
+
+        /* ---------------------------------------------------------
+           PAGE
+           --------------------------------------------------------- */
+
+        .kism-primary-btn {
+            background-color: var(--kism-magenta);
+            border-color: var(--kism-magenta);
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 0.65rem;
+            transition: all 0.2s ease;
+        }
+
+        .kism-primary-btn:hover,
+        .kism-primary-btn:focus {
+            background-color: #b8009c;
+            border-color: #b8009c;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(216, 0, 184, 0.15);
+        }
+
+        /* ---------------------------------------------------------
+           INFORMATION ALERT
+           --------------------------------------------------------- */
+
+        .kism-info-alert {
+            background-color: var(--kism-light-magenta);
+            color: #343434;
+            border-left: 4px solid var(--kism-magenta) !important;
+        }
+
+        .kism-alert-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            background-color: rgba(216, 0, 184, 0.10);
+            color: var(--kism-magenta);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        /* ---------------------------------------------------------
+           TABLE
+           --------------------------------------------------------- */
+
+        #applicationsTable {
+            margin-bottom: 0 !important;
+        }
+
+        #applicationsTable thead th {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: #555;
+            background-color: #fafafa;
+            border-bottom: 1px solid #e9ecef;
+            white-space: nowrap;
+            padding-top: 0.9rem;
+            padding-bottom: 0.9rem;
+        }
+
+        #applicationsTable tbody td {
+            padding-top: 0.9rem;
+            padding-bottom: 0.9rem;
+            font-size: 0.9rem;
+        }
+
+        #applicationsTable tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        #applicationsTable tbody tr:hover {
+            background-color: var(--kism-light-magenta);
+        }
+
+        /* ---------------------------------------------------------
+           STATUS BADGES
+           --------------------------------------------------------- */
+
+        .kism-status-draft {
+            background-color: #f1f3f5;
+            color: #495057;
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+
+        .kism-status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+
+        .kism-status-passed {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+
+        .kism-status-failed {
+            background-color: #f8d7da;
+            color: #842029;
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+
+        /* ---------------------------------------------------------
+           ACTION BUTTONS
+           --------------------------------------------------------- */
+
+        #applicationsTable .btn-outline-primary {
+            color: var(--kism-magenta);
+            border-color: var(--kism-magenta);
+        }
+
+        #applicationsTable .btn-outline-primary:hover {
+            background-color: var(--kism-magenta);
+            border-color: var(--kism-magenta);
+            color: #ffffff;
+        }
+
+        #applicationsTable .btn {
+            border-radius: 0.45rem;
+        }
+
+        /* ---------------------------------------------------------
+           MODALS
+           --------------------------------------------------------- */
+
+        .kism-modal-header {
+            background-color: var(--kism-magenta);
+            color: #ffffff;
+            border-bottom: 4px solid var(--kism-yellow);
+            padding: 1rem 1.25rem;
+        }
+
+        .modal-content {
+            border-radius: 1rem !important;
+        }
+
+        /* ---------------------------------------------------------
+           DATATABLES
+           --------------------------------------------------------- */
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1rem;
+        }
+
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 0.375rem 0.65rem;
+            outline: none;
+        }
+
+        .dataTables_wrapper .dataTables_filter input:focus,
+        .dataTables_wrapper .dataTables_length select:focus {
+            border-color: var(--kism-magenta);
+            box-shadow: 0 0 0 0.15rem rgba(216, 0, 184, 0.12);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--kism-magenta) !important;
+            border-color: var(--kism-magenta) !important;
+            color: #ffffff !important;
+            border-radius: 0.4rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--kism-magenta) !important;
+            border-color: var(--kism-magenta) !important;
+            color: #ffffff !important;
+        }
+
+        /* ---------------------------------------------------------
+           RESPONSIVE
+           --------------------------------------------------------- */
+
+        @@media (max-width: 767.98px) {
+
+            .card-body {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .card-header {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            #applicationsTable tbody td {
+                font-size: 0.85rem;
+            }
+
+            .modal-body {
+                padding: 1rem !important;
+            }
+        }
+
+    </style>
+}
+
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+
+            /* =====================================================
+               DATATABLE
+               ===================================================== */
+
+            const applicationsTable = $('#applicationsTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, 'All']
+                ],
+
+                order: [[8, 'desc']],
+
+                columnDefs: [
+                    {
+                        targets: 9,
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+
+                language: {
+                    search: '',
+                    searchPlaceholder: 'Search applications...',
+                    lengthMenu: 'Show _MENU_',
+                    emptyTable: 'No applications found.',
+                    zeroRecords: 'No matching applications found.'
+                }
+            });
+
+
+            /* =====================================================
+               BOOTSTRAP MODALS
+               ===================================================== */
+
+            const createModalElement =
+                document.getElementById('createApplicationModal');
+
+            const editModalElement =
+                document.getElementById('editApplicationModal');
+
+            const detailsModalElement =
+                document.getElementById('detailsApplicationModal');
+
+            const createModal =
+                bootstrap.Modal.getOrCreateInstance(createModalElement);
+
+            const editModal =
+                bootstrap.Modal.getOrCreateInstance(editModalElement);
+
+            const detailsModal =
+                bootstrap.Modal.getOrCreateInstance(detailsModalElement);
+
+
+            /* =====================================================
+               LOADING HTML
+               ===================================================== */
+
+            function getLoadingHtml(message) {
+
+                return `
+                    <div class="text-center py-5">
+                        <div class="spinner-border"
+                             role="status"
+                             style="color: #d800b8;">
+                        </div>
+
+                        <div class="small text-muted mt-3">
+                            ${message}
+                        </div>
+                    </div>
+                `;
+            }
+
+
+            /* =====================================================
+               CREATE APPLICATION
+               ===================================================== */
+
+            $('#btnCreateApplication').on('click', function () {
+
+                $('#createApplicationModalBody')
+                    .html(getLoadingHtml('Loading application form...'));
+
+                createModal.show();
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Application")',
+                    type: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+
+                    success: function (response) {
+                        $('#createApplicationModalBody').html(response);
+                    },
+
+                    error: function (xhr) {
+
+                        let message =
+                            'Unable to load the application form. Please try again.';
+
+                        if (xhr.responseJSON &&
+                            xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+
+                        $('#createApplicationModalBody').html(`
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                ${message}
+                            </div>
+                        `);
+                    }
+                });
+            });
+
+
+            /* =====================================================
+               CREATE FORM SUBMISSION
+               ===================================================== */
+
+            $(document).on(
+                'submit',
+                '#createApplicationForm',
+                function (event) {
+
+                    event.preventDefault();
+
+                    const form = this;
+
+                    if (!form.checkValidity()) {
+                        form.classList.add('was-validated');
+                        return;
+                    }
+
+                    const submitButton =
+                        $(form).find('[type="submit"]');
+
+                    const originalButtonHtml =
+                        submitButton.html();
+
+                    submitButton
+                        .prop('disabled', true)
+                        .html(`
+                            <span class="spinner-border spinner-border-sm me-2"
+                                  role="status"></span>
+                            Creating...
+                        `);
+
+                    $.ajax({
+                        url: $(form).attr('action'),
+                        type: 'POST',
+                        data: $(form).serialize(),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+
+                        success: function (response) {
+
+                            if (response.success) {
+
+                                createModal.hide();
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Application Created',
+                                    text: response.message,
+                                    confirmButtonColor: '#d800b8'
+                                }).then(function () {
+                                    window.location.reload();
+                                });
+
+                                return;
+                            }
+
+                            $('#createApplicationModalBody')
+                                .html(response);
+                        },
+
+                        error: function (xhr) {
+
+                            let message =
+                                'An error occurred while creating the application.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to Create Application',
+                                text: message,
+                                confirmButtonColor: '#d800b8'
+                            });
+
+                            submitButton
+                                .prop('disabled', false)
+                                .html(originalButtonHtml);
+                        }
+                    });
+                }
+            );
+
+
+            /* =====================================================
+               VIEW APPLICATION
+               ===================================================== */
+
+            $(document).on(
+                'click',
+                '.btn-view-application',
+                function () {
+
+                    const id = $(this).data('id');
+
+                    $('#detailsApplicationModalBody')
+                        .html(getLoadingHtml(
+                            'Loading application details...'
+                        ));
+
+                    detailsModal.show();
+
+                    $.ajax({
+                        url:
+                            '@Url.Action("Details", "Application")'
+                            + '?id=' + id,
+
+                        type: 'GET',
+
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+
+                        success: function (response) {
+                            $('#detailsApplicationModalBody')
+                                .html(response);
+                        },
+
+                        error: function (xhr) {
+
+                            let message =
+                                'Unable to load application details.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            $('#detailsApplicationModalBody')
+                                .html(`
+                                    <div class="alert alert-danger">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        ${message}
+                                    </div>
+                                `);
+                        }
+                    });
+                }
+            );
+
+
+            /* =====================================================
+               EDIT APPLICATION
+               ===================================================== */
+
+            $(document).on(
+                'click',
+                '.btn-edit-application',
+                function () {
+
+                    const id = $(this).data('id');
+
+                    $('#editApplicationModalBody')
+                        .html(getLoadingHtml(
+                            'Loading application...'
+                        ));
+
+                    editModal.show();
+
+                    $.ajax({
+                        url:
+                            '@Url.Action("Edit", "Application")'
+                            + '?id=' + id,
+
+                        type: 'GET',
+
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+
+                        success: function (response) {
+                            $('#editApplicationModalBody')
+                                .html(response);
+                        },
+
+                        error: function (xhr) {
+
+                            let message =
+                                'Unable to load the application.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            $('#editApplicationModalBody')
+                                .html(`
+                                    <div class="alert alert-danger">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        ${message}
+                                    </div>
+                                `);
+                        }
+                    });
+                }
+            );
+
+
+            /* =====================================================
+               EDIT FORM SUBMISSION
+               ===================================================== */
+
+            $(document).on(
+                'submit',
+                '#editApplicationForm',
+                function (event) {
+
+                    event.preventDefault();
+
+                    const form = this;
+
+                    if (!form.checkValidity()) {
+                        form.classList.add('was-validated');
+                        return;
+                    }
+
+                    const submitButton =
+                        $(form).find('[type="submit"]');
+
+                    const originalButtonHtml =
+                        submitButton.html();
+
+                    submitButton
+                        .prop('disabled', true)
+                        .html(`
+                            <span class="spinner-border spinner-border-sm me-2"
+                                  role="status"></span>
+                            Saving...
+                        `);
+
+                    $.ajax({
+                        url: $(form).attr('action'),
+                        type: 'POST',
+                        data: $(form).serialize(),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+
+                        success: function (response) {
+
+                            if (response.success) {
+
+                                editModal.hide();
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Application Updated',
+                                    text: response.message,
+                                    confirmButtonColor: '#d800b8'
+                                }).then(function () {
+                                    window.location.reload();
+                                });
+
+                                return;
+                            }
+
+                            $('#editApplicationModalBody')
+                                .html(response);
+                        },
+
+                        error: function (xhr) {
+
+                            let message =
+                                'An error occurred while updating the application.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to Update Application',
+                                text: message,
+                                confirmButtonColor: '#d800b8'
+                            });
+
+                            submitButton
+                                .prop('disabled', false)
+                                .html(originalButtonHtml);
+                        }
+                    });
+                }
+            );
+
+
+            /* =====================================================
+               SUBMIT APPLICATION
+               ===================================================== */
+
+            $(document).on(
+                'click',
+                '.btn-submit-application',
+                function () {
+
+                    const button = $(this);
+
+                    const id = button.data('id');
+                    const number = button.data('number');
+
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Submit Application?',
+                        html: `
+                            <div class="text-center">
+                                <p class="mb-2">
+                                    You are about to submit:
+                                </p>
+
+                                <div class="fw-bold"
+                                     style="color: #d800b8;">
+                                    ${number}
+                                </div>
+
+                                <p class="small text-muted mt-3 mb-0">
+                                    Once submitted, the application will
+                                    enter the review process and can no
+                                    longer be edited.
+                                </p>
+                            </div>
+                        `,
+
+                        showCancelButton: true,
+
+                        confirmButtonText:
+                            '<i class="bi bi-send me-1"></i> Submit Application',
+
+                        cancelButtonText:
+                            'Cancel',
+
+                        confirmButtonColor:
+                            '#d800b8',
+
+                        reverseButtons: true
+                    }).then(function (result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        button
+                            .prop('disabled', true)
+                            .html(`
+                                <span class="spinner-border spinner-border-sm"
+                                      role="status"></span>
+                            `);
+
+                        $.ajax({
+                            url:
+                                '@Url.Action("Submit", "Application")'
+                                + '?id=' + id,
+
+                            type: 'POST',
+
+                            headers: {
+                                'X-Requested-With':
+                                    'XMLHttpRequest'
+                            },
+
+                            data: {
+                                __RequestVerificationToken:
+                                    $('input[name="__RequestVerificationToken"]')
+                                        .first()
+                                        .val()
+                            },
+
+                            success: function (response) {
+
+                                if (response.success) {
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Application Submitted',
+                                        text: response.message,
+                                        confirmButtonColor:
+                                            '#d800b8'
+                                    }).then(function () {
+                                        window.location.reload();
+                                    });
+
+                                    return;
+                                }
+
+                                button
+                                    .prop('disabled', false)
+                                    .html(
+                                        '<i class="bi bi-send"></i>'
+                                    );
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Unable to Submit',
+                                    text:
+                                        response.message ||
+                                        'The application could not be submitted.',
+                                    confirmButtonColor:
+                                        '#d800b8'
+                                });
+                            },
+
+                            error: function (xhr) {
+
+                                button
+                                    .prop('disabled', false)
+                                    .html(
+                                        '<i class="bi bi-send"></i>'
+                                    );
+
+                                let message =
+                                    'An error occurred while submitting the application.';
+
+                                if (xhr.responseJSON &&
+                                    xhr.responseJSON.message) {
+                                    message =
+                                        xhr.responseJSON.message;
+                                }
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Submission Failed',
+                                    text: message,
+                                    confirmButtonColor:
+                                        '#d800b8'
+                                });
+                            }
+                        });
+                    });
+                }
+            );
+
+
+            /* =====================================================
+               TEMP DATA / SERVER MESSAGES
+               ===================================================== */
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonColor: '#d800b8'
+                });
+                </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unable to Continue',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonColor: '#d800b8'
+                });
+                </text>
+            }
+
+        });
+    </script>
+}

@@ -1,0 +1,2005 @@
+@model KISMApplicationManagement.Models.CommitteeSittingViewModels.CommitteeSittingManagementViewModel
+
+@{
+    ViewData["Title"] = "Manage Committee Applications";
+}
+
+<style>
+    .kism-page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .kism-page-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: .25rem;
+    }
+
+    .kism-page-subtitle {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .btn-kism {
+        background-color: #d800b8;
+        border-color: #d800b8;
+        color: #fff;
+    }
+
+    .btn-kism:hover,
+    .btn-kism:focus {
+        background-color: #ad0093;
+        border-color: #ad0093;
+        color: #fff;
+    }
+
+    .btn-kism-outline {
+        background-color: transparent;
+        border: 1px solid #d800b8;
+        color: #d800b8;
+    }
+
+    .btn-kism-outline:hover,
+    .btn-kism-outline:focus {
+        background-color: #d800b8;
+        border-color: #d800b8;
+        color: #fff;
+    }
+
+    .kism-card {
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .06);
+        overflow: hidden;
+    }
+
+    .kism-card .card-header {
+        background: #fff;
+        border-bottom: 1px solid #f1f1f1;
+        padding: 1rem 1.25rem;
+    }
+
+    .kism-card .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .kism-card .card-body {
+        padding: 1.25rem;
+    }
+
+    .summary-item {
+        padding: .75rem 0;
+    }
+
+    .summary-label {
+        display: block;
+        font-size: .78rem;
+        font-weight: 600;
+        color: #8a8a8a;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: .2rem;
+    }
+
+    .summary-value {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .summary-value.reference {
+        color: #d800b8;
+        font-size: 1.05rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .45rem .75rem;
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 600;
+    }
+
+    .status-scheduled {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-progress {
+        background: #e7f1ff;
+        color: #0b5ed7;
+    }
+
+    .status-completed {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .kism-alert {
+        border: 0;
+        border-left: 4px solid #d800b8;
+        background: #fff8fe;
+        color: #555;
+        border-radius: 8px;
+    }
+
+    .selection-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .selection-actions {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex-wrap: wrap;
+    }
+
+    .selection-count {
+        background: #d800b8;
+        color: #fff;
+        border-radius: 999px;
+        padding: .3rem .65rem;
+        font-size: .75rem;
+        font-weight: 600;
+    }
+
+    .table thead th {
+        white-space: nowrap;
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: #666;
+        background: #fafafa;
+        border-bottom: 1px solid #e9e9e9;
+    }
+
+    .table tbody td {
+        vertical-align: middle;
+    }
+
+    .application-number {
+        font-weight: 700;
+        color: #d800b8;
+    }
+
+    .applicant-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .programme-choice {
+        display: block;
+        font-size: .82rem;
+        margin-bottom: .2rem;
+    }
+
+    .programme-choice:last-child {
+        margin-bottom: 0;
+    }
+
+    .choice-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #edff0f;
+        color: #333;
+        font-size: .7rem;
+        font-weight: 700;
+        margin-right: .3rem;
+    }
+
+    .decision-badge {
+        display: inline-block;
+        padding: .35rem .65rem;
+        border-radius: 999px;
+        font-size: .74rem;
+        font-weight: 600;
+    }
+
+    .decision-recommended {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .decision-not-recommended {
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .decision-deferred {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .decision-pending {
+        background: #e9ecef;
+        color: #495057;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        color: #d800b8;
+        margin-bottom: .75rem;
+    }
+
+    .completed-banner {
+        border: 1px solid #badbcc;
+        background: #f0fff5;
+        color: #0f5132;
+        border-radius: 10px;
+        padding: .85rem 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .completed-banner i {
+        margin-right: .4rem;
+    }
+
+    .dt-buttons {
+        margin-bottom: .75rem;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        padding: .4rem .65rem;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        padding: .35rem 1.8rem .35rem .5rem;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #d800b8 !important;
+        border-color: #d800b8 !important;
+        color: #fff !important;
+        border-radius: 6px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #ad0093 !important;
+        border-color: #ad0093 !important;
+        color: #fff !important;
+    }
+
+    .btn-complete {
+        background-color: #198754;
+        border-color: #198754;
+        color: #fff;
+    }
+
+    .btn-complete:hover,
+    .btn-complete:focus {
+        background-color: #157347;
+        border-color: #146c43;
+        color: #fff;
+    }
+
+    @@media (max-width: 768px) {
+        .kism-page-header .d-flex {
+            align-items: flex-start !important;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .selection-toolbar {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .selection-actions {
+            width: 100%;
+        }
+
+        .selection-actions .btn {
+            flex: 1 1 auto;
+        }
+    }
+</style>
+
+<div class="container-fluid py-3">
+
+    <!-- ========================================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="kism-page-header">
+        <div class="d-flex justify-content-between align-items-center gap-3">
+
+            <div>
+                <h2 class="kism-page-title">
+                    <i class="bi bi-people-fill me-2"
+                       style="color:#d800b8;"></i>
+                    Manage Committee Applications
+                </h2>
+
+                <p class="kism-page-subtitle">
+                    Manage the applications assigned to this committee sitting.
+                </p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                <a asp-controller="CommitteeSittings"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Back
+                </a>
+
+                @if (Model.Status == "Scheduled" &&
+                     Model.ApplicationCount > 0)
+                {
+                    <button type="button"
+                            class="btn btn-kism"
+                            id="btnStartSitting">
+                        <i class="bi bi-play-circle me-1"></i>
+                        Start Sitting
+                    </button>
+                }
+
+                @if (Model.Status == "In Progress")
+                {
+                    <a asp-controller="CommitteeWorkbench"
+                       asp-action="Index"
+                       asp-route-committeeSittingId="@Model.CommitteeSittingId"
+                       asp-route-position="1"
+                       class="btn btn-kism">
+                        <i class="bi bi-display me-1"></i>
+                        Open Workbench
+                    </a>
+
+                    <button type="button"
+                            class="btn btn-complete"
+                            id="btnCompleteSitting">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Complete Sitting
+                    </button>
+                }
+
+                @if (Model.Status == "Completed")
+                {
+                    <span class="status-badge status-completed">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Sitting Completed
+                    </span>
+                }
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- COMPLETED BANNER -->
+    <!-- ========================================================= -->
+
+    @if (Model.Status == "Completed")
+    {
+        <div class="completed-banner">
+            <i class="bi bi-lock-fill"></i>
+            <strong>This committee sitting has been completed.</strong>
+            Application membership and committee decisions are now read-only.
+        </div>
+    }
+
+    <!-- ========================================================= -->
+    <!-- SITTING SUMMARY -->
+    <!-- ========================================================= -->
+
+    <div class="card kism-card mb-4">
+
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h5>
+                    <i class="bi bi-calendar-event me-2"
+                       style="color:#d800b8;"></i>
+                    Sitting Summary
+                </h5>
+
+                <div>
+
+                    @if (Model.Status == "Scheduled")
+                    {
+                        <span class="status-badge status-scheduled">
+                            <i class="bi bi-clock"></i>
+                            Scheduled
+                        </span>
+                    }
+                    else if (Model.Status == "In Progress")
+                    {
+                        <span class="status-badge status-progress">
+                            <i class="bi bi-play-circle-fill"></i>
+                            In Progress
+                        </span>
+                    }
+                    else if (Model.Status == "Completed")
+                    {
+                        <span class="status-badge status-completed">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Completed
+                        </span>
+                    }
+                    else if (Model.Status == "Cancelled")
+                    {
+                        <span class="status-badge status-cancelled">
+                            <i class="bi bi-x-circle-fill"></i>
+                            Cancelled
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="status-badge bg-secondary-subtle text-secondary">
+                            @Model.Status
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <span class="summary-label">
+                            Reference Number
+                        </span>
+
+                        <span class="summary-value reference">
+                            @Model.ReferenceNumber
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <span class="summary-label">
+                            Sitting Date
+                        </span>
+
+                        <span class="summary-value">
+                            @Model.SittingDate.ToString("dd MMMM yyyy")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <span class="summary-label">
+                            Intake
+                        </span>
+
+                        <span class="summary-value">
+                            @Model.IntakeName
+                        </span>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.AcademicYear) ||
+                             !string.IsNullOrWhiteSpace(Model.IntakePeriod))
+                        {
+                            <small class="text-muted d-block mt-1">
+                                @Model.AcademicYear
+                                @if (!string.IsNullOrWhiteSpace(Model.AcademicYear) &&
+                                     !string.IsNullOrWhiteSpace(Model.IntakePeriod))
+                                {
+                                    <span> • </span>
+                                }
+                                @Model.IntakePeriod
+                            </small>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="summary-item">
+                        <span class="summary-label">
+                            Applications
+                        </span>
+
+                        <span class="summary-value">
+                            @Model.ApplicationCount
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- REMARKS -->
+    <!-- ========================================================= -->
+
+    @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+    {
+        <div class="alert kism-alert mb-4">
+            <div class="d-flex">
+                <i class="bi bi-info-circle-fill me-2 mt-1"
+                   style="color:#d800b8;"></i>
+
+                <div>
+                    <strong>Committee Remarks</strong>
+
+                    <div class="mt-1">
+                        @Model.Remarks
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ========================================================= -->
+    <!-- ELIGIBLE APPLICATIONS -->
+    <!-- ========================================================= -->
+
+    @if (Model.Status == "Scheduled")
+    {
+        <div class="card kism-card mb-4">
+
+            <div class="card-header">
+
+                <div class="d-flex justify-content-between align-items-center gap-3">
+
+                    <div>
+                        <h5>
+                            <i class="bi bi-person-plus-fill me-2"
+                               style="color:#d800b8;"></i>
+                            Eligible Applications
+                        </h5>
+
+                        <small class="text-muted">
+                            Select applications from this intake to add them to the committee sitting.
+                        </small>
+                    </div>
+
+                    <span class="badge rounded-pill text-bg-light">
+                        @Model.EligibleApplications.Count available
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                @if (Model.EligibleApplications.Any())
+                {
+                    <div class="selection-toolbar">
+
+                        <div class="selection-actions">
+
+                            <button type="button"
+                                    class="btn btn-sm btn-kism-outline"
+                                    id="btnSelectAll">
+                                <i class="bi bi-check2-square me-1"></i>
+                                Select All
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    id="btnClearSelection">
+                                <i class="bi bi-x-square me-1"></i>
+                                Clear
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-kism"
+                                    id="btnAddSelected"
+                                    disabled>
+                                <i class="bi bi-plus-circle me-1"></i>
+                                Add Selected
+                                <span class="selection-count ms-1"
+                                      id="selectedCountBadge">
+                                    0
+                                </span>
+                            </button>
+
+                        </div>
+
+                        <div class="small text-muted">
+                            Select one or more applications and add them to this sitting.
+                        </div>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle w-100"
+                               id="eligibleApplicationsTable">
+
+                            <thead>
+                                <tr>
+
+                                    <th style="width:40px;">
+                                        <div class="form-check">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   id="selectAllHeader"
+                                                   title="Select all applications">
+                                        </div>
+                                    </th>
+
+                                    <th>
+                                        Application
+                                    </th>
+
+                                    <th>
+                                        Applicant
+                                    </th>
+
+                                    <th>
+                                        Programme Choices
+                                    </th>
+
+                                    <th>
+                                        Submitted
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var application in Model.EligibleApplications)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input application-checkbox"
+                                                       type="checkbox"
+                                                       value="@application.ApplicationId"
+                                                       id="application_@application.ApplicationId">
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <span class="application-number">
+                                                @application.ApplicationNumber
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <span class="applicant-name">
+                                                @application.ApplicantName
+                                            </span>
+                                        </td>
+
+                                        <td>
+
+                                            @if (application.ProgrammeChoices.Any())
+                                            {
+                                                foreach (var choice in application.ProgrammeChoices)
+                                                {
+                                                    <span class="programme-choice">
+
+                                                        <span class="choice-number">
+                                                            @choice.ChoiceNumber
+                                                        </span>
+
+                                                        <strong>
+                                                            @choice.ProgrammeCode
+                                                        </strong>
+
+                                                        @if (!string.IsNullOrWhiteSpace(choice.ProgrammeName))
+                                                        {
+                                                            <span class="text-muted">
+                                                                — @choice.ProgrammeName
+                                                            </span>
+                                                        }
+
+                                                    </span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    No programme choices
+                                                </span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            @if (application.SubmittedAtUtc.HasValue)
+                                            {
+                                                <span>
+                                                    @application.SubmittedAtUtc.Value.ToLocalTime().ToString("dd MMM yyyy")
+                                                </span>
+
+                                                <small class="text-muted d-block">
+                                                    @application.SubmittedAtUtc.Value.ToLocalTime().ToString("HH:mm")
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-warning-subtle text-warning-emphasis">
+                                                @application.Status
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+
+                        <i class="bi bi-inbox"></i>
+
+                        <h5>
+                            No Eligible Applications
+                        </h5>
+
+                        <p class="mb-0">
+                            There are currently no pending-review applications available for this intake.
+                        </p>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+    <!-- ========================================================= -->
+    <!-- APPLICATIONS IN THIS SITTING -->
+    <!-- ========================================================= -->
+
+    <div class="card kism-card mb-4">
+
+        <div class="card-header">
+
+            <div class="d-flex justify-content-between align-items-center gap-3">
+
+                <div>
+                    <h5>
+                        <i class="bi bi-people me-2"
+                           style="color:#d800b8;"></i>
+                        Applications in This Sitting
+                    </h5>
+
+                    <small class="text-muted">
+                        Applications currently assigned to this committee sitting.
+                    </small>
+                </div>
+
+                <span class="badge rounded-pill text-bg-light">
+                    @Model.ApplicationCount
+                    @(Model.ApplicationCount == 1 ? "application" : "applications")
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            @if (Model.SittingApplications.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle w-100"
+                           id="sittingApplicationsTable">
+
+                        <thead>
+                            <tr>
+
+                                <th style="width:70px;">
+                                    #
+                                </th>
+
+                                <th>
+                                    Application
+                                </th>
+
+                                <th>
+                                    Applicant
+                                </th>
+
+                                <th>
+                                    Decision
+                                </th>
+
+                                @if (Model.Status == "Scheduled")
+                                {
+                                    <th style="width:100px;">
+                                        Action
+                                    </th>
+                                }
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var application in Model.SittingApplications.OrderBy(x => x.DisplayOrder))
+                            {
+                                <tr>
+
+                                    <td>
+                                        <span class="badge rounded-pill text-bg-light">
+                                            @application.DisplayOrder
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="application-number">
+                                            @application.ApplicationNumber
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="applicant-name">
+                                            @application.ApplicantName
+                                        </span>
+                                    </td>
+
+                                    <td>
+
+                                        @if (application.HasDecision &&
+                                             !string.IsNullOrWhiteSpace(application.Decision))
+                                        {
+                                            if (application.Decision == "Recommended for Admission")
+                                            {
+                                                <span class="decision-badge decision-recommended">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    @application.Decision
+                                                </span>
+                                            }
+                                            else if (application.Decision == "Not Recommended")
+                                            {
+                                                <span class="decision-badge decision-not-recommended">
+                                                    <i class="bi bi-x-circle me-1"></i>
+                                                    @application.Decision
+                                                </span>
+                                            }
+                                            else if (application.Decision == "Deferred")
+                                            {
+                                                <span class="decision-badge decision-deferred">
+                                                    <i class="bi bi-hourglass-split me-1"></i>
+                                                    @application.Decision
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="decision-badge decision-pending">
+                                                    @application.Decision
+                                                </span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="decision-badge decision-pending">
+                                                <i class="bi bi-clock me-1"></i>
+                                                Pending Decision
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    @if (Model.Status == "Scheduled")
+                                    {
+                                        <td>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger btn-remove-application"
+                                                    data-id="@application.CommitteeSittingApplicationId"
+                                                    title="Remove application">
+
+                                                <i class="bi bi-trash"></i>
+
+                                            </button>
+
+                                        </td>
+                                    }
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+
+                    <i class="bi bi-people"></i>
+
+                    <h5>
+                        No Applications Added
+                    </h5>
+
+                    @if (Model.Status == "Scheduled")
+                    {
+                        <p class="mb-0">
+                            Select applications from the eligible applications section above.
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="mb-0">
+                            No applications are currently assigned to this sitting.
+                        </p>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================================= -->
+<!-- ANTI-FORGERY TOKEN -->
+<!-- ============================================================= -->
+
+<form id="antiForgeryForm"
+      method="post"
+      class="d-none">
+
+    @Html.AntiForgeryToken()
+
+</form>
+
+@section Scripts
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            'use strict';
+
+            // =====================================================
+            // Configuration
+            // =====================================================
+
+            const committeeSittingId =
+                @Model.CommitteeSittingId;
+
+            const addApplicationsUrl =
+                '@Url.Action("AddApplications", "CommitteeSittings")';
+
+            const removeApplicationUrl =
+                '@Url.Action("RemoveApplication", "CommitteeSittings")';
+
+            const startSittingUrl =
+                '@Url.Action("Start", "CommitteeSittings")';
+
+            const completeSittingUrl =
+                '@Url.Action("Complete", "CommitteeSittings")';
+
+            const antiForgeryTokenElement =
+                document.querySelector(
+                    '#antiForgeryForm input[name="__RequestVerificationToken"]'
+                );
+
+            const antiForgeryToken =
+                antiForgeryTokenElement
+                    ? antiForgeryTokenElement.value
+                    : '';
+
+            // =====================================================
+            // DOM Elements
+            // =====================================================
+
+            const eligibleTable =
+                document.getElementById(
+                    'eligibleApplicationsTable'
+                );
+
+            const sittingTable =
+                document.getElementById(
+                    'sittingApplicationsTable'
+                );
+
+            const btnSelectAll =
+                document.getElementById(
+                    'btnSelectAll'
+                );
+
+            const btnClearSelection =
+                document.getElementById(
+                    'btnClearSelection'
+                );
+
+            const btnAddSelected =
+                document.getElementById(
+                    'btnAddSelected'
+                );
+
+            const selectedCountBadge =
+                document.getElementById(
+                    'selectedCountBadge'
+                );
+
+            const selectAllHeader =
+                document.getElementById(
+                    'selectAllHeader'
+                );
+
+            const btnStartSitting =
+                document.getElementById(
+                    'btnStartSitting'
+                );
+
+            const btnCompleteSitting =
+                document.getElementById(
+                    'btnCompleteSitting'
+                );
+
+            // =====================================================
+            // SweetAlert / Fallback
+            // =====================================================
+
+            function showAlert(
+                icon,
+                title,
+                text
+            ) {
+
+                if (window.Swal) {
+
+                    return Swal.fire({
+                        icon: icon,
+                        title: title,
+                        text: text,
+                        confirmButtonColor: '#d800b8'
+                    });
+
+                }
+
+                window.alert(
+                    title + '\n\n' + text
+                );
+
+                return Promise.resolve();
+            }
+
+            function confirmAction(options) {
+
+                if (window.Swal) {
+                    return Swal.fire(options);
+                }
+
+                const confirmed =
+                    window.confirm(
+                        options.text || options.title
+                    );
+
+                return Promise.resolve({
+                    isConfirmed: confirmed
+                });
+            }
+
+            // =====================================================
+            // Response Helper
+            // =====================================================
+
+            async function readJsonResponse(response) {
+
+                const contentType =
+                    response.headers.get(
+                        'content-type'
+                    ) || '';
+
+                if (contentType.includes('application/json')) {
+
+                    return await response.json();
+
+                }
+
+                const text =
+                    await response.text();
+
+                return {
+                    success: false,
+                    message:
+                        text ||
+                        'The server returned an unexpected response.'
+                };
+            }
+
+            // =====================================================
+            // POST Helper
+            // =====================================================
+
+            async function postForm(
+                url,
+                formData
+            ) {
+
+                if (!formData.has(
+                    '__RequestVerificationToken'
+                )) {
+
+                    formData.append(
+                        '__RequestVerificationToken',
+                        antiForgeryToken
+                    );
+
+                }
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        }
+                    );
+
+                const result =
+                    await readJsonResponse(
+                        response
+                    );
+
+                if (!response.ok &&
+                    result.success !== true) {
+
+                    throw new Error(
+                        result.message ||
+                        'The request could not be completed.'
+                    );
+
+                }
+
+                return result;
+            }
+
+            // =====================================================
+            // Selected Applications
+            // =====================================================
+
+            const selectedApplicationIds =
+                new Set();
+
+            const allEligibleApplicationIds =
+                Array.from(
+                    document.querySelectorAll(
+                        '.application-checkbox'
+                    )
+                ).map(function (checkbox) {
+                    return Number(
+                        checkbox.value
+                    );
+                })
+                .filter(function (id) {
+                    return id > 0;
+                });
+
+            function getVisibleCheckboxes() {
+
+                return Array.from(
+                    document.querySelectorAll(
+                        '.application-checkbox'
+                    )
+                );
+
+            }
+
+            function syncVisibleCheckboxes() {
+
+                const checkboxes =
+                    getVisibleCheckboxes();
+
+                checkboxes.forEach(
+                    function (checkbox) {
+
+                        const id =
+                            Number(
+                                checkbox.value
+                            );
+
+                        checkbox.checked =
+                            selectedApplicationIds.has(
+                                id
+                            );
+
+                    }
+                );
+
+                updateSelectionUI();
+            }
+
+            function updateSelectionUI() {
+
+                const selectedCount =
+                    selectedApplicationIds.size;
+
+                if (selectedCountBadge) {
+
+                    selectedCountBadge.textContent =
+                        selectedCount;
+                }
+
+                if (btnAddSelected) {
+
+                    btnAddSelected.disabled =
+                        selectedCount === 0;
+                }
+
+                const allSelected =
+                    allEligibleApplicationIds.length > 0 &&
+                    allEligibleApplicationIds.every(
+                        function (id) {
+                            return selectedApplicationIds.has(
+                                id
+                            );
+                        }
+                    );
+
+                if (selectAllHeader) {
+
+                    selectAllHeader.checked =
+                        allSelected;
+
+                    selectAllHeader.indeterminate =
+                        selectedCount > 0 &&
+                        !allSelected;
+                }
+
+            }
+
+            // =====================================================
+            // Individual Checkbox Selection
+            // =====================================================
+
+            document.addEventListener(
+                'change',
+                function (event) {
+
+                    if (!event.target.matches(
+                        '.application-checkbox'
+                    )) {
+                        return;
+                    }
+
+                    const checkbox =
+                        event.target;
+
+                    const applicationId =
+                        Number(
+                            checkbox.value
+                        );
+
+                    if (!applicationId) {
+                        return;
+                    }
+
+                    if (checkbox.checked) {
+
+                        selectedApplicationIds.add(
+                            applicationId
+                        );
+
+                    } else {
+
+                        selectedApplicationIds.delete(
+                            applicationId
+                        );
+
+                    }
+
+                    updateSelectionUI();
+
+                }
+            );
+
+            // =====================================================
+            // Select All
+            // =====================================================
+
+            if (btnSelectAll) {
+
+                btnSelectAll.addEventListener(
+                    'click',
+                    function () {
+
+                        allEligibleApplicationIds.forEach(
+                            function (id) {
+
+                                selectedApplicationIds.add(
+                                    id
+                                );
+
+                            }
+                        );
+
+                        syncVisibleCheckboxes();
+
+                    }
+                );
+
+            }
+
+            // =====================================================
+            // Clear Selection
+            // =====================================================
+
+            if (btnClearSelection) {
+
+                btnClearSelection.addEventListener(
+                    'click',
+                    function () {
+
+                        selectedApplicationIds.clear();
+
+                        syncVisibleCheckboxes();
+
+                    }
+                );
+
+            }
+
+            // =====================================================
+            // Header Select All
+            // =====================================================
+
+            if (selectAllHeader) {
+
+                selectAllHeader.addEventListener(
+                    'change',
+                    function () {
+
+                        if (selectAllHeader.checked) {
+
+                            allEligibleApplicationIds.forEach(
+                                function (id) {
+
+                                    selectedApplicationIds.add(
+                                        id
+                                    );
+
+                                }
+                            );
+
+                        } else {
+
+                            selectedApplicationIds.clear();
+
+                        }
+
+                        syncVisibleCheckboxes();
+
+                    }
+                );
+
+            }
+
+            // =====================================================
+            // Add Selected Applications
+            // =====================================================
+
+            if (btnAddSelected) {
+
+                btnAddSelected.addEventListener(
+                    'click',
+                    async function () {
+
+                        if (
+                            selectedApplicationIds.size === 0
+                        ) {
+                            await showAlert(
+                                'warning',
+                                'No Applications Selected',
+                                'Please select at least one application.'
+                            );
+
+                            return;
+                        }
+
+                        const selectedCount =
+                            selectedApplicationIds.size;
+
+                        const confirmation =
+                            await confirmAction({
+
+                                title:
+                                    'Add Applications?',
+
+                                text:
+                                    `Add ${selectedCount} selected application(s) to this committee sitting?`,
+
+                                icon:
+                                    'question',
+
+                                showCancelButton:
+                                    true,
+
+                                confirmButtonText:
+                                    'Yes, Add Applications',
+
+                                cancelButtonText:
+                                    'Cancel',
+
+                                confirmButtonColor:
+                                    '#d800b8',
+
+                                cancelButtonColor:
+                                    '#6c757d'
+
+                            });
+
+                        if (!confirmation.isConfirmed) {
+                            return;
+                        }
+
+                        const originalHtml =
+                            btnAddSelected.innerHTML;
+
+                        btnAddSelected.disabled =
+                            true;
+
+                        btnAddSelected.innerHTML =
+                            '<span class="spinner-border spinner-border-sm me-1"></span> Adding...';
+
+                        try {
+
+                            const formData =
+                                new FormData();
+
+                            formData.append(
+                                'CommitteeSittingId',
+                                committeeSittingId
+                            );
+
+                            selectedApplicationIds.forEach(
+                                function (id) {
+
+                                    formData.append(
+                                        'ApplicationIds',
+                                        id
+                                    );
+
+                                }
+                            );
+
+                            const result =
+                                await postForm(
+                                    addApplicationsUrl,
+                                    formData
+                                );
+
+                            if (!result.success) {
+
+                                throw new Error(
+                                    result.message ||
+                                    'Applications could not be added.'
+                                );
+
+                            }
+
+                            await showAlert(
+                                'success',
+                                'Applications Added',
+                                result.message
+                            );
+
+                            window.location.reload();
+
+                        } catch (error) {
+
+                            await showAlert(
+                                'error',
+                                'Unable to Add Applications',
+                                error.message ||
+                                'An unexpected error occurred.'
+                            );
+
+                            btnAddSelected.disabled =
+                                false;
+
+                            btnAddSelected.innerHTML =
+                                originalHtml;
+
+                            updateSelectionUI();
+
+                        }
+
+                    }
+                );
+
+            }
+
+            // =====================================================
+            // Remove Application
+            // =====================================================
+
+            document.addEventListener(
+                'click',
+                async function (event) {
+
+                    const button =
+                        event.target.closest(
+                            '.btn-remove-application'
+                        );
+
+                    if (!button) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const id =
+                        Number(
+                            button.dataset.id
+                        );
+
+                    if (!id) {
+                        return;
+                    }
+
+                    const confirmation =
+                        await confirmAction({
+
+                            title:
+                                'Remove Application?',
+
+                            text:
+                                'This application will be removed from the committee sitting.',
+
+                            icon:
+                                'warning',
+
+                            showCancelButton:
+                                true,
+
+                            confirmButtonText:
+                                'Yes, Remove',
+
+                            cancelButtonText:
+                                'Cancel',
+
+                            confirmButtonColor:
+                                '#dc3545',
+
+                            cancelButtonColor:
+                                '#6c757d'
+
+                        });
+
+                    if (!confirmation.isConfirmed) {
+                        return;
+                    }
+
+                    const originalHtml =
+                        button.innerHTML;
+
+                    button.disabled =
+                        true;
+
+                    button.innerHTML =
+                        '<span class="spinner-border spinner-border-sm"></span>';
+
+                    try {
+
+                        const formData =
+                            new FormData();
+
+                        formData.append(
+                            'id',
+                            id
+                        );
+
+                        const result =
+                            await postForm(
+                                removeApplicationUrl,
+                                formData
+                            );
+
+                        if (!result.success) {
+
+                            throw new Error(
+                                result.message ||
+                                'The application could not be removed.'
+                            );
+
+                        }
+
+                        await showAlert(
+                            'success',
+                            'Application Removed',
+                            result.message
+                        );
+
+                        window.location.reload();
+
+                    } catch (error) {
+
+                        await showAlert(
+                            'error',
+                            'Unable to Remove Application',
+                            error.message ||
+                            'An unexpected error occurred.'
+                        );
+
+                        button.disabled =
+                            false;
+
+                        button.innerHTML =
+                            originalHtml;
+
+                    }
+
+                }
+            );
+
+            // =====================================================
+            // Start Sitting
+            // =====================================================
+
+            if (btnStartSitting) {
+
+                btnStartSitting.addEventListener(
+                    'click',
+                    async function () {
+
+                        const confirmation =
+                            await confirmAction({
+
+                                title:
+                                    'Start Committee Sitting?',
+
+                                text:
+                                    'Once the sitting starts, applications can no longer be added or removed. The committee workbench will become active.',
+
+                                icon:
+                                    'warning',
+
+                                showCancelButton:
+                                    true,
+
+                                confirmButtonText:
+                                    'Yes, Start Sitting',
+
+                                cancelButtonText:
+                                    'Cancel',
+
+                                confirmButtonColor:
+                                    '#d800b8',
+
+                                cancelButtonColor:
+                                    '#6c757d'
+
+                            });
+
+                        if (!confirmation.isConfirmed) {
+                            return;
+                        }
+
+                        const originalHtml =
+                            btnStartSitting.innerHTML;
+
+                        btnStartSitting.disabled =
+                            true;
+
+                        btnStartSitting.innerHTML =
+                            '<span class="spinner-border spinner-border-sm me-1"></span> Starting...';
+
+                        try {
+
+                            const formData =
+                                new FormData();
+
+                            formData.append(
+                                'id',
+                                committeeSittingId
+                            );
+
+                            const result =
+                                await postForm(
+                                    startSittingUrl,
+                                    formData
+                                );
+
+                            if (!result.success) {
+
+                                throw new Error(
+                                    result.message ||
+                                    'The committee sitting could not be started.'
+                                );
+
+                            }
+
+                            await showAlert(
+                                'success',
+                                'Committee Sitting Started',
+                                result.message
+                            );
+
+                            window.location.reload();
+
+                        } catch (error) {
+
+                            await showAlert(
+                                'error',
+                                'Unable to Start Sitting',
+                                error.message ||
+                                'An unexpected error occurred.'
+                            );
+
+                            btnStartSitting.disabled =
+                                false;
+
+                            btnStartSitting.innerHTML =
+                                originalHtml;
+
+                        }
+
+                    }
+                );
+
+            }
+
+            // =====================================================
+            // Complete Sitting
+            // =====================================================
+
+            if (btnCompleteSitting) {
+
+                btnCompleteSitting.addEventListener(
+                    'click',
+                    async function () {
+
+                        const confirmation =
+                            await confirmAction({
+
+                                title:
+                                    'Complete Committee Sitting?',
+
+                                html:
+                                    'The committee sitting will be permanently closed for decision entry.<br><br><strong>Make sure every application has a committee decision.</strong>',
+
+                                icon:
+                                    'warning',
+
+                                showCancelButton:
+                                    true,
+
+                                confirmButtonText:
+                                    'Yes, Complete Sitting',
+
+                                cancelButtonText:
+                                    'Cancel',
+
+                                confirmButtonColor:
+                                    '#198754',
+
+                                cancelButtonColor:
+                                    '#6c757d'
+
+                            });
+
+                        if (!confirmation.isConfirmed) {
+                            return;
+                        }
+
+                        const originalHtml =
+                            btnCompleteSitting.innerHTML;
+
+                        btnCompleteSitting.disabled =
+                            true;
+
+                        btnCompleteSitting.innerHTML =
+                            '<span class="spinner-border spinner-border-sm me-1"></span> Completing...';
+
+                        try {
+
+                            const formData =
+                                new FormData();
+
+                            formData.append(
+                                'id',
+                                committeeSittingId
+                            );
+
+                            const result =
+                                await postForm(
+                                    completeSittingUrl,
+                                    formData
+                                );
+
+                            if (!result.success) {
+
+                                throw new Error(
+                                    result.message ||
+                                    'The committee sitting could not be completed.'
+                                );
+
+                            }
+
+                            await showAlert(
+                                'success',
+                                'Committee Sitting Completed',
+                                result.message
+                            );
+
+                            window.location.reload();
+
+                        } catch (error) {
+
+                            await showAlert(
+                                'error',
+                                'Unable to Complete Sitting',
+                                error.message ||
+                                'An unexpected error occurred.'
+                            );
+
+                            btnCompleteSitting.disabled =
+                                false;
+
+                            btnCompleteSitting.innerHTML =
+                                originalHtml;
+
+                        }
+
+                    }
+                );
+
+            }
+
+            // =====================================================
+            // DataTables
+            //
+            // DataTables is optional. The page remains functional
+            // even if jQuery/DataTables is not loaded.
+            // =====================================================
+
+            if (
+                window.jQuery &&
+                window.jQuery.fn &&
+                window.jQuery.fn.DataTable
+            ) {
+
+                const $ =
+                    window.jQuery;
+
+                if (eligibleTable) {
+
+                    const eligibleDataTable =
+                        $(eligibleTable).DataTable({
+
+                            pageLength: 10,
+
+                            lengthMenu: [
+                                [10, 25, 50, 100, -1],
+                                [10, 25, 50, 100, 'All']
+                            ],
+
+                            order: [
+                                [1, 'asc']
+                            ],
+
+                            columnDefs: [
+                                {
+                                    orderable: false,
+                                    searchable: false,
+                                    targets: 0
+                                }
+                            ],
+
+                            language: {
+                                search: '',
+                                searchPlaceholder:
+                                    'Search applications...',
+                                emptyTable:
+                                    'No eligible applications found.',
+                                zeroRecords:
+                                    'No matching applications found.'
+                            },
+
+                            drawCallback: function () {
+
+                                syncVisibleCheckboxes();
+
+                            }
+
+                        });
+
+                    $(eligibleTable).on(
+                        'draw.dt',
+                        function () {
+
+                            syncVisibleCheckboxes();
+
+                        }
+                    );
+
+                }
+
+                if (sittingTable) {
+
+                    $(sittingTable).DataTable({
+
+                        pageLength: 10,
+
+                        lengthMenu: [
+                            [10, 25, 50, 100, -1],
+                            [10, 25, 50, 100, 'All']
+                        ],
+
+                        order: [
+                            [0, 'asc']
+                        ],
+
+                        language: {
+                            search: '',
+                            searchPlaceholder:
+                                'Search applications...',
+                            emptyTable:
+                                'No applications in this sitting.',
+                            zeroRecords:
+                                'No matching applications found.'
+                        }
+
+                    });
+
+                }
+
+            }
+
+            // =====================================================
+            // Initial UI State
+            // =====================================================
+
+            syncVisibleCheckboxes();
+
+        });
+    </script>
+}

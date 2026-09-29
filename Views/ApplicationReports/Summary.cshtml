@@ -1,0 +1,1007 @@
+@model KISMApplicationManagement.Models.ReportViewModels.ApplicationSummaryReportViewModel
+
+@{
+    ViewData["Title"] = "Application Summary Report";
+}
+
+<style>
+    .kism-report-header {
+        background: linear-gradient(
+            135deg,
+            #d800b8 0%,
+            #ad0093 100%
+        );
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 24px rgba(216, 0, 184, 0.15);
+    }
+
+    .kism-report-header h2 {
+        margin: 0 0 5px;
+        font-weight: 700;
+    }
+
+    .kism-report-header p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .kism-filter-card {
+        border: 1px solid #e7e8ef;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 4px 18px rgba(31, 35, 45, 0.05);
+        margin-bottom: 20px;
+    }
+
+    .kism-filter-card .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #eeeeee;
+        padding: 15px 18px;
+        font-weight: 700;
+    }
+
+    .kism-stat-card {
+        border: 1px solid #e7e8ef;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 4px 18px rgba(31, 35, 45, 0.05);
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .kism-stat-card .stat-content {
+        padding: 20px;
+    }
+
+    .kism-stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 11px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(216, 0, 184, 0.09);
+        color: #d800b8;
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+    }
+
+    .kism-stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #30323d;
+        line-height: 1;
+    }
+
+    .kism-stat-label {
+        color: #858999;
+        font-size: 0.82rem;
+        margin-top: 7px;
+        font-weight: 600;
+    }
+
+    .kism-report-card {
+        border: 1px solid #e7e8ef;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 4px 18px rgba(31, 35, 45, 0.05);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .kism-report-card-header {
+        padding: 16px 18px;
+        border-bottom: 1px solid #eeeeee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .kism-report-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #30323d;
+    }
+
+    .kism-report-card-body {
+        padding: 18px;
+    }
+
+    .kism-status-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 50px;
+        padding: 5px 10px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .kism-status-draft {
+        background: #f0f1f5;
+        color: #646978;
+    }
+
+    .kism-status-pending {
+        background: #fff7d6;
+        color: #806600;
+    }
+
+    .kism-status-passed {
+        background: #e7f8ee;
+        color: #19733f;
+    }
+
+    .kism-status-failed {
+        background: #fde8ec;
+        color: #a72b42;
+    }
+
+    .kism-status-default {
+        background: #f1e7f5;
+        color: #7d2870;
+    }
+
+    .kism-table thead th {
+        background: #fafafd;
+        color: #555a6c;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .kism-table tbody td {
+        vertical-align: middle;
+    }
+
+    .kism-programme-code {
+        font-size: 0.75rem;
+        color: #858999;
+        font-weight: 700;
+    }
+
+    .kism-report-note {
+        background: #fff8fe;
+        border-left: 4px solid #d800b8;
+        border-radius: 8px;
+        padding: 12px 15px;
+        color: #555a6c;
+        font-size: 0.88rem;
+    }
+
+    .btn-kism-outline {
+        border: 1px solid #d800b8;
+        color: #d800b8;
+        background: #ffffff;
+        font-weight: 600;
+    }
+
+    .btn-kism-outline:hover {
+        background: #d800b8;
+        border-color: #d800b8;
+        color: #ffffff;
+    }
+
+    @@media print {
+
+        .kism-sidebar,
+        .kism-topbar,
+        .kism-footer,
+        .kism-sidebar-overlay,
+        .kism-filter-card,
+        .dt-search,
+        .dt-length,
+        .dt-paging,
+        .dt-info,
+        .dt-buttons,
+        .no-print {
+            display: none !important;
+        }
+
+        .kism-main-wrapper {
+            margin-left: 0 !important;
+        }
+
+        .kism-main {
+            padding: 0 !important;
+        }
+
+        .kism-report-header {
+            box-shadow: none;
+        }
+
+        .kism-report-card,
+        .kism-stat-card {
+            box-shadow: none;
+        }
+
+        body {
+            background: #ffffff !important;
+        }
+    }
+</style>
+
+
+<div class="container-fluid">
+
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+
+    <div class="kism-report-header">
+
+        <div class="d-flex flex-column flex-md-row
+                    align-items-md-center
+                    justify-content-between
+                    gap-3">
+
+            <div>
+
+                <h2>
+                    <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                    Application Summary Report
+                </h2>
+
+                <p>
+                    Overview of applications, current statuses and
+                    programme choices.
+                </p>
+
+            </div>
+
+            <div class="no-print">
+
+                <button type="button"
+                        class="btn btn-light"
+                        onclick="window.print()">
+
+                    <i class="bi bi-printer me-1"></i>
+
+                    Print Report
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         FILTERS
+         ============================================================ -->
+
+    <div class="card kism-filter-card no-print">
+
+        <div class="card-header">
+
+            <i class="bi bi-funnel me-2 text-primary"></i>
+
+            Report Filters
+
+        </div>
+
+        <div class="card-body">
+
+            <form asp-controller="ApplicationReports"
+                  asp-action="Summary"
+                  method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-5">
+
+                        <label for="intakeId"
+                               class="form-label fw-semibold">
+
+                            Intake
+
+                        </label>
+
+                        <select id="intakeId"
+                                name="intakeId"
+                                class="form-select">
+
+                            <option value="">
+                                All Intakes
+                            </option>
+
+                            @foreach (var intake in Model.IntakeOptions)
+                            {
+                                var selected =
+                                    Model.IntakeId == intake.IntakeId;
+
+                                <option value="@intake.IntakeId"
+                                        selected="@selected">
+
+                                    @intake.IntakeName
+                                    -
+                                    @intake.AcademicYear
+                                    -
+                                    @intake.IntakePeriod
+
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label for="status"
+                               class="form-label fw-semibold">
+
+                            Application Status
+
+                        </label>
+
+                        <select id="status"
+                                name="status"
+                                class="form-select">
+
+                            <option value="">
+                                All Statuses
+                            </option>
+
+                            <option value="Draft"
+                                    selected="@(Model.Status == "Draft")">
+
+                                Draft
+
+                            </option>
+
+                            <option value="Pending Review"
+                                    selected="@(Model.Status == "Pending Review")">
+
+                                Pending Review
+
+                            </option>
+
+                            <option value="Passed"
+                                    selected="@(Model.Status == "Passed")">
+
+                                Passed
+
+                            </option>
+
+                            <option value="Failed"
+                                    selected="@(Model.Status == "Failed")">
+
+                                Failed
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-kism-primary flex-grow-1">
+
+                                <i class="bi bi-search me-1"></i>
+
+                                Generate
+
+                            </button>
+
+                            <a asp-controller="ApplicationReports"
+                               asp-action="Summary"
+                               class="btn btn-kism-outline">
+
+                                <i class="bi bi-arrow-counterclockwise"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         SUMMARY CARDS
+         ============================================================ -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-xl-3">
+
+            <div class="kism-stat-card">
+
+                <div class="stat-content">
+
+                    <div class="kism-stat-icon">
+                        <i class="bi bi-files"></i>
+                    </div>
+
+                    <div class="kism-stat-value">
+                        @Model.TotalApplications
+                    </div>
+
+                    <div class="kism-stat-label">
+                        Total Applications
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-xl-3">
+
+            <div class="kism-stat-card">
+
+                <div class="stat-content">
+
+                    <div class="kism-stat-icon">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+
+                    <div class="kism-stat-value">
+                        @Model.DraftCount
+                    </div>
+
+                    <div class="kism-stat-label">
+                        Draft Applications
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-xl-3">
+
+            <div class="kism-stat-card">
+
+                <div class="stat-content">
+
+                    <div class="kism-stat-icon">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+
+                    <div class="kism-stat-value">
+                        @Model.PendingReviewCount
+                    </div>
+
+                    <div class="kism-stat-label">
+                        Pending Review
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-xl-3">
+
+            <div class="kism-stat-card">
+
+                <div class="stat-content">
+
+                    <div class="kism-stat-icon">
+                        <i class="bi bi-send-check"></i>
+                    </div>
+
+                    <div class="kism-stat-value">
+                        @Model.SubmittedCount
+                    </div>
+
+                    <div class="kism-stat-label">
+                        Submitted Applications
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         STATUS SUMMARY
+         ============================================================ -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-6">
+
+            <div class="kism-report-card h-100">
+
+                <div class="kism-report-card-header">
+
+                    <h5>
+                        <i class="bi bi-pie-chart me-2 text-primary"></i>
+                        Application Status
+                    </h5>
+
+                </div>
+
+                <div class="kism-report-card-body">
+
+                    @if (Model.StatusSummary.Any())
+                    {
+                        <div class="table-responsive">
+
+                            <table class="table kism-table mb-0">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Status
+                                        </th>
+
+                                        <th class="text-end">
+                                            Applications
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.StatusSummary)
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                @{
+                                                    var statusClass =
+                                                        item.Status switch
+                                                        {
+                                                            "Draft" =>
+                                                                "kism-status-draft",
+
+                                                            "Pending Review" =>
+                                                                "kism-status-pending",
+
+                                                            "Passed" =>
+                                                                "kism-status-passed",
+
+                                                            "Failed" =>
+                                                                "kism-status-failed",
+
+                                                            _ =>
+                                                                "kism-status-default"
+                                                        };
+                                                }
+
+                                                <span class="kism-status-badge @statusClass">
+
+                                                    @item.Status
+
+                                                </span>
+
+                                            </td>
+
+                                            <td class="text-end fw-bold">
+
+                                                @item.Count
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+
+                            <i class="bi bi-bar-chart fs-2 d-block mb-2"></i>
+
+                            No application data is available for the
+                            selected filters.
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================================
+             PROGRAMME SUMMARY
+             ======================================================== -->
+
+        <div class="col-lg-6">
+
+            <div class="kism-report-card h-100">
+
+                <div class="kism-report-card-header">
+
+                    <h5>
+                        <i class="bi bi-mortarboard me-2 text-primary"></i>
+                        Programme Choice Demand
+                    </h5>
+
+                </div>
+
+                <div class="kism-report-card-body">
+
+                    @if (Model.ProgrammeSummary.Any())
+                    {
+                        <div class="table-responsive">
+
+                            <table class="table kism-table mb-0">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Programme
+                                        </th>
+
+                                        <th class="text-end">
+                                            1st
+                                        </th>
+
+                                        <th class="text-end">
+                                            2nd
+                                        </th>
+
+                                        <th class="text-end">
+                                            Total
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var programme in
+                                        Model.ProgrammeSummary.Take(10))
+                                    {
+                                        <tr>
+
+                                            <td>
+
+                                                <div class="fw-semibold">
+                                                    @programme.ProgrammeName
+                                                </div>
+
+                                                <div class="kism-programme-code">
+                                                    @programme.ProgrammeCode
+                                                </div>
+
+                                            </td>
+
+                                            <td class="text-end">
+                                                @programme.FirstChoiceCount
+                                            </td>
+
+                                            <td class="text-end">
+                                                @programme.SecondChoiceCount
+                                            </td>
+
+                                            <td class="text-end fw-bold">
+                                                @programme.TotalChoiceCount
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        @if (Model.ProgrammeSummary.Count > 10)
+                        {
+                            <div class="text-muted small mt-2">
+                                Showing the top 10 programmes by
+                                total programme choices.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+
+                            <i class="bi bi-mortarboard fs-2 d-block mb-2"></i>
+
+                            No programme choice data is available.
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         REPORT INFORMATION
+         ============================================================ -->
+
+    <div class="kism-report-note mb-4">
+
+        <i class="bi bi-info-circle me-2"></i>
+
+        This report is generated from the current application records.
+        It does not modify applications, programme choices or committee
+        decisions.
+
+    </div>
+
+
+    <!-- ============================================================
+         APPLICATION REGISTER
+         ============================================================ -->
+
+    <div class="kism-report-card">
+
+        <div class="kism-report-card-header">
+
+            <h5>
+
+                <i class="bi bi-table me-2 text-primary"></i>
+
+                Application Register
+
+            </h5>
+
+            <span class="badge text-bg-light">
+
+                @Model.Applications.Count application(s)
+
+            </span>
+
+        </div>
+
+
+        <div class="kism-report-card-body">
+
+            <div class="table-responsive">
+
+                <table id="applicationSummaryTable"
+                       class="table table-striped table-hover
+                              table-bordered kism-table w-100">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Application No.
+                            </th>
+
+                            <th>
+                                Applicant
+                            </th>
+
+                            <th>
+                                Intake
+                            </th>
+
+                            <th>
+                                First Choice
+                            </th>
+
+                            <th>
+                                Second Choice
+                            </th>
+
+                            <th>
+                                Submitted
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var application in Model.Applications)
+                        {
+                            <tr>
+
+                                <td>
+                                    @application.ApplicationId
+                                </td>
+
+                                <td class="fw-semibold">
+
+                                    @application.ApplicationNumber
+
+                                </td>
+
+                                <td>
+
+                                    @application.ApplicantName
+
+                                </td>
+
+                                <td>
+
+                                    <div class="fw-semibold">
+
+                                        @application.IntakeName
+
+                                    </div>
+
+                                    <div class="small text-muted">
+
+                                        @application.AcademicYear
+                                        -
+                                        @application.IntakePeriod
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        application.FirstChoiceProgramme))
+                                    {
+                                        @application.FirstChoiceProgramme
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        application.SecondChoiceProgramme))
+                                    {
+                                        @application.SecondChoiceProgramme
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td data-order="@(
+                                    application.SubmittedAtUtc
+                                        ?.ToString("yyyy-MM-dd HH:mm")
+                                    ?? "")">
+
+                                    @if (application.SubmittedAtUtc.HasValue)
+                                    {
+                                        @application.SubmittedAtUtc.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Not submitted
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    @{
+                                        var statusClass =
+                                            application.Status switch
+                                            {
+                                                "Draft" =>
+                                                    "kism-status-draft",
+
+                                                "Pending Review" =>
+                                                    "kism-status-pending",
+
+                                                "Passed" =>
+                                                    "kism-status-passed",
+
+                                                "Failed" =>
+                                                    "kism-status-failed",
+
+                                                _ =>
+                                                    "kism-status-default"
+                                            };
+                                    }
+
+                                    <span class="kism-status-badge @statusClass">
+
+                                        @application.Status
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            if (window.jQuery &&
+                $.fn.DataTable &&
+                document.getElementById("applicationSummaryTable")) {
+
+                $("#applicationSummaryTable").DataTable({
+                    responsive: true,
+                    pageLength: 25,
+                    order: [[6, "desc"]],
+                    language: {
+                        emptyTable: "No applications found.",
+                        zeroRecords: "No matching applications found."
+                    }
+                });
+
+            }
+
+        });
+    </script>
+
+}

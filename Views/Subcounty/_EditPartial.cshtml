@@ -1,0 +1,197 @@
+@model KISMApplicationManagement.Models.Subcounty
+
+@using KISMApplicationManagement.Models
+
+@{
+    var counties =
+        ViewBag.Counties as IEnumerable<County>
+        ?? Enumerable.Empty<County>();
+}
+
+<form asp-action="Edit"
+      asp-controller="Subcounty"
+      asp-route-id="@Model.SubcountyId"
+      method="post"
+      id="editSubcountyForm">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden"
+           asp-for="SubcountyId" />
+
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         role="alert">
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- COUNTY -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label asp-for="CountyId"
+               class="form-label fw-semibold">
+
+            County
+
+        </label>
+
+        <select asp-for="CountyId"
+                class="form-select"
+                required>
+
+            <option value="">
+                Select county
+            </option>
+
+            @foreach (var county in counties)
+            {
+                <option value="@county.CountyId">
+
+                    @county.CountyNumber -
+                    @county.CountyName
+
+                </option>
+            }
+
+        </select>
+
+        <div class="form-text">
+
+            Select the county that this subcounty belongs to.
+
+        </div>
+
+        <span asp-validation-for="CountyId"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SUBCOUNTY NAME -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label asp-for="SubcountyName"
+               class="form-label fw-semibold">
+
+            Subcounty Name
+
+        </label>
+
+        <input asp-for="SubcountyName"
+               class="form-control"
+               placeholder="Enter subcounty name"
+               autocomplete="off"
+               maxlength="100"
+               required />
+
+        <span asp-validation-for="SubcountyName"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- STATUS -->
+    <!-- ========================================================= -->
+
+    <div class="form-check form-switch mb-3">
+
+        <input asp-for="IsActive"
+               class="form-check-input"
+               role="switch"
+               id="editSubcountyIsActive" />
+
+        <label class="form-check-label fw-semibold"
+               for="editSubcountyIsActive">
+
+            Active
+
+        </label>
+
+        <div class="form-text">
+
+            Active subcounties will be available for
+            selection in the application system.
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTIONS -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex justify-content-end gap-2 pt-2">
+
+        <button type="button"
+                class="btn btn-light border"
+                data-bs-dismiss="modal">
+
+            Cancel
+
+        </button>
+
+        <button type="submit"
+                class="btn btn-kism-primary"
+                id="editSubcountySubmit">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            Save Changes
+
+        </button>
+
+    </div>
+
+</form>
+
+
+<script>
+
+    (function () {
+
+        const form =
+            document.getElementById(
+                "editSubcountyForm"
+            );
+
+
+        if (!form) {
+
+            return;
+
+        }
+
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                if (!form.checkValidity()) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    form.classList.add(
+                        "was-validated"
+                    );
+
+                }
+
+            }
+        );
+
+    })();
+
+</script>

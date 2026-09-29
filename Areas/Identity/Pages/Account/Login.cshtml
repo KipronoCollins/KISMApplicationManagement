@@ -1,0 +1,472 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "/Areas/Identity/Pages/Shared/_Layout.cshtml";
+}
+
+<style>
+    :root {
+        --kism-primary: #d800b8;
+        --kism-primary-dark: #a90090;
+        --kism-accent: #edff0f;
+        --kism-dark: #202020;
+        --kism-muted: #6c757d;
+        --kism-light: #f7f7f9;
+    }
+
+    body {
+        background: var(--kism-light);
+    }
+
+    .kism-auth-page {
+        min-height: calc(100vh - 30px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 15px;
+    }
+
+    .kism-auth-container {
+        width: 100%;
+        max-width: 1050px;
+    }
+
+    .kism-auth-card {
+        background: #ffffff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+    }
+
+    .kism-brand-panel {
+        background: var(--kism-primary);
+        color: #ffffff;
+        min-height: 560px;
+        padding: 55px 45px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kism-brand-panel::before {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        border-radius: 50%;
+        background: var(--kism-accent);
+        opacity: 0.12;
+        top: -120px;
+        right: -100px;
+    }
+
+    .kism-brand-panel::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: var(--kism-accent);
+        opacity: 0.10;
+        bottom: -100px;
+        left: -80px;
+    }
+
+    .kism-brand-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .kism-logo {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 30px;
+        background: #ffffff;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .kism-brand-title {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 15px;
+    }
+
+    .kism-brand-subtitle {
+        font-size: 1rem;
+        line-height: 1.7;
+        opacity: 0.95;
+        margin-bottom: 30px;
+    }
+
+    .kism-accent-line {
+        width: 70px;
+        height: 5px;
+        background: var(--kism-accent);
+        border-radius: 10px;
+        margin-bottom: 25px;
+    }
+
+    .kism-brand-feature {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        font-size: 0.95rem;
+    }
+
+    .kism-feature-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--kism-accent);
+        color: var(--kism-dark);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .kism-form-panel {
+        min-height: 560px;
+        padding: 55px 50px;
+        display: flex;
+        align-items: center;
+    }
+
+    .kism-form-content {
+        width: 100%;
+        max-width: 440px;
+        margin: 0 auto;
+    }
+
+    .kism-form-title {
+        color: var(--kism-dark);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .kism-form-subtitle {
+        color: var(--kism-muted);
+        margin-bottom: 30px;
+    }
+
+    .kism-form-label {
+        font-weight: 600;
+        color: var(--kism-dark);
+        margin-bottom: 8px;
+    }
+
+    .kism-input {
+        min-height: 50px;
+        border: 1px solid #d9d9df;
+        border-radius: 10px;
+        padding: 12px 14px;
+        transition: all 0.2s ease;
+    }
+
+    .kism-input:focus {
+        border-color: var(--kism-primary);
+        box-shadow: 0 0 0 0.2rem rgba(216, 0, 184, 0.12);
+    }
+
+    .kism-password-wrapper {
+        position: relative;
+    }
+
+    .kism-password-wrapper .kism-input {
+        padding-right: 50px;
+    }
+
+    .kism-password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: var(--kism-muted);
+        cursor: pointer;
+        padding: 8px;
+    }
+
+    .kism-password-toggle:hover {
+        color: var(--kism-primary);
+    }
+
+    .kism-check {
+        accent-color: var(--kism-primary);
+    }
+
+    .kism-forgot-link {
+        color: var(--kism-primary);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .kism-forgot-link:hover {
+        color: var(--kism-primary-dark);
+        text-decoration: underline;
+    }
+
+    .kism-submit {
+        width: 100%;
+        min-height: 52px;
+        border: none;
+        border-radius: 10px;
+        background: var(--kism-primary);
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 700;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 16px rgba(216, 0, 184, 0.22);
+    }
+
+    .kism-submit:hover {
+        background: var(--kism-primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(216, 0, 184, 0.28);
+    }
+
+    .kism-register-box {
+        margin-top: 25px;
+        padding-top: 22px;
+        border-top: 1px solid #eeeeee;
+        text-align: center;
+        color: var(--kism-muted);
+    }
+
+    .kism-register-link {
+        color: var(--kism-primary);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .kism-register-link:hover {
+        color: var(--kism-primary-dark);
+        text-decoration: underline;
+    }
+
+    .kism-validation {
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    @@media (max-width: 767.98px) {
+        .kism-auth-page {
+            padding: 20px 12px;
+        }
+
+        .kism-brand-panel {
+            min-height: auto;
+            padding: 35px 30px;
+            text-align: center;
+        }
+
+        .kism-logo {
+            width: 100%;
+        }
+
+        .kism-brand-title {
+            font-size: 1.6rem;
+        }
+
+        .kism-accent-line {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .kism-brand-feature {
+            justify-content: center;
+        }
+
+        .kism-form-panel {
+            min-height: auto;
+            padding: 35px 25px;
+        }
+
+        .kism-form-title {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+<div class="kism-auth-page">
+    <div class="kism-auth-container">
+        <div class="kism-auth-card">
+            <div class="row g-0">
+
+                <!-- Branding -->
+                <div class="col-lg-6">
+                    <div class="kism-brand-panel">
+                        <div class="kism-brand-content">
+
+                            <img src="https://kism.ac.ke/wp-content/uploads/2021/07/new.png"
+                                 alt="KISM Logo"
+                                 class="kism-logo" />
+
+                            <div class="kism-accent-line"></div>
+
+                            <h1 class="kism-brand-title">
+                                KISM Application Management System
+                            </h1>
+
+                            <p class="kism-brand-subtitle">
+                                Welcome to the Kenya Institute of Surveying and Mapping
+                                online application portal.
+                            </p>
+
+                            <div class="kism-brand-feature">
+                                <span class="kism-feature-icon">✓</span>
+                                <span>Apply for KISM programmes online</span>
+                            </div>
+
+                            <div class="kism-brand-feature">
+                                <span class="kism-feature-icon">✓</span>
+                                <span>Manage your application securely</span>
+                            </div>
+
+                            <div class="kism-brand-feature">
+                                <span class="kism-feature-icon">✓</span>
+                                <span>Track your application status</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <div class="col-lg-6">
+                    <div class="kism-form-panel">
+                        <div class="kism-form-content">
+
+                            <h2 class="kism-form-title">Sign In</h2>
+
+                            <p class="kism-form-subtitle">
+                                Sign in to continue to your KISM account.
+                            </p>
+
+                            <form id="account" method="post">
+
+                                <div asp-validation-summary="ModelOnly"
+                                     class="alert alert-danger kism-validation"
+                                     role="alert">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Input.Email"
+                                           class="form-label kism-form-label">
+                                        Email or Username
+                                    </label>
+
+                                    <input asp-for="Input.Email"
+                                           class="form-control kism-input"
+                                           autocomplete="username"
+                                           placeholder="Enter your email or username" />
+
+                                    <span asp-validation-for="Input.Email"
+                                          class="text-danger">
+                                    </span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Input.Password"
+                                           class="form-label kism-form-label">
+                                        Password
+                                    </label>
+
+                                    <div class="kism-password-wrapper">
+                                        <input asp-for="Input.Password"
+                                               class="form-control kism-input"
+                                               autocomplete="current-password"
+                                               placeholder="Enter your password"
+                                               id="kismPassword" />
+
+                                        <button type="button"
+                                                class="kism-password-toggle"
+                                                id="togglePassword"
+                                                aria-label="Show password">
+                                            <span id="passwordIcon">Show</span>
+                                        </button>
+                                    </div>
+
+                                    <span asp-validation-for="Input.Password"
+                                          class="text-danger">
+                                    </span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="form-check">
+                                        <input asp-for="Input.RememberMe"
+                                               class="form-check-input kism-check" />
+
+                                        <label asp-for="Input.RememberMe"
+                                               class="form-check-label">
+                                            Remember me
+                                        </label>
+                                    </div>
+
+                                    <a asp-page="./ForgotPassword"
+                                       class="kism-forgot-link">
+                                        Forgot password?
+                                    </a>
+                                </div>
+
+                                <button id="login-submit"
+                                        type="submit"
+                                        class="kism-submit">
+                                    Sign In
+                                </button>
+
+                                <div class="kism-register-box">
+                                    <span>Don't have an account?</span>
+
+                                    <a asp-page="./Register"
+                                       asp-route-returnUrl="@Model.ReturnUrl"
+                                       class="kism-register-link">
+                                        Create an account
+                                    </a>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const passwordInput = document.getElementById("kismPassword");
+            const togglePassword = document.getElementById("togglePassword");
+            const passwordIcon = document.getElementById("passwordIcon");
+
+            if (passwordInput && togglePassword && passwordIcon) {
+                togglePassword.addEventListener("click", function () {
+                    const isPassword = passwordInput.type === "password";
+
+                    passwordInput.type = isPassword ? "text" : "password";
+                    passwordIcon.textContent = isPassword ? "Hide" : "Show";
+                    togglePassword.setAttribute(
+                        "aria-label",
+                        isPassword ? "Hide password" : "Show password"
+                    );
+                });
+            }
+        });
+    </script>
+}

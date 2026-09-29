@@ -1,0 +1,1013 @@
+@model IEnumerable<KISMApplicationManagement.Models.County>
+
+@{
+    ViewData["Title"] = "County Management";
+}
+
+@section Styles {
+
+    <style>
+
+        /* =========================================================
+           COUNTY DATATABLE BORDERS
+        ========================================================= */
+
+        #countiesTable {
+            border: 1px solid #dee2e6;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #countiesTable thead th {
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        #countiesTable thead th:last-child {
+            border-right: none;
+        }
+
+        #countiesTable tbody td {
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+        }
+
+        #countiesTable tbody td:last-child {
+            border-right: none;
+        }
+
+        #countiesTable tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        #countiesTable tbody tr:hover {
+            background-color: rgba(216, 0, 184, 0.03);
+        }
+
+        /* =========================================================
+           DATATABLE SEARCH / LENGTH CONTROLS
+        ========================================================= */
+
+        .dataTables_wrapper .dt-search input {
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: .45rem .75rem;
+        }
+
+        .dataTables_wrapper .dt-search input:focus {
+            border-color: #d800b8;
+            box-shadow: 0 0 0 .2rem rgba(216, 0, 184, .12);
+        }
+
+        .dataTables_wrapper .dt-length select {
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: .35rem 2rem .35rem .6rem;
+        }
+
+        /* =========================================================
+           DATATABLE PAGINATION
+        ========================================================= */
+
+        .dataTables_wrapper .dt-paging .pagination {
+            margin-bottom: 0;
+        }
+
+        /* =========================================================
+           MODALS
+        ========================================================= */
+
+        .modal-content {
+            border-radius: 14px;
+        }
+
+    </style>
+
+}
+
+
+<div class="container-fluid py-4">
+
+    <!-- ========================================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+
+            <h1 class="h3 fw-bold mb-1">
+
+                <i class="bi bi-map me-2"
+                   style="color:#d800b8;"></i>
+
+                County Management
+
+            </h1>
+
+            <p class="text-muted mb-0">
+                Manage counties used throughout the KISM
+                application system.
+            </p>
+
+        </div>
+
+        <button type="button"
+                class="btn btn-kism-primary"
+                id="btnCreateCounty">
+
+            <i class="bi bi-plus-circle me-1"></i>
+
+            Add County
+
+        </button>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SUCCESS MESSAGE -->
+    <!-- ========================================================= -->
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- COUNTY TABLE -->
+    <!-- ========================================================= -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-3 p-md-4">
+
+            <div class="table-responsive">
+
+                <table id="countiesTable"
+                       class="table table-hover align-middle w-100">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                No.
+                            </th>
+
+                            <th>
+                                County Name
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th class="text-end">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var county in Model)
+                        {
+                            <tr>
+
+                                <td class="fw-semibold">
+                                    @county.CountyNumber
+                                </td>
+
+                                <td>
+                                    @county.CountyName
+                                </td>
+
+                                <td>
+
+                                    @if (county.IsActive)
+                                    {
+                                        <span class="badge bg-success-subtle
+                                                     text-success border
+                                                     border-success-subtle">
+
+                                            <i class="bi bi-check-circle me-1"></i>
+
+                                            Active
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle
+                                                     text-secondary border
+                                                     border-secondary-subtle">
+
+                                            <i class="bi bi-pause-circle me-1"></i>
+
+                                            Inactive
+
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    @county.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy")
+                                </td>
+
+                                <td class="text-end">
+
+                                    <div class="btn-group"
+                                         role="group"
+                                         aria-label="County actions">
+
+                                        <!-- EDIT -->
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-edit-county"
+                                                data-id="@county.CountyId"
+                                                title="Edit county">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                            <span class="visually-hidden">
+                                                Edit @county.CountyName
+                                            </span>
+
+                                        </button>
+
+
+                                        <!-- TOGGLE STATUS -->
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary btn-toggle-county"
+                                                data-id="@county.CountyId"
+                                                data-name="@county.CountyName"
+                                                data-active="@county.IsActive.ToString().ToLowerInvariant()"
+                                                title="Change county status">
+
+                                            @if (county.IsActive)
+                                            {
+                                                <i class="bi bi-toggle-on"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-toggle-off"></i>
+                                            }
+
+                                            <span class="visually-hidden">
+                                                Change status for @county.CountyName
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- CREATE COUNTY MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade"
+     id="createCountyModal"
+     tabindex="-1"
+     aria-labelledby="createCountyModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title fw-bold"
+                    id="createCountyModalLabel">
+
+                    <i class="bi bi-plus-circle me-2"
+                       style="color:#d800b8;"></i>
+
+                    Add County
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="createCountyModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         style="color:#d800b8;"
+                         role="status">
+
+                        <span class="visually-hidden">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- EDIT COUNTY MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade"
+     id="editCountyModal"
+     tabindex="-1"
+     aria-labelledby="editCountyModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title fw-bold"
+                    id="editCountyModalLabel">
+
+                    <i class="bi bi-pencil-square me-2"
+                       style="color:#d800b8;"></i>
+
+                    Edit County
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="editCountyModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         style="color:#d800b8;"
+                         role="status">
+
+                        <span class="visually-hidden">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            /* =====================================================
+               DATATABLE
+            ===================================================== */
+
+            $('#countiesTable').DataTable({
+
+                responsive: true,
+
+                pageLength: 10,
+
+                lengthMenu: [
+                    [10, 25, 47, -1],
+                    [10, 25, 47, 'All']
+                ],
+
+                order: [
+                    [0, 'asc']
+                ],
+
+                columnDefs: [
+
+                    {
+                        targets: 4,
+                        orderable: false,
+                        searchable: false
+                    }
+
+                ],
+
+                language: {
+
+                    search: "",
+
+                    searchPlaceholder:
+                        "Search counties..."
+
+                }
+
+            });
+
+
+            /* =====================================================
+               CREATE COUNTY
+            ===================================================== */
+
+            $('#btnCreateCounty').on('click', function () {
+
+                const modalElement =
+                    document.getElementById(
+                        'createCountyModal'
+                    );
+
+                const modal =
+                    bootstrap.Modal.getOrCreateInstance(
+                        modalElement
+                    );
+
+                $('#createCountyModalBody').html(`
+
+                    <div class="text-center py-4">
+
+                        <div class="spinner-border"
+                             style="color:#d800b8;"
+                             role="status">
+
+                            <span class="visually-hidden">
+                                Loading...
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                `);
+
+                modal.show();
+
+                $.get(
+                    '@Url.Action("Create", "County")'
+                )
+
+                .done(function (html) {
+
+                    $('#createCountyModalBody')
+                        .html(html);
+
+                })
+
+                .fail(function () {
+
+                    $('#createCountyModalBody').html(`
+
+                        <div class="alert alert-danger mb-0">
+
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                            Unable to load the county form.
+                            Please try again.
+
+                        </div>
+
+                    `);
+
+                });
+
+            });
+
+
+            /* =====================================================
+               EDIT COUNTY
+            ===================================================== */
+
+            $(document).on(
+                'click',
+                '.btn-edit-county',
+                function () {
+
+                    const id =
+                        $(this).data('id');
+
+                    const modalElement =
+                        document.getElementById(
+                            'editCountyModal'
+                        );
+
+                    const modal =
+                        bootstrap.Modal.getOrCreateInstance(
+                            modalElement
+                        );
+
+
+                    $('#editCountyModalBody').html(`
+
+                        <div class="text-center py-4">
+
+                            <div class="spinner-border"
+                                 style="color:#d800b8;"
+                                 role="status">
+
+                                <span class="visually-hidden">
+                                    Loading...
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    `);
+
+
+                    modal.show();
+
+
+                    const editUrl =
+                        '@Url.Action("Edit", "County")' +
+                        '/' +
+                        encodeURIComponent(id);
+
+
+                    $.get(editUrl)
+
+                    .done(function (html) {
+
+                        $('#editCountyModalBody')
+                            .html(html);
+
+                    })
+
+                    .fail(function () {
+
+                        $('#editCountyModalBody').html(`
+
+                            <div class="alert alert-danger mb-0">
+
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                                Unable to load the county form.
+                                Please try again.
+
+                            </div>
+
+                        `);
+
+                    });
+
+                });
+
+
+            /* =====================================================
+               CREATE / EDIT FORM SUBMISSION
+            ===================================================== */
+
+            $(document).on(
+                'submit',
+                '#createCountyForm, #editCountyForm',
+                function (event) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    const form = this;
+
+
+                    /* -------------------------------------------------
+                       CLIENT-SIDE VALIDATION
+                    ------------------------------------------------- */
+
+                    if (!form.checkValidity()) {
+
+                        form.classList.add(
+                            'was-validated'
+                        );
+
+                        return;
+
+                    }
+
+
+                    const submitButton =
+                        $(form).find(
+                            'button[type="submit"]'
+                        );
+
+
+                    const originalButtonHtml =
+                        submitButton.html();
+
+
+                    submitButton.prop(
+                        'disabled',
+                        true
+                    );
+
+
+                    submitButton.html(`
+
+                        <span class="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"></span>
+
+                        Saving...
+
+                    `);
+
+
+                    /* -------------------------------------------------
+                       AJAX POST
+                    ------------------------------------------------- */
+
+                    $.ajax({
+
+                        url: form.action,
+
+                        type: 'POST',
+
+                        data: $(form).serialize(),
+
+                        success: function (
+                            response,
+                            status,
+                            xhr
+                        ) {
+
+                            /*
+                             * Successful Create/Edit returns
+                             * the County Index page after the
+                             * controller redirect.
+                             */
+
+                            if (
+                                response &&
+                                response.indexOf(
+                                    'countiesTable'
+                                ) !== -1
+                            ) {
+
+                                const modalElement =
+                                    form.closest(
+                                        '.modal'
+                                    );
+
+
+                                const modal =
+                                    bootstrap.Modal
+                                        .getInstance(
+                                            modalElement
+                                        );
+
+
+                                if (modal) {
+
+                                    modal.hide();
+
+                                }
+
+
+                                /*
+                                 * Remove Bootstrap modal state.
+                                 */
+
+                                $('body')
+                                    .removeClass(
+                                        'modal-open'
+                                    );
+
+                                $('.modal-backdrop')
+                                    .remove();
+
+
+                                /*
+                                 * Go directly to County Index.
+                                 */
+
+                                window.location.replace(
+                                    '@Url.Action("Index", "County")'
+                                );
+
+                                return;
+
+                            }
+
+
+                            /* -------------------------------------------------
+                               SERVER-SIDE VALIDATION
+                            ------------------------------------------------- */
+
+                            if (
+                                form.id ===
+                                'createCountyForm'
+                            ) {
+
+                                $('#createCountyModalBody')
+                                    .html(response);
+
+                            }
+                            else {
+
+                                $('#editCountyModalBody')
+                                    .html(response);
+
+                            }
+
+                        },
+
+
+                        error: function (xhr) {
+
+                            /*
+                             * Server returned validation
+                             * HTML for Edit.
+                             */
+
+                            if (
+                                xhr.responseText &&
+                                xhr.responseText
+                                    .indexOf(
+                                        'editCountyForm'
+                                    ) !== -1
+                            ) {
+
+                                $('#editCountyModalBody')
+                                    .html(
+                                        xhr.responseText
+                                    );
+
+                                return;
+
+                            }
+
+
+                            /*
+                             * Server returned validation
+                             * HTML for Create.
+                             */
+
+                            if (
+                                xhr.responseText &&
+                                xhr.responseText
+                                    .indexOf(
+                                        'createCountyForm'
+                                    ) !== -1
+                            ) {
+
+                                $('#createCountyModalBody')
+                                    .html(
+                                        xhr.responseText
+                                    );
+
+                                return;
+
+                            }
+
+
+                            /* -------------------------------------------------
+                               SERVER ERROR
+                            ------------------------------------------------- */
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title:
+                                    'Unable to save county',
+
+                                text:
+                                    'The county could not be saved. Please try again.',
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+
+                            submitButton.prop(
+                                'disabled',
+                                false
+                            );
+
+
+                            submitButton.html(
+                                originalButtonHtml
+                            );
+
+                        }
+
+                    });
+
+                });
+
+
+            /* =====================================================
+               ACTIVATE / DEACTIVATE COUNTY
+            ===================================================== */
+
+            $(document).on(
+                'click',
+                '.btn-toggle-county',
+                function () {
+
+                    const button =
+                        $(this);
+
+
+                    const id =
+                        button.data('id');
+
+
+                    const name =
+                        button.data('name');
+
+
+                    const isActive =
+                        button.data('active') === true ||
+                        button.data('active') === 'true' ||
+                        button.data('active') === 'True';
+
+
+                    const escapedName =
+                        $('<div>')
+                            .text(name)
+                            .html();
+
+
+                    const title =
+                        isActive
+                            ? 'Deactivate County?'
+                            : 'Activate County?';
+
+
+                    const message =
+                        isActive
+
+                            ? `Are you sure you want to deactivate <strong>${escapedName}</strong>?`
+
+                            : `Are you sure you want to activate <strong>${escapedName}</strong>?`;
+
+
+                    Swal.fire({
+
+                        title: title,
+
+                        html: message,
+
+                        icon:
+                            isActive
+                                ? 'warning'
+                                : 'question',
+
+                        showCancelButton: true,
+
+                        confirmButtonText:
+                            isActive
+                                ? 'Yes, deactivate'
+                                : 'Yes, activate',
+
+                        cancelButtonText:
+                            'Cancel',
+
+                        confirmButtonColor:
+                            '#d800b8',
+
+                        cancelButtonColor:
+                            '#6c757d'
+
+                    }).then(function (result) {
+
+                        if (!result.isConfirmed) {
+
+                            return;
+
+                        }
+
+
+                        /* ---------------------------------------------
+                           POST FORM
+                        --------------------------------------------- */
+
+                        const form =
+                            $('<form>', {
+
+                                method: 'POST',
+
+                                action:
+                                    '@Url.Action("ToggleStatus", "County")'
+
+                            });
+
+
+                        /* ---------------------------------------------
+                           County ID
+                        --------------------------------------------- */
+
+                        form.append(
+                            $('<input>', {
+
+                                type: 'hidden',
+
+                                name: 'id',
+
+                                value: id
+
+                            })
+                        );
+
+
+                        /* ---------------------------------------------
+                           Anti-forgery token
+                        --------------------------------------------- */
+
+                        const token =
+                            $('input[name="__RequestVerificationToken"]')
+                                .first()
+                                .clone();
+
+
+                        if (token.length) {
+
+                            form.append(token);
+
+                        }
+
+
+                        $('body').append(form);
+
+                        form.submit();
+
+                    });
+
+                });
+
+        });
+
+    </script>
+
+}

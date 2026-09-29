@@ -1,0 +1,453 @@
+@model KISMApplicationManagement.Models.Intake
+
+<div class="modal-header text-white"
+     style="background:#d800b8;">
+
+    <div>
+
+        <h5 class="modal-title fw-bold mb-1">
+            <i class="bi bi-calendar3 me-2"></i>
+            Intake Details
+        </h5>
+
+        <div class="small opacity-75">
+            View intake configuration and status.
+        </div>
+
+    </div>
+
+    <button type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close">
+    </button>
+
+</div>
+
+
+<div class="modal-body">
+
+    <!-- =========================================================
+         Intake Header
+         ========================================================= -->
+
+    <div class="d-flex flex-wrap
+                justify-content-between
+                align-items-start
+                gap-3 mb-4">
+
+        <div>
+
+            <h5 class="fw-bold mb-1">
+                @Model.IntakeName
+            </h5>
+
+            <div class="text-muted">
+
+                @Model.AcademicYear
+
+                <span class="mx-1">
+                    ·
+                </span>
+
+                @Model.IntakePeriod
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            @if (Model.IsActive)
+            {
+                <span class="badge bg-success me-1">
+                    Active
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-secondary me-1">
+                    Inactive
+                </span>
+            }
+
+
+            @if (Model.ApplicationsOpen)
+            {
+                <span class="badge bg-success">
+                    <i class="bi bi-unlock me-1"></i>
+                    Applications Open
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">
+                    <i class="bi bi-lock me-1"></i>
+                    Applications Closed
+                </span>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Intake Information
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm mb-3">
+
+        <div class="card-header bg-white border-bottom">
+
+            <h6 class="fw-bold mb-0">
+
+                <i class="bi bi-calendar3 me-2"
+                   style="color:#d800b8;"></i>
+
+                Intake Information
+
+            </h6>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted mb-1">
+                        Intake Name
+                    </div>
+
+                    <div class="fw-semibold">
+                        @Model.IntakeName
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="small text-muted mb-1">
+                        Academic Year
+                    </div>
+
+                    <div class="fw-semibold">
+                        @Model.AcademicYear
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="small text-muted mb-1">
+                        Intake Period
+                    </div>
+
+                    <div class="fw-semibold">
+                        @Model.IntakePeriod
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="small text-muted mb-1">
+                        Display Order
+                    </div>
+
+                    <div class="fw-semibold">
+                        @Model.DisplayOrder
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Application Period
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm mb-3">
+
+        <div class="card-header bg-white border-bottom">
+
+            <h6 class="fw-bold mb-0">
+
+                <i class="bi bi-file-earmark-text me-2"
+                   style="color:#d800b8;"></i>
+
+                Application Period
+
+            </h6>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted mb-1">
+                        Application Opening Date
+                    </div>
+
+                    <div class="fw-semibold">
+                        @Model.ApplicationOpeningDate.ToString("dd MMMM yyyy")
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted mb-1">
+                        Application Closing Date
+                    </div>
+
+                    <div class="fw-semibold">
+                        @Model.ApplicationClosingDate.ToString("dd MMMM yyyy")
+                    </div>
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <div class="small text-muted mb-1">
+                        Application Status
+                    </div>
+
+                    @if (Model.ApplicationsOpen)
+                    {
+                        <span class="badge bg-success">
+
+                            <i class="bi bi-unlock me-1"></i>
+
+                            Applications Open
+
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">
+
+                            <i class="bi bi-lock me-1"></i>
+
+                            Applications Closed
+
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Admission Period
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm mb-3">
+
+        <div class="card-header bg-white border-bottom">
+
+            <h6 class="fw-bold mb-0">
+
+                <i class="bi bi-mortarboard me-2"
+                   style="color:#d800b8;"></i>
+
+                Admission Period
+
+            </h6>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted mb-1">
+                        Admission Start Date
+                    </div>
+
+                    @if (Model.AdmissionStartDate.HasValue)
+                    {
+                        <div class="fw-semibold">
+                            @Model.AdmissionStartDate.Value.ToString("dd MMMM yyyy")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            Not specified
+                        </div>
+                    }
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted mb-1">
+                        Admission End Date
+                    </div>
+
+                    @if (Model.AdmissionEndDate.HasValue)
+                    {
+                        <div class="fw-semibold">
+                            @Model.AdmissionEndDate.Value.ToString("dd MMMM yyyy")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            Not specified
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Description
+         ========================================================= -->
+
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <div class="card border-0 shadow-sm mb-3">
+
+            <div class="card-header bg-white border-bottom">
+
+                <h6 class="fw-bold mb-0">
+
+                    <i class="bi bi-card-text me-2"
+                       style="color:#d800b8;"></i>
+
+                    Description
+
+                </h6>
+
+            </div>
+
+            <div class="card-body">
+
+                <div style="white-space:pre-line;">
+                    @Model.Description
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         Record Information
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-bottom">
+
+            <h6 class="fw-bold mb-0">
+
+                <i class="bi bi-clock-history me-2"
+                   style="color:#d800b8;"></i>
+
+                Record Information
+
+            </h6>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted mb-1">
+                        Created
+                    </div>
+
+                    <div>
+                        @Model.CreatedAtUtc
+                            .ToLocalTime()
+                            .ToString("dd MMMM yyyy, HH:mm")
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="small text-muted mb-1">
+                        Last Updated
+                    </div>
+
+                    @if (Model.UpdatedAtUtc.HasValue)
+                    {
+                        <div>
+                            @Model.UpdatedAtUtc.Value
+                                .ToLocalTime()
+                                .ToString("dd MMMM yyyy, HH:mm")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            Not updated
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Footer
+     ========================================================= -->
+
+<div class="modal-footer">
+
+    <button type="button"
+            class="btn btn-outline-secondary"
+            data-bs-dismiss="modal">
+
+        <i class="bi bi-x-circle me-1"></i>
+        Close
+
+    </button>
+
+</div>

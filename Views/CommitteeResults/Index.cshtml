@@ -1,0 +1,675 @@
+@using KISMApplicationManagement.Constants
+@model KISMApplicationManagement.Models.CommitteeResultViewModels.CommitteeResultsViewModel
+
+@{
+    ViewData["Title"] = "Committee Results";
+
+    string GetDecisionBadgeClass(string decision)
+    {
+        return decision switch
+        {
+            "Recommended for Admission" => "decision-recommended",
+            "Not Recommended" => "decision-not-recommended",
+            "Deferred" => "decision-deferred",
+            _ => "decision-default"
+        };
+    }
+
+    string FormatUtc(DateTime? date)
+    {
+        if (!date.HasValue)
+        {
+            return "—";
+        }
+
+        return date.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt");
+    }
+}
+
+<style>
+    .committee-results-page {
+        --kism-magenta: #d800b8;
+        --kism-magenta-dark: #ad0093;
+        --kism-yellow: #edff0f;
+        --kism-light: #fff8fe;
+    }
+
+    .committee-results-page .page-header {
+        background: linear-gradient(
+            135deg,
+            var(--kism-magenta) 0%,
+            #b5009d 100%
+        );
+        color: #fff;
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 24px rgba(216, 0, 184, 0.16);
+    }
+
+    .committee-results-page .page-header h1 {
+        margin: 0;
+        font-size: 1.65rem;
+        font-weight: 700;
+    }
+
+    .committee-results-page .page-header p {
+        margin: 6px 0 0;
+        opacity: .9;
+    }
+
+    .committee-results-page .page-header .btn {
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .committee-results-page .card {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .06);
+        margin-bottom: 24px;
+    }
+
+    .committee-results-page .card-header {
+        background: #fff;
+        border-bottom: 1px solid #f0e8ef;
+        border-radius: 16px 16px 0 0;
+        padding: 18px 22px;
+    }
+
+    .committee-results-page .card-header h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .committee-results-page .card-body {
+        padding: 22px;
+    }
+
+    .summary-item {
+        background: var(--kism-light);
+        border-radius: 12px;
+        padding: 16px;
+        height: 100%;
+    }
+
+    .summary-item .label {
+        color: #777;
+        font-size: .78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: 5px;
+    }
+
+    .summary-item .value {
+        color: #292929;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .stat-card {
+        border-radius: 14px;
+        padding: 18px;
+        height: 100%;
+        border: 1px solid #f0e8ef;
+        background: #fff;
+    }
+
+    .stat-card .stat-label {
+        color: #777;
+        font-size: .8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+
+    .stat-card .stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-top: 5px;
+        color: #252525;
+    }
+
+    .stat-card.recommended {
+        border-left: 4px solid #198754;
+    }
+
+    .stat-card.not-recommended {
+        border-left: 4px solid #dc3545;
+    }
+
+    .stat-card.deferred {
+        border-left: 4px solid #fd7e14;
+    }
+
+    .stat-card.total {
+        border-left: 4px solid var(--kism-magenta);
+    }
+
+    .completed-banner {
+        background: #f0fff6;
+        border: 1px solid #b9e7ca;
+        color: #176b3a;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 24px;
+    }
+
+    .completed-banner i {
+        font-size: 1.15rem;
+        margin-right: 7px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+
+    .status-completed {
+        background: #e8f8ef;
+        color: #19723e;
+    }
+
+    .decision-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: .74rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .decision-recommended {
+        background: #e9f8ef;
+        color: #19723e;
+    }
+
+    .decision-not-recommended {
+        background: #fff0f1;
+        color: #b4232f;
+    }
+
+    .decision-deferred {
+        background: #fff5e8;
+        color: #a95a00;
+    }
+
+    .decision-default {
+        background: #f1f1f1;
+        color: #555;
+    }
+
+    .programme-box {
+        background: #fafafa;
+        border: 1px solid #eeeeee;
+        border-radius: 10px;
+        padding: 9px 11px;
+        min-width: 200px;
+    }
+
+    .programme-box .programme-code {
+        color: var(--kism-magenta);
+        font-weight: 800;
+        font-size: .78rem;
+    }
+
+    .programme-box .programme-name {
+        color: #333;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    .programme-box .programme-award {
+        color: #777;
+        font-size: .75rem;
+        margin-top: 2px;
+    }
+
+    .remarks-box {
+        background: #fffdf0;
+        border: 1px solid #eee6aa;
+        border-radius: 10px;
+        padding: 12px 14px;
+        color: #5c561e;
+        font-size: .88rem;
+    }
+
+    .results-table {
+        margin-bottom: 0;
+    }
+
+    .results-table thead th {
+        background: #faf7fa;
+        color: #555;
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .035em;
+        font-weight: 700;
+        border-bottom: 1px solid #e9e1e8;
+        white-space: nowrap;
+    }
+
+    .results-table tbody td {
+        vertical-align: middle;
+        border-color: #f0edf0;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .application-number {
+        color: var(--kism-magenta);
+        font-weight: 800;
+    }
+
+    .applicant-name {
+        font-weight: 700;
+        color: #333;
+    }
+
+    .recorded-by {
+        font-size: .82rem;
+        color: #555;
+    }
+
+    .decision-date {
+        font-size: .78rem;
+        color: #777;
+        white-space: nowrap;
+    }
+
+    .readonly-note {
+        font-size: .82rem;
+        color: #777;
+        margin: 0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 45px 20px;
+        color: #777;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        color: #c7b8c4;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    @@media (max-width: 767.98px) {
+        .committee-results-page .page-header {
+            padding: 20px;
+        }
+
+        .committee-results-page .page-header h1 {
+            font-size: 1.35rem;
+        }
+
+        .committee-results-page .card-body {
+            padding: 16px;
+        }
+
+        .results-table {
+            min-width: 1050px;
+        }
+    }
+</style>
+
+<div class="committee-results-page">
+
+    <div class="page-header">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+            <div>
+                <h1>
+                    <i class="bi bi-clipboard2-check me-2"></i>
+                    Committee Results
+                </h1>
+
+                <p>
+                    Official results recorded for completed committee sitting
+                    <strong>@Model.ReferenceNumber</strong>.
+                </p>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <a asp-controller="CommitteeSittings"
+                   asp-action="Manage"
+                   asp-route-id="@Model.CommitteeSittingId"
+                   class="btn btn-light">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Back to Sitting
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="completed-banner">
+        <i class="bi bi-check-circle-fill"></i>
+
+        <strong>Sitting Completed</strong>
+
+        <span class="ms-1">
+            This committee sitting has been finalized and its decision records are read-only.
+        </span>
+
+        @if (Model.CompletedAtUtc.HasValue)
+        {
+            <span class="ms-1">
+                Completed on <strong>@FormatUtc(Model.CompletedAtUtc)</strong>.
+            </span>
+        }
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>
+                <i class="bi bi-info-circle me-2" style="color:#d800b8;"></i>
+                Sitting Information
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Reference Number</div>
+                        <div class="value">@Model.ReferenceNumber</div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Intake</div>
+                        <div class="value">@Model.IntakeName</div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Academic Year</div>
+                        <div class="value">@Model.AcademicYear</div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Intake Period</div>
+                        <div class="value">@Model.IntakePeriod</div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Sitting Date</div>
+                        <div class="value">
+                            @Model.SittingDate.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Status</div>
+                        <div class="value">
+                            <span class="status-badge status-completed">
+                                <i class="bi bi-check-circle-fill"></i>
+                                @Model.Status
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Completed</div>
+                        <div class="value">
+                            @FormatUtc(Model.CompletedAtUtc)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="summary-item">
+                        <div class="label">Applications</div>
+                        <div class="value">
+                            @Model.TotalApplications
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+            {
+                <div class="remarks-box mt-3">
+                    <div class="fw-bold mb-1">
+                        <i class="bi bi-chat-left-text me-1"></i>
+                        Sitting Remarks
+                    </div>
+
+                    <div>
+                        @Model.Remarks
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-lg-3">
+            <div class="stat-card total">
+                <div class="stat-label">Total Applications</div>
+                <div class="stat-value">@Model.TotalApplications</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="stat-card recommended">
+                <div class="stat-label">Recommended</div>
+                <div class="stat-value">@Model.RecommendedCount</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="stat-card not-recommended">
+                <div class="stat-label">Not Recommended</div>
+                <div class="stat-value">@Model.NotRecommendedCount</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="stat-card deferred">
+                <div class="stat-label">Deferred</div>
+                <div class="stat-value">@Model.DeferredCount</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+                <div>
+                    <h5>
+                        <i class="bi bi-list-check me-2" style="color:#d800b8;"></i>
+                        Committee Decisions
+                    </h5>
+
+                    <p class="readonly-note mt-1">
+                        These are the collective decisions recorded during the committee sitting.
+                    </p>
+                </div>
+
+                <span class="status-badge status-completed">
+                    <i class="bi bi-lock-fill"></i>
+                    Read Only
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+
+            @if (Model.Applications.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table results-table align-middle">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">#</th>
+                                <th>Application</th>
+                                <th>Applicant</th>
+                                <th>Decision</th>
+                                <th>Assigned Programme</th>
+                                <th>Committee Remarks</th>
+                                <th>Recorded By</th>
+                                <th>Decision Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var application in Model.Applications)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-semibold">
+                                        @application.DisplayOrder
+                                    </td>
+
+                                    <td>
+                                        <span class="application-number">
+                                            @application.ApplicationNumber
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="applicant-name">
+                                            @application.ApplicantName
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="decision-badge @GetDecisionBadgeClass(application.Decision)">
+                                            @if (application.Decision == CommitteeDecisionResults.RecommendedForAdmission)
+                                            {
+                                                <i class="bi bi-check-circle-fill"></i>
+                                            }
+                                            else if (application.Decision == CommitteeDecisionResults.NotRecommended)
+                                            {
+                                                <i class="bi bi-x-circle-fill"></i>
+                                            }
+                                            else if (application.Decision == CommitteeDecisionResults.Deferred)
+                                            {
+                                                <i class="bi bi-clock-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-question-circle-fill"></i>
+                                            }
+
+                                            @application.Decision
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @if (application.AssignedProgrammeId.HasValue)
+                                        {
+                                            <div class="programme-box">
+                                                @if (!string.IsNullOrWhiteSpace(application.AssignedProgrammeCode))
+                                                {
+                                                    <div class="programme-code">
+                                                        @application.AssignedProgrammeCode
+                                                    </div>
+                                                }
+
+                                                @if (!string.IsNullOrWhiteSpace(application.AssignedProgrammeName))
+                                                {
+                                                    <div class="programme-name">
+                                                        @application.AssignedProgrammeName
+                                                    </div>
+                                                }
+
+                                                @if (!string.IsNullOrWhiteSpace(application.AssignedProgrammeAwardType))
+                                                {
+                                                    <div class="programme-award">
+                                                        @application.AssignedProgrammeAwardType
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(application.CommitteeRemarks))
+                                        {
+                                            <div class="remarks-box">
+                                                @application.CommitteeRemarks
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(application.RecordedByName))
+                                        {
+                                            <div class="recorded-by">
+                                                <i class="bi bi-person me-1"></i>
+                                                @application.RecordedByName
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (application.DecisionDateUtc != DateTime.MinValue)
+                                        {
+                                            <div class="decision-date">
+                                                @FormatUtc(application.DecisionDateUtc)
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+
+                    <h5>No Applications</h5>
+
+                    <p class="mb-0">
+                        There are no applications recorded in this committee sitting.
+                    </p>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

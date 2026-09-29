@@ -1,0 +1,597 @@
+@model KISMApplicationManagement.Models.IntakeViewModels.IntakeViewModel
+
+<div class="modal-header text-white"
+     style="background:#d800b8;">
+
+    <div>
+
+        <h5 class="modal-title fw-bold mb-1">
+            <i class="bi bi-pencil-square me-2"></i>
+            Edit Intake
+        </h5>
+
+        <div class="small opacity-75">
+            Update intake configuration and dates.
+        </div>
+
+    </div>
+
+    <button type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close">
+    </button>
+
+</div>
+
+
+<form asp-action="Edit"
+      asp-controller="Intakes"
+      method="post"
+      id="editIntakeForm"
+      novalidate>
+
+    @Html.AntiForgeryToken()
+
+    <input asp-for="IntakeId"
+           type="hidden" />
+
+    <div class="modal-body">
+
+        <!-- =====================================================
+             Intake Information
+             ===================================================== -->
+
+        <div class="card border-0 mb-3">
+
+            <div class="card-header px-0 bg-white border-bottom">
+
+                <h6 class="fw-bold mb-0">
+
+                    <i class="bi bi-calendar3 me-2"
+                       style="color:#d800b8;"></i>
+
+                    Intake Information
+
+                </h6>
+
+            </div>
+
+            <div class="card-body px-0 pt-3">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="IntakeName"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="IntakeName"
+                               class="form-control"
+                               required />
+
+                        <span asp-validation-for="IntakeName"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label asp-for="AcademicYear"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="AcademicYear"
+                               class="form-control"
+                               required />
+
+                        <span asp-validation-for="AcademicYear"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label asp-for="IntakePeriod"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <select asp-for="IntakePeriod"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                Select period
+                            </option>
+
+                            <option value="January">
+                                January
+                            </option>
+
+                            <option value="May">
+                                May
+                            </option>
+
+                            <option value="September">
+                                September
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="IntakePeriod"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             Application Period
+             ===================================================== -->
+
+        <div class="card border-0 mb-3">
+
+            <div class="card-header px-0 bg-white border-bottom">
+
+                <h6 class="fw-bold mb-0">
+
+                    <i class="bi bi-file-earmark-text me-2"
+                       style="color:#d800b8;"></i>
+
+                    Application Period
+
+                </h6>
+
+            </div>
+
+            <div class="card-body px-0 pt-3">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="ApplicationOpeningDate"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="ApplicationOpeningDate"
+                               type="date"
+                               class="form-control"
+                               id="editApplicationOpeningDate"
+                               required />
+
+                        <span asp-validation-for="ApplicationOpeningDate"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="ApplicationClosingDate"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="ApplicationClosingDate"
+                               type="date"
+                               class="form-control"
+                               id="editApplicationClosingDate"
+                               required />
+
+                        <span asp-validation-for="ApplicationClosingDate"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             Admission Period
+             ===================================================== -->
+
+        <div class="card border-0 mb-3">
+
+            <div class="card-header px-0 bg-white border-bottom">
+
+                <h6 class="fw-bold mb-0">
+
+                    <i class="bi bi-mortarboard me-2"
+                       style="color:#d800b8;"></i>
+
+                    Admission Period
+
+                </h6>
+
+            </div>
+
+            <div class="card-body px-0 pt-3">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="AdmissionStartDate"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="AdmissionStartDate"
+                               type="date"
+                               class="form-control"
+                               id="editAdmissionStartDate" />
+
+                        <span asp-validation-for="AdmissionStartDate"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="AdmissionEndDate"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="AdmissionEndDate"
+                               type="date"
+                               class="form-control"
+                               id="editAdmissionEndDate" />
+
+                        <span asp-validation-for="AdmissionEndDate"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             Additional Settings
+             ===================================================== -->
+
+        <div class="card border-0">
+
+            <div class="card-header px-0 bg-white border-bottom">
+
+                <h6 class="fw-bold mb-0">
+
+                    <i class="bi bi-gear me-2"
+                       style="color:#d800b8;"></i>
+
+                    Additional Settings
+
+                </h6>
+
+            </div>
+
+            <div class="card-body px-0 pt-3">
+
+                <div class="row g-3">
+
+                    <div class="col-12">
+
+                        <label asp-for="Description"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <textarea asp-for="Description"
+                                  class="form-control"
+                                  rows="3">
+                        </textarea>
+
+                        <span asp-validation-for="Description"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="DisplayOrder"
+                               class="form-label fw-semibold">
+                        </label>
+
+                        <input asp-for="DisplayOrder"
+                               type="number"
+                               class="form-control"
+                               min="0" />
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <div class="form-check form-switch mt-4">
+
+                            <input asp-for="IsActive"
+                                   class="form-check-input"
+                                   id="editIsActive" />
+
+                            <label asp-for="IsActive"
+                                   class="form-check-label fw-semibold">
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Footer
+         ========================================================= -->
+
+    <div class="modal-footer">
+
+        <button type="button"
+                class="btn btn-outline-secondary"
+                data-bs-dismiss="modal">
+
+            Cancel
+
+        </button>
+
+        <button type="submit"
+                class="btn text-white"
+                style="background:#d800b8;">
+
+            <i class="bi bi-check-lg me-1"></i>
+            Save Changes
+
+        </button>
+
+    </div>
+
+</form>
+
+
+<script>
+
+    (function () {
+
+        const form =
+            document.getElementById(
+                'editIntakeForm');
+
+        if (!form) {
+            return;
+        }
+
+
+        const opening =
+            document.getElementById(
+                'editApplicationOpeningDate');
+
+        const closing =
+            document.getElementById(
+                'editApplicationClosingDate');
+
+        const admissionStart =
+            document.getElementById(
+                'editAdmissionStartDate');
+
+        const admissionEnd =
+            document.getElementById(
+                'editAdmissionEndDate');
+
+
+        function validateDates() {
+
+            if (opening.value &&
+                closing.value &&
+                closing.value < opening.value) {
+
+                closing.setCustomValidity(
+                    'Application closing date cannot be before the application opening date.'
+                );
+
+            }
+            else {
+
+                closing.setCustomValidity('');
+
+            }
+
+
+            if (admissionStart.value &&
+                admissionEnd.value &&
+                admissionEnd.value < admissionStart.value) {
+
+                admissionEnd.setCustomValidity(
+                    'Admission end date cannot be before the admission start date.'
+                );
+
+            }
+            else {
+
+                admissionEnd.setCustomValidity('');
+
+            }
+
+
+            if (admissionStart.value &&
+                opening.value &&
+                admissionStart.value < opening.value) {
+
+                admissionStart.setCustomValidity(
+                    'Admission start date cannot be before the application opening date.'
+                );
+
+            }
+            else {
+
+                admissionStart.setCustomValidity('');
+
+            }
+
+
+            if (admissionEnd.value &&
+                closing.value &&
+                admissionEnd.value < closing.value) {
+
+                admissionEnd.setCustomValidity(
+                    'Admission end date cannot be before the application closing date.'
+                );
+
+            }
+            else {
+
+                admissionEnd.setCustomValidity('');
+
+            }
+
+        }
+
+
+        [
+            opening,
+            closing,
+            admissionStart,
+            admissionEnd
+        ].forEach(function (element) {
+
+            element.addEventListener(
+                'change',
+                validateDates);
+
+        });
+
+
+        form.addEventListener(
+            'submit',
+            function (event) {
+
+                validateDates();
+
+                if (!form.checkValidity()) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    form.classList.add(
+                        'was-validated');
+
+                    return;
+                }
+
+                event.preventDefault();
+
+                const formData =
+                    new FormData(form);
+
+                $.ajax({
+
+                    url:
+                        form.action,
+
+                    type:
+                        'POST',
+
+                    data:
+                        formData,
+
+                    processData:
+                        false,
+
+                    contentType:
+                        false,
+
+                    success:
+                        function (response) {
+
+                            if (response.success) {
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    confirmButtonColor:
+                                        '#d800b8'
+                                }).then(function () {
+
+                                    window.location.reload();
+
+                                });
+
+                            }
+                            else {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Unable to save',
+                                    text:
+                                        response.message,
+                                    confirmButtonColor:
+                                        '#d800b8'
+                                });
+
+                            }
+
+                        },
+
+                    error:
+                        function (xhr) {
+
+                            let message =
+                                'The intake could not be updated.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to save',
+                                text: message,
+                                confirmButtonColor:
+                                    '#d800b8'
+                            });
+
+                        }
+
+                });
+
+            });
+
+    })();
+
+</script>

@@ -1,0 +1,1058 @@
+@model IEnumerable<KISMApplicationManagement.Models.Intake>
+
+@{
+    ViewData["Title"] = "Intakes";
+}
+
+<div class="container-fluid px-0">
+
+    <!-- =========================================================
+         Header
+         ========================================================= -->
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between
+                align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                Intakes
+            </h2>
+
+            <p class="text-muted mb-0">
+                Configure application and admission periods for KISM intakes.
+            </p>
+
+        </div>
+
+        <div>
+
+            <button type="button"
+                    class="btn text-white"
+                    id="btnCreateIntake"
+                    style="background:#d800b8;">
+
+                <i class="bi bi-plus-lg me-1"></i>
+                Add Intake
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Information
+         ========================================================= -->
+
+    <div class="alert border-0 shadow-sm mb-4"
+         style="background:#fff8fe;">
+
+        <div class="d-flex gap-3">
+
+            <div class="fs-4"
+                 style="color:#d800b8;">
+
+                <i class="bi bi-info-circle"></i>
+
+            </div>
+
+            <div>
+
+                <div class="fw-bold mb-1">
+                    Intake management
+                </div>
+
+                <div class="small text-muted">
+
+                    Configure when applications open and close,
+                    define admission periods, and control the
+                    active status of each intake.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Intake Table
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="intakesTable"
+                       class="table table-hover align-middle w-100">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>Intake</th>
+
+                            <th>Academic Year</th>
+
+                            <th>Period</th>
+
+                            <th>Application Period</th>
+
+                            <th>Admission Period</th>
+
+                            <th>Status</th>
+
+                            <th>Applications</th>
+
+                            <th>Order</th>
+
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @{
+                            var rowNumber = 1;
+                        }
+
+                        @foreach (var intake in Model)
+                        {
+                            <tr data-intake-id="@intake.IntakeId">
+
+                                <!-- Number -->
+                                <td>
+                                    @rowNumber
+                                </td>
+
+
+                                <!-- Intake -->
+                                <td>
+
+                                    <div class="fw-semibold">
+                                        @intake.IntakeName
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(intake.Description))
+                                    {
+                                        <div class="small text-muted text-truncate"
+                                             style="max-width:260px;">
+                                            @intake.Description
+                                        </div>
+                                    }
+
+                                </td>
+
+
+                                <!-- Academic Year -->
+                                <td>
+
+                                    <span class="badge"
+                                          style="background:#f4d8f0;
+                                                 color:#a90090;">
+
+                                        @intake.AcademicYear
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Intake Period -->
+                                <td>
+                                    @intake.IntakePeriod
+                                </td>
+
+
+                                <!-- Application Period -->
+                                <td>
+
+                                    <div class="small">
+
+                                        <div>
+                                            <span class="text-muted">
+                                                Opens:
+                                            </span>
+
+                                            <span class="fw-semibold">
+                                                @intake.ApplicationOpeningDate.ToString("dd MMM yyyy")
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <span class="text-muted">
+                                                Closes:
+                                            </span>
+
+                                            <span class="fw-semibold">
+                                                @intake.ApplicationClosingDate.ToString("dd MMM yyyy")
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Admission Period -->
+                                <td>
+
+                                    <div class="small">
+
+                                        <div>
+                                            <span class="text-muted">
+                                                Starts:
+                                            </span>
+
+                                            @if (intake.AdmissionStartDate.HasValue)
+                                            {
+                                                <span class="fw-semibold">
+                                                    @intake.AdmissionStartDate.Value.ToString("dd MMM yyyy")
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                        <div>
+                                            <span class="text-muted">
+                                                Ends:
+                                            </span>
+
+                                            @if (intake.AdmissionEndDate.HasValue)
+                                            {
+                                                <span class="fw-semibold">
+                                                    @intake.AdmissionEndDate.Value.ToString("dd MMM yyyy")
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Status -->
+                                <td class="intake-status-cell">
+
+                                    @if (intake.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Applications -->
+                                <td class="applications-status-cell">
+
+                                    @if (intake.ApplicationsOpen)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-unlock me-1"></i>
+                                            Open
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-lock me-1"></i>
+                                            Closed
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- Display Order -->
+                                <td>
+                                    @intake.DisplayOrder
+                                </td>
+
+
+                                <!-- Actions -->
+                                <td>
+
+                                    <div class="d-flex gap-1">
+
+                                        <!-- Details -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary btn-details-intake"
+                                                data-id="@intake.IntakeId"
+                                                title="View Details">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </button>
+
+
+                                        <!-- Edit -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-edit-intake"
+                                                data-id="@intake.IntakeId"
+                                                title="Edit Intake">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </button>
+
+
+                                        <!-- Toggle Active -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success btn-toggle-status"
+                                                data-id="@intake.IntakeId"
+                                                data-is-active="@intake.IsActive.ToString().ToLower()"
+                                                title="Toggle Status">
+
+                                            @if (intake.IsActive)
+                                            {
+                                                <i class="bi bi-toggle-on"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-toggle-off"></i>
+                                            }
+
+                                        </button>
+
+
+                                        <!-- Toggle Applications -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary btn-toggle-applications"
+                                                data-id="@intake.IntakeId"
+                                                data-applications-open="@intake.ApplicationsOpen.ToString().ToLower()"
+                                                title="Open / Close Applications">
+
+                                            @if (intake.ApplicationsOpen)
+                                            {
+                                                <i class="bi bi-unlock"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-lock"></i>
+                                            }
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            rowNumber++;
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Create Intake Modal
+     ========================================================= -->
+
+<div class="modal fade"
+     id="createIntakeModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+            <div id="createIntakeModalBody">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Edit Intake Modal
+     ========================================================= -->
+
+<div class="modal fade"
+     id="editIntakeModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+            <div id="editIntakeModalBody">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Details Modal
+     ========================================================= -->
+
+<div class="modal fade"
+     id="detailsIntakeModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+            <div id="detailsIntakeModalBody">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     Anti Forgery Token
+     ========================================================= -->
+
+<form id="intakeAntiForgeryForm"
+      class="d-none">
+
+    @Html.AntiForgeryToken()
+
+</form>
+
+
+@section Scripts {
+
+    <script>
+
+        // =========================================================
+        // DataTable
+        // =========================================================
+
+        $(function () {
+
+            $('#intakesTable').DataTable({
+
+                responsive: true,
+
+                pageLength: 10,
+
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, 'All']
+                ],
+
+                order: [
+                    [8, 'asc']
+                ],
+
+                columnDefs: [
+                    {
+                        targets: 9,
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+
+                language: {
+                    emptyTable:
+                        'No intakes have been configured yet.'
+                }
+
+            });
+
+        });
+
+
+        // =========================================================
+        // Create Intake
+        // =========================================================
+
+        $('#btnCreateIntake').on(
+            'click',
+            function () {
+
+                $('#createIntakeModalBody')
+                    .html(
+                        '<div class="text-center py-5">' +
+                        '<div class="spinner-border" ' +
+                        'style="color:#d800b8;"></div>' +
+                        '<div class="mt-3 text-muted">' +
+                        'Loading intake form...' +
+                        '</div>' +
+                        '</div>'
+                    );
+
+                $('#createIntakeModal')
+                    .modal('show');
+
+                $.get(
+                    '@Url.Action("Create", "Intakes")'
+                )
+                .done(function (html) {
+
+                    $('#createIntakeModalBody')
+                        .html(html);
+
+                })
+                .fail(function () {
+
+                    $('#createIntakeModalBody')
+                        .html(
+                            '<div class="alert alert-danger m-4">' +
+                            'The intake form could not be loaded.' +
+                            '</div>'
+                        );
+
+                });
+
+            });
+
+
+        // =========================================================
+        // Edit Intake
+        // =========================================================
+
+        $(document).on(
+            'click',
+            '.btn-edit-intake',
+            function () {
+
+                const id =
+                    $(this).data('id');
+
+                $('#editIntakeModalBody')
+                    .html(
+                        '<div class="text-center py-5">' +
+                        '<div class="spinner-border" ' +
+                        'style="color:#d800b8;"></div>' +
+                        '<div class="mt-3 text-muted">' +
+                        'Loading intake...' +
+                        '</div>' +
+                        '</div>'
+                    );
+
+                $('#editIntakeModal')
+                    .modal('show');
+
+                $.get(
+                    '@Url.Action("Edit", "Intakes")',
+                    {
+                        id: id
+                    })
+                .done(function (html) {
+
+                    $('#editIntakeModalBody')
+                        .html(html);
+
+                })
+                .fail(function () {
+
+                    $('#editIntakeModalBody')
+                        .html(
+                            '<div class="alert alert-danger m-4">' +
+                            'The intake form could not be loaded.' +
+                            '</div>'
+                        );
+
+                });
+
+            });
+
+
+        // =========================================================
+        // Intake Details
+        // =========================================================
+
+        $(document).on(
+            'click',
+            '.btn-details-intake',
+            function () {
+
+                const id =
+                    $(this).data('id');
+
+                $('#detailsIntakeModalBody')
+                    .html(
+                        '<div class="text-center py-5">' +
+                        '<div class="spinner-border" ' +
+                        'style="color:#d800b8;"></div>' +
+                        '<div class="mt-3 text-muted">' +
+                        'Loading intake details...' +
+                        '</div>' +
+                        '</div>'
+                    );
+
+                $('#detailsIntakeModal')
+                    .modal('show');
+
+                $.get(
+                    '@Url.Action("Details", "Intakes")',
+                    {
+                        id: id
+                    })
+                .done(function (html) {
+
+                    $('#detailsIntakeModalBody')
+                        .html(html);
+
+                })
+                .fail(function () {
+
+                    $('#detailsIntakeModalBody')
+                        .html(
+                            '<div class="alert alert-danger m-4">' +
+                            'Unable to load intake details.' +
+                            '</div>'
+                        );
+
+                });
+
+            });
+
+
+        // =========================================================
+        // Toggle Active Status
+        // =========================================================
+
+        $(document).on(
+            'click',
+            '.btn-toggle-status',
+            function () {
+
+                const button =
+                    $(this);
+
+                const id =
+                    button.data('id');
+
+                const isActive =
+                    button.data('is-active') === true ||
+                    button.data('is-active') === 'true';
+
+                Swal.fire({
+
+                    icon: 'question',
+
+                    title:
+                        isActive
+                            ? 'Deactivate intake?'
+                            : 'Activate intake?',
+
+                    text:
+                        isActive
+                            ? 'The intake will become inactive and applications will be closed.'
+                            : 'The intake will become active.',
+
+                    showCancelButton: true,
+
+                    confirmButtonColor:
+                        '#d800b8',
+
+                    cancelButtonColor:
+                        '#6c757d',
+
+                    confirmButtonText:
+                        isActive
+                            ? 'Yes, deactivate'
+                            : 'Yes, activate'
+
+                }).then(function (result) {
+
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    const token =
+                        $('#intakeAntiForgeryForm')
+                            .find('input[name="__RequestVerificationToken"]')
+                            .val();
+
+                    $.ajax({
+
+                        url:
+                            '@Url.Action("ToggleStatus", "Intakes")',
+
+                        type: 'POST',
+
+                        data: {
+                            id: id,
+                            __RequestVerificationToken:
+                                token
+                        },
+
+                        success: function (response) {
+
+                            if (!response.success) {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Unable to update',
+                                    text: response.message,
+                                    confirmButtonColor:
+                                        '#d800b8'
+                                });
+
+                                return;
+                            }
+
+                            const row =
+                                button.closest('tr');
+
+                            const statusCell =
+                                row.find('.intake-status-cell');
+
+                            const applicationsCell =
+                                row.find('.applications-status-cell');
+
+                            if (response.isActive) {
+
+                                statusCell.html(
+                                    '<span class="badge bg-success">' +
+                                    'Active' +
+                                    '</span>'
+                                );
+
+                                button
+                                    .data(
+                                        'is-active',
+                                        true)
+                                    .attr(
+                                        'data-is-active',
+                                        'true');
+
+                                button.html(
+                                    '<i class="bi bi-toggle-on"></i>'
+                                );
+
+                            }
+                            else {
+
+                                statusCell.html(
+                                    '<span class="badge bg-secondary">' +
+                                    'Inactive' +
+                                    '</span>'
+                                );
+
+                                applicationsCell.html(
+                                    '<span class="badge bg-secondary">' +
+                                    '<i class="bi bi-lock me-1"></i>' +
+                                    'Closed' +
+                                    '</span>'
+                                );
+
+                                button
+                                    .data(
+                                        'is-active',
+                                        false)
+                                    .attr(
+                                        'data-is-active',
+                                        'false');
+
+                                button.html(
+                                    '<i class="bi bi-toggle-off"></i>'
+                                );
+
+                                const applicationButton =
+                                    row.find(
+                                        '.btn-toggle-applications');
+
+                                applicationButton
+                                    .data(
+                                        'applications-open',
+                                        false)
+                                    .attr(
+                                        'data-applications-open',
+                                        'false');
+
+                                applicationButton.html(
+                                    '<i class="bi bi-lock"></i>'
+                                );
+
+                            }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message,
+                                confirmButtonColor:
+                                    '#d800b8'
+                            });
+
+                        },
+
+                        error: function (xhr) {
+
+                            let message =
+                                'The intake status could not be changed.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to update',
+                                text: message,
+                                confirmButtonColor:
+                                    '#d800b8'
+                            });
+
+                        }
+
+                    });
+
+                });
+
+            });
+
+
+        // =========================================================
+        // Toggle Applications
+        // =========================================================
+
+        $(document).on(
+            'click',
+            '.btn-toggle-applications',
+            function () {
+
+                const button =
+                    $(this);
+
+                const id =
+                    button.data('id');
+
+                const applicationsOpen =
+                    button.data('applications-open') === true ||
+                    button.data('applications-open') === 'true';
+
+                Swal.fire({
+
+                    icon: 'question',
+
+                    title:
+                        applicationsOpen
+                            ? 'Close applications?'
+                            : 'Open applications?',
+
+                    text:
+                        applicationsOpen
+                            ? 'Applications will no longer be available for this intake.'
+                            : 'Applications will be opened for this intake.',
+
+                    showCancelButton: true,
+
+                    confirmButtonColor:
+                        '#d800b8',
+
+                    cancelButtonColor:
+                        '#6c757d',
+
+                    confirmButtonText:
+                        applicationsOpen
+                            ? 'Yes, close'
+                            : 'Yes, open'
+
+                }).then(function (result) {
+
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    const token =
+                        $('#intakeAntiForgeryForm')
+                            .find('input[name="__RequestVerificationToken"]')
+                            .val();
+
+                    $.ajax({
+
+                        url:
+                            '@Url.Action("ToggleApplications", "Intakes")',
+
+                        type: 'POST',
+
+                        data: {
+                            id: id,
+                            __RequestVerificationToken:
+                                token
+                        },
+
+                        success: function (response) {
+
+                            if (!response.success) {
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Unable to update',
+                                    text: response.message,
+                                    confirmButtonColor:
+                                        '#d800b8'
+                                });
+
+                                return;
+                            }
+
+                            const row =
+                                button.closest('tr');
+
+                            const applicationsCell =
+                                row.find(
+                                    '.applications-status-cell');
+
+                            if (response.applicationsOpen) {
+
+                                applicationsCell.html(
+                                    '<span class="badge bg-success">' +
+                                    '<i class="bi bi-unlock me-1"></i>' +
+                                    'Open' +
+                                    '</span>'
+                                );
+
+                                button
+                                    .data(
+                                        'applications-open',
+                                        true)
+                                    .attr(
+                                        'data-applications-open',
+                                        'true');
+
+                                button.html(
+                                    '<i class="bi bi-unlock"></i>'
+                                );
+
+                            }
+                            else {
+
+                                applicationsCell.html(
+                                    '<span class="badge bg-secondary">' +
+                                    '<i class="bi bi-lock me-1"></i>' +
+                                    'Closed' +
+                                    '</span>'
+                                );
+
+                                button
+                                    .data(
+                                        'applications-open',
+                                        false)
+                                    .attr(
+                                        'data-applications-open',
+                                        'false');
+
+                                button.html(
+                                    '<i class="bi bi-lock"></i>'
+                                );
+
+                            }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message,
+                                confirmButtonColor:
+                                    '#d800b8'
+                            });
+
+                        },
+
+                        error: function (xhr) {
+
+                            let message =
+                                'The application status could not be changed.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to update',
+                                text: message,
+                                confirmButtonColor:
+                                    '#d800b8'
+                            });
+
+                        }
+
+                    });
+
+                });
+
+            });
+
+    </script>
+
+    <style>
+
+        #intakesTable thead th {
+            white-space: nowrap;
+        }
+
+        #intakesTable tbody td {
+            vertical-align: middle;
+        }
+
+        #intakesTable .btn {
+            min-width: 34px;
+        }
+
+        .modal-content {
+            overflow: hidden;
+        }
+
+    </style>
+
+}

@@ -1,0 +1,519 @@
+@model KISMApplicationManagement.Models.Sublocation
+
+@using KISMApplicationManagement.Models
+
+@{
+    var counties =
+        ViewBag.Counties as IEnumerable<County>
+        ?? Enumerable.Empty<County>();
+
+    var subcounties =
+        ViewBag.Subcounties as IEnumerable<Subcounty>
+        ?? Enumerable.Empty<Subcounty>();
+
+    var divisions =
+        ViewBag.Divisions as IEnumerable<Division>
+        ?? Enumerable.Empty<Division>();
+
+    var locations =
+        ViewBag.Locations as IEnumerable<Location>
+        ?? Enumerable.Empty<Location>();
+}
+
+
+<form asp-action="Create"
+      asp-controller="Sublocation"
+      method="post"
+      id="createSublocationForm">
+
+    @Html.AntiForgeryToken()
+
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         role="alert">
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- COUNTY -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label for="createSublocationCountyId"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-geo-alt me-1"></i>
+
+            County
+
+        </label>
+
+        <select id="createSublocationCountyId"
+                class="form-select"
+                required>
+
+            <option value="">
+                Select County
+            </option>
+
+            @foreach (var county in counties)
+            {
+                <option value="@county.CountyId">
+
+                    @county.CountyNumber -
+                    @county.CountyName
+
+                </option>
+            }
+
+        </select>
+
+        <div class="form-text">
+            Select the county first.
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SUBCOUNTY -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label for="createSublocationSubcountyId"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-2 me-1"></i>
+
+            Subcounty
+
+        </label>
+
+        <select id="createSublocationSubcountyId"
+                class="form-select"
+                disabled
+                required>
+
+            <option value="">
+                Select Subcounty
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- DIVISION -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label for="createSublocationDivisionId"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-3 me-1"></i>
+
+            Division
+
+        </label>
+
+        <select id="createSublocationDivisionId"
+                class="form-select"
+                disabled
+                required>
+
+            <option value="">
+                Select Division
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- LOCATION -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label asp-for="LocationId"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-geo me-1"></i>
+
+            Location
+
+        </label>
+
+        <select asp-for="LocationId"
+                id="createSublocationLocationId"
+                class="form-select"
+                disabled
+                required>
+
+            <option value="">
+                Select Location
+            </option>
+
+        </select>
+
+        <span asp-validation-for="LocationId"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SUBLOCATION NAME -->
+    <!-- ========================================================= -->
+
+    <div class="mb-3">
+
+        <label asp-for="SublocationName"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-pin-map me-1"></i>
+
+            Sublocation Name
+
+        </label>
+
+        <input asp-for="SublocationName"
+               class="form-control"
+               placeholder="Enter sublocation name"
+               autocomplete="off"
+               maxlength="100"
+               required />
+
+        <span asp-validation-for="SublocationName"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- STATUS -->
+    <!-- ========================================================= -->
+
+    <div class="form-check form-switch mb-3">
+
+        <input asp-for="IsActive"
+               class="form-check-input"
+               role="switch"
+               id="createSublocationIsActive" />
+
+        <label class="form-check-label fw-semibold"
+               for="createSublocationIsActive">
+
+            Active
+
+        </label>
+
+        <div class="form-text">
+            Active sublocations will be available for selection
+            in the application system.
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTIONS -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex justify-content-end gap-2 pt-2">
+
+        <button type="button"
+                class="btn btn-light border"
+                data-bs-dismiss="modal">
+
+            Cancel
+
+        </button>
+
+
+        <button type="submit"
+                class="btn btn-kism-primary"
+                id="createSublocationSubmit">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            Save Sublocation
+
+        </button>
+
+    </div>
+
+</form>
+
+
+<script>
+
+    (function () {
+
+        const counties = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                counties.Select(c => new
+                {
+                    id = c.CountyId,
+                    number = c.CountyNumber,
+                    name = c.CountyName
+                })
+            )
+        );
+
+
+        const subcounties = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                subcounties.Select(s => new
+                {
+                    id = s.SubcountyId,
+                    countyId = s.CountyId,
+                    name = s.SubcountyName
+                })
+            )
+        );
+
+
+        const divisions = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                divisions.Select(d => new
+                {
+                    id = d.DivisionId,
+                    subcountyId = d.SubcountyId,
+                    name = d.DivisionName
+                })
+            )
+        );
+
+
+        const locations = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(
+                locations.Select(l => new
+                {
+                    id = l.LocationId,
+                    divisionId = l.DivisionId,
+                    name = l.LocationName
+                })
+            )
+        );
+
+
+        const countySelect =
+            document.getElementById(
+                "createSublocationCountyId"
+            );
+
+
+        const subcountySelect =
+            document.getElementById(
+                "createSublocationSubcountyId"
+            );
+
+
+        const divisionSelect =
+            document.getElementById(
+                "createSublocationDivisionId"
+            );
+
+
+        const locationSelect =
+            document.getElementById(
+                "createSublocationLocationId"
+            );
+
+
+        if (
+            !countySelect ||
+            !subcountySelect ||
+            !divisionSelect ||
+            !locationSelect
+        ) {
+            return;
+        }
+
+
+        function resetSubcounties() {
+
+            subcountySelect.innerHTML =
+                '<option value="">Select Subcounty</option>';
+
+            subcountySelect.disabled = true;
+
+        }
+
+
+        function resetDivisions() {
+
+            divisionSelect.innerHTML =
+                '<option value="">Select Division</option>';
+
+            divisionSelect.disabled = true;
+
+        }
+
+
+        function resetLocations() {
+
+            locationSelect.innerHTML =
+                '<option value="">Select Location</option>';
+
+            locationSelect.disabled = true;
+
+        }
+
+
+        countySelect.addEventListener(
+            "change",
+            function () {
+
+                const countyId =
+                    this.value;
+
+
+                resetSubcounties();
+
+                resetDivisions();
+
+                resetLocations();
+
+
+                if (!countyId) {
+                    return;
+                }
+
+
+                const matchingSubcounties =
+                    subcounties.filter(function (item) {
+
+                        return String(item.countyId) ===
+                            String(countyId);
+
+                    });
+
+
+                matchingSubcounties.forEach(
+                    function (item) {
+
+                        subcountySelect.appendChild(
+                            new Option(
+                                item.name,
+                                item.id
+                            )
+                        );
+
+                    }
+                );
+
+
+                subcountySelect.disabled =
+                    matchingSubcounties.length === 0;
+
+            }
+        );
+
+
+        subcountySelect.addEventListener(
+            "change",
+            function () {
+
+                const subcountyId =
+                    this.value;
+
+
+                resetDivisions();
+
+                resetLocations();
+
+
+                if (!subcountyId) {
+                    return;
+                }
+
+
+                const matchingDivisions =
+                    divisions.filter(function (item) {
+
+                        return String(item.subcountyId) ===
+                            String(subcountyId);
+
+                    });
+
+
+                matchingDivisions.forEach(
+                    function (item) {
+
+                        divisionSelect.appendChild(
+                            new Option(
+                                item.name,
+                                item.id
+                            )
+                        );
+
+                    }
+                );
+
+
+                divisionSelect.disabled =
+                    matchingDivisions.length === 0;
+
+            }
+        );
+
+
+        divisionSelect.addEventListener(
+            "change",
+            function () {
+
+                const divisionId =
+                    this.value;
+
+
+                resetLocations();
+
+
+                if (!divisionId) {
+                    return;
+                }
+
+
+                const matchingLocations =
+                    locations.filter(function (item) {
+
+                        return String(item.divisionId) ===
+                            String(divisionId);
+
+                    });
+
+
+                matchingLocations.forEach(
+                    function (item) {
+
+                        locationSelect.appendChild(
+                            new Option(
+                                item.name,
+                                item.id
+                            )
+                        );
+
+                    }
+                );
+
+
+                locationSelect.disabled =
+                    matchingLocations.length === 0;
+
+            }
+        );
+
+
+    })();
+
+</script>

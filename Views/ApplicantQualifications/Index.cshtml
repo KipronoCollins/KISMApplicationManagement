@@ -1,0 +1,1997 @@
+@using KISMApplicationManagement.ViewModels.ApplicantQualifications
+
+@model IEnumerable<ApplicantQualificationDetailsViewModel>
+
+@{
+    ViewData["Title"] = "My Qualifications";
+}
+
+<style>
+    .qualifications-page {
+        padding: 1.5rem 0;
+    }
+
+    .page-hero {
+        background: linear-gradient(135deg, #d800b8 0%, #ad0093 100%);
+        color: #fff;
+        border-radius: 18px;
+        padding: 1.75rem 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(216, 0, 184, 0.18);
+    }
+
+    .page-hero h2 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .page-hero p {
+        margin: .45rem 0 0;
+        opacity: .9;
+    }
+
+    .hero-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+        background: rgba(255,255,255,.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        flex-shrink: 0;
+    }
+
+    .btn-kism {
+        background: #d800b8;
+        border-color: #d800b8;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: .65rem 1.1rem;
+    }
+
+    .btn-kism:hover,
+    .btn-kism:focus {
+        background: #ad0093;
+        border-color: #ad0093;
+        color: #fff;
+    }
+
+    .qualification-card {
+        background: #fff;
+        border: 1px solid #e9eaf0;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(20, 20, 40, .06);
+        height: 100%;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .qualification-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(20, 20, 40, .10);
+    }
+
+    .qualification-card-header {
+        padding: 1.2rem 1.25rem;
+        border-bottom: 1px solid #f0f1f5;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .qualification-route-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: rgba(216, 0, 184, .10);
+        color: #d800b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .qualification-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #242438;
+        margin: 0;
+    }
+
+    .qualification-subtitle {
+        color: #74758a;
+        font-size: .86rem;
+        margin-top: .2rem;
+    }
+
+    .qualification-card-body {
+        padding: 1.2rem 1.25rem;
+    }
+
+    .qualification-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .9rem;
+    }
+
+    .info-item {
+        min-width: 0;
+    }
+
+    .info-label {
+        color: #85869a;
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .info-value {
+        color: #28283b;
+        font-weight: 600;
+        font-size: .92rem;
+        word-break: break-word;
+    }
+
+    .qualification-card-footer {
+        padding: .9rem 1.25rem 1.1rem;
+        border-top: 1px solid #f0f1f5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .38rem .7rem;
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+    .status-pending {
+        background: #fff4d6;
+        color: #916600;
+    }
+
+    .status-verified {
+        background: #e5f8ec;
+        color: #16733b;
+    }
+
+    .status-rejected {
+        background: #fde9ec;
+        color: #a5263b;
+    }
+
+    .status-default {
+        background: #eef0f5;
+        color: #5f6273;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-card-action {
+        border: 1px solid #e2e3e9;
+        background: #fff;
+        color: #515267;
+        border-radius: 8px;
+        padding: .4rem .65rem;
+        font-size: .82rem;
+        font-weight: 600;
+    }
+
+    .btn-card-action:hover {
+        border-color: #d800b8;
+        color: #d800b8;
+        background: #fff;
+    }
+
+    .btn-card-danger:hover {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .empty-state {
+        background: #fff;
+        border: 1px dashed #d9dbe4;
+        border-radius: 16px;
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background: rgba(216, 0, 184, .09);
+        color: #d800b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+    }
+
+    .empty-state h4 {
+        font-weight: 700;
+        color: #28283b;
+    }
+
+    .empty-state p {
+        max-width: 560px;
+        margin: .5rem auto 1.25rem;
+        color: #77798d;
+    }
+
+    .subjects-count {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        color: #66687a;
+        font-size: .82rem;
+    }
+
+    .modal-content {
+        border: 0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 18px 60px rgba(20, 20, 40, .18);
+    }
+
+    .modal-header-kism {
+        background: linear-gradient(135deg, #d800b8 0%, #ad0093 100%);
+        color: #fff;
+        padding: 1.15rem 1.35rem;
+    }
+
+    .modal-header-kism .modal-title {
+        font-weight: 700;
+    }
+
+    .modal-header-kism .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: .9;
+    }
+
+    .modal-body {
+        padding: 1.35rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #3b3c50;
+        margin-bottom: .4rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-color: #dfe1e8;
+        border-radius: 9px;
+        min-height: 42px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #d800b8;
+        box-shadow: 0 0 0 .2rem rgba(216, 0, 184, .10);
+    }
+
+    .route-selection {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .route-option {
+        position: relative;
+    }
+
+    .route-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .route-option label {
+        display: block;
+        border: 1px solid #dfe1e8;
+        border-radius: 12px;
+        padding: 1rem;
+        cursor: pointer;
+        background: #fff;
+        transition: all .15s ease;
+    }
+
+    .route-option label:hover {
+        border-color: #d800b8;
+    }
+
+    .route-option input:checked + label {
+        border-color: #d800b8;
+        background: rgba(216, 0, 184, .055);
+        box-shadow: 0 0 0 2px rgba(216, 0, 184, .08);
+    }
+
+    .route-option-title {
+        font-weight: 700;
+        color: #2b2c3e;
+    }
+
+    .route-option-description {
+        font-size: .8rem;
+        color: #77798b;
+        margin-top: .25rem;
+    }
+
+    .section-box {
+        border: 1px solid #ececf2;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #fafafd;
+    }
+
+    .section-box-title {
+        display: flex;
+        align-items: center;
+        gap: .45rem;
+        font-weight: 700;
+        color: #303144;
+        margin-bottom: .9rem;
+    }
+
+    .subject-row {
+        background: #fff;
+        border: 1px solid #e7e8ee;
+        border-radius: 10px;
+        padding: .75rem;
+        margin-bottom: .65rem;
+    }
+
+    .subject-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .btn-add-subject {
+        border: 1px dashed #d800b8;
+        color: #d800b8;
+        background: #fff;
+        border-radius: 9px;
+        font-weight: 600;
+    }
+
+    .btn-add-subject:hover {
+        background: rgba(216, 0, 184, .06);
+        color: #ad0093;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.35rem;
+        border-top: 1px solid #ececf2;
+        background: #fafafd;
+    }
+
+    .details-label {
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #85869a;
+        font-weight: 700;
+    }
+
+    .details-value {
+        color: #292a3c;
+        font-weight: 600;
+        margin-top: .2rem;
+    }
+
+    .details-section {
+        border: 1px solid #ececf2;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .subject-table th {
+        font-size: .78rem;
+        color: #717386;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        font-weight: 700;
+    }
+
+    .subject-table td {
+        vertical-align: middle;
+    }
+
+    .loading-state {
+        padding: 2rem;
+        text-align: center;
+        color: #77798d;
+    }
+
+    .loading-state .spinner-border {
+        color: #d800b8;
+    }
+
+    .qualification-refreshing {
+        opacity: .55;
+        pointer-events: none;
+        transition: opacity .2s ease;
+    }
+
+    @@media (max-width: 767.98px) {
+        .qualifications-page {
+            padding: 1rem 0;
+        }
+
+        .page-hero {
+            padding: 1.25rem;
+            border-radius: 14px;
+        }
+
+        .hero-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 1.4rem;
+        }
+
+        .page-hero h2 {
+            font-size: 1.25rem;
+        }
+
+        .qualification-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .route-selection {
+            grid-template-columns: 1fr;
+        }
+
+        .qualification-card-footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .action-buttons {
+            width: 100%;
+        }
+
+        .btn-card-action {
+            flex: 1;
+        }
+    }
+</style>
+
+<div class="container-fluid qualifications-page">
+
+    <div class="page-hero">
+
+        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="hero-icon">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+
+                <div>
+
+                    <h2>My Qualifications</h2>
+
+                    <p>
+                        Manage your academic qualifications used for programme eligibility.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="btn btn-light fw-semibold px-3 py-2"
+                    id="btnAddQualification">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                Add Qualification
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="qualificationMessage"></div>
+
+    <!-- Qualification Content -->
+    <div id="qualificationContent">
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row g-4" id="qualificationsContainer">
+
+                @foreach (var qualification in Model)
+                {
+                    var route = qualification.QualificationRoute?.Trim().ToUpperInvariant() ?? string.Empty;
+
+                    var status = qualification.VerificationStatus?.Trim() ?? "Pending";
+
+                    var statusClass = status.Equals("Verified", StringComparison.OrdinalIgnoreCase)
+                        ? "status-verified"
+                        : status.Equals("Rejected", StringComparison.OrdinalIgnoreCase)
+                            ? "status-rejected"
+                            : status.Equals("Pending", StringComparison.OrdinalIgnoreCase)
+                                ? "status-pending"
+                                : "status-default";
+
+                    var routeTitle = route == "KCSE"
+                        ? "KCSE"
+                        : route == "KNEC"
+                            ? "KNEC"
+                            : qualification.QualificationRoute;
+
+                    var routeIcon = route == "KCSE"
+                        ? "bi-journal-text"
+                        : "bi-award-fill";
+
+                    var isVerified = status.Equals("Verified", StringComparison.OrdinalIgnoreCase);
+
+                    <div class="col-12 col-lg-6 qualification-item"
+                         data-qualification-id="@qualification.ApplicantQualificationId">
+
+                        <div class="qualification-card">
+
+                            <div class="qualification-card-header">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <div class="qualification-route-icon">
+                                        <i class="bi @routeIcon"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <div class="qualification-title">
+                                            @routeTitle Qualification
+                                        </div>
+
+                                        <div class="qualification-subtitle">
+                                            Qualification year: @qualification.QualificationYear
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <span class="status-badge @statusClass">
+
+                                    <i class="bi @(isVerified ? "bi-check-circle-fill" : "bi-clock-fill")"></i>
+
+                                    @status
+
+                                </span>
+
+                            </div>
+
+                            <div class="qualification-card-body">
+
+                                @if (route == "KCSE")
+                                {
+                                    <div class="qualification-info-grid">
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Mean Grade
+                                            </div>
+
+                                            <div class="info-value">
+                                                @(string.IsNullOrWhiteSpace(qualification.MeanGrade)
+                                                    ? "Not provided"
+                                                    : qualification.MeanGrade)
+                                            </div>
+
+                                        </div>
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Index Number
+                                            </div>
+
+                                            <div class="info-value">
+                                                @(string.IsNullOrWhiteSpace(qualification.ExaminationIndexNumber)
+                                                    ? "Not provided"
+                                                    : qualification.ExaminationIndexNumber)
+                                            </div>
+
+                                        </div>
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Subjects
+                                            </div>
+
+                                            <div class="info-value">
+
+                                                <span class="subjects-count">
+                                                    <i class="bi bi-book"></i>
+                                                    @(qualification.Subjects?.Count ?? 0) subject(s)
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Route
+                                            </div>
+
+                                            <div class="info-value">
+                                                KCSE
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                }
+                                else if (route == "KNEC")
+                                {
+                                    <div class="qualification-info-grid">
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Qualification Type
+                                            </div>
+
+                                            <div class="info-value">
+                                                @(string.IsNullOrWhiteSpace(qualification.QualificationType)
+                                                    ? "Not provided"
+                                                    : qualification.QualificationType)
+                                            </div>
+
+                                        </div>
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Institution
+                                            </div>
+
+                                            <div class="info-value">
+                                                @(string.IsNullOrWhiteSpace(qualification.InstitutionName)
+                                                    ? "Not provided"
+                                                    : qualification.InstitutionName)
+                                            </div>
+
+                                        </div>
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Field of Study
+                                            </div>
+
+                                            <div class="info-value">
+                                                @(string.IsNullOrWhiteSpace(qualification.FieldOfStudy)
+                                                    ? "Not provided"
+                                                    : qualification.FieldOfStudy)
+                                            </div>
+
+                                        </div>
+
+                                        <div class="info-item">
+
+                                            <div class="info-label">
+                                                Certificate Number
+                                            </div>
+
+                                            <div class="info-value">
+                                                @(string.IsNullOrWhiteSpace(qualification.CertificateNumber)
+                                                    ? "Not provided"
+                                                    : qualification.CertificateNumber)
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">
+
+                                        Qualification route:
+                                        <strong>@qualification.QualificationRoute</strong>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                            <div class="qualification-card-footer">
+
+                                <div class="small text-muted">
+
+                                    @if (isVerified)
+                                    {
+                                        <span>
+                                            <i class="bi bi-shield-check me-1"></i>
+                                            Verified qualifications cannot be edited or deleted.
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Pending verification
+                                        </span>
+                                    }
+
+                                </div>
+
+                                <div class="action-buttons">
+
+                                    <button type="button"
+                                            class="btn-card-action btn-view-qualification"
+                                            data-id="@qualification.ApplicantQualificationId">
+
+                                        <i class="bi bi-eye me-1"></i>
+                                        View
+
+                                    </button>
+
+                                    @if (!isVerified)
+                                    {
+                                        <button type="button"
+                                                class="btn-card-action btn-edit-qualification"
+                                                data-id="@qualification.ApplicantQualificationId">
+
+                                            <i class="bi bi-pencil-square me-1"></i>
+                                            Edit
+
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn-card-action btn-card-danger btn-delete-qualification"
+                                                data-id="@qualification.ApplicantQualificationId">
+
+                                            <i class="bi bi-trash3 me-1"></i>
+                                            Delete
+
+                                        </button>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-state" id="emptyQualificationsState">
+
+                <div class="empty-icon">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+
+                <h4>No qualifications added yet</h4>
+
+                <p>
+                    Add your KCSE or KNEC qualification so the system can use your
+                    academic information when determining programme eligibility.
+                </p>
+
+                <button type="button"
+                        class="btn btn-kism"
+                        id="btnAddQualificationEmpty">
+
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Your First Qualification
+
+                </button>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<!-- Create Qualification Modal -->
+<div class="modal fade"
+     id="createQualificationModal"
+     tabindex="-1"
+     aria-labelledby="createQualificationModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header modal-header-kism">
+
+                <h5 class="modal-title" id="createQualificationModalLabel">
+
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Add Qualification
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body" id="createQualificationModalBody">
+
+                <div class="loading-state">
+
+                    <div class="spinner-border" role="status"></div>
+
+                    <div class="mt-2">
+                        Loading form...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Edit Qualification Modal -->
+<div class="modal fade"
+     id="editQualificationModal"
+     tabindex="-1"
+     aria-labelledby="editQualificationModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header modal-header-kism">
+
+                <h5 class="modal-title" id="editQualificationModalLabel">
+
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit Qualification
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body" id="editQualificationModalBody">
+
+                <div class="loading-state">
+
+                    <div class="spinner-border" role="status"></div>
+
+                    <div class="mt-2">
+                        Loading qualification...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Details Qualification Modal -->
+<div class="modal fade"
+     id="detailsQualificationModal"
+     tabindex="-1"
+     aria-labelledby="detailsQualificationModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header modal-header-kism">
+
+                <h5 class="modal-title" id="detailsQualificationModalLabel">
+
+                    <i class="bi bi-eye me-2"></i>
+                    Qualification Details
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body" id="detailsQualificationModalBody">
+
+                <div class="loading-state">
+
+                    <div class="spinner-border" role="status"></div>
+
+                    <div class="mt-2">
+                        Loading qualification...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            const createModalElement =
+                document.getElementById('createQualificationModal');
+
+            const editModalElement =
+                document.getElementById('editQualificationModal');
+
+            const detailsModalElement =
+                document.getElementById('detailsQualificationModal');
+
+            const createModal =
+                bootstrap.Modal.getOrCreateInstance(createModalElement);
+
+            const editModal =
+                bootstrap.Modal.getOrCreateInstance(editModalElement);
+
+            const detailsModal =
+                bootstrap.Modal.getOrCreateInstance(detailsModalElement);
+
+
+            function showError(message) {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unable to continue',
+                    text: message || 'An unexpected error occurred.',
+                    confirmButtonColor: '#d800b8'
+                });
+
+            }
+
+
+            function showSuccess(message) {
+
+                return Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: message || 'Operation completed successfully.',
+                    confirmButtonColor: '#d800b8'
+                });
+
+            }
+
+
+            function getAntiForgeryToken(container) {
+
+                const token = container
+                    .find('input[name="__RequestVerificationToken"]')
+                    .val();
+
+                if (token) {
+                    return token;
+                }
+
+                return $('input[name="__RequestVerificationToken"]')
+                    .first()
+                    .val();
+            }
+
+
+            function loadCreateForm() {
+
+                $('#createQualificationModalBody').html(`
+                    <div class="loading-state">
+                        <div class="spinner-border" role="status"></div>
+                        <div class="mt-2">Loading form...</div>
+                    </div>
+                `);
+
+                createModal.show();
+
+                $.ajax({
+
+                    url: '@Url.Action("Create", "ApplicantQualifications")',
+
+                    type: 'GET',
+
+                    cache: false,
+
+                    success: function (html) {
+
+                        $('#createQualificationModalBody').html(html);
+
+                        initializeQualificationForm(
+                            '#createQualificationModalBody'
+                        );
+
+                    },
+
+                    error: function (xhr) {
+
+                        $('#createQualificationModalBody').html('');
+
+                        createModal.hide();
+
+                        showError(
+                            xhr.responseJSON?.message ||
+                            'The qualification form could not be loaded.'
+                        );
+
+                    }
+
+                });
+
+            }
+
+
+            function loadEditForm(id) {
+
+                $('#editQualificationModalBody').html(`
+                    <div class="loading-state">
+                        <div class="spinner-border" role="status"></div>
+                        <div class="mt-2">Loading qualification...</div>
+                    </div>
+                `);
+
+                editModal.show();
+
+                $.ajax({
+
+                    url: '@Url.Action("Edit", "ApplicantQualifications")',
+
+                    type: 'GET',
+
+                    data: {
+                        id: id
+                    },
+
+                    cache: false,
+
+                    success: function (html) {
+
+                        $('#editQualificationModalBody').html(html);
+
+                        initializeQualificationForm(
+                            '#editQualificationModalBody'
+                        );
+
+                    },
+
+                    error: function (xhr) {
+
+                        editModal.hide();
+
+                        showError(
+                            xhr.responseJSON?.message ||
+                            'The qualification could not be loaded.'
+                        );
+
+                    }
+
+                });
+
+            }
+
+
+            function loadDetails(id) {
+
+                $('#detailsQualificationModalBody').html(`
+                    <div class="loading-state">
+                        <div class="spinner-border" role="status"></div>
+                        <div class="mt-2">Loading qualification...</div>
+                    </div>
+                `);
+
+                detailsModal.show();
+
+                $.ajax({
+
+                    url: '@Url.Action("Details", "ApplicantQualifications")',
+
+                    type: 'GET',
+
+                    data: {
+                        id: id
+                    },
+
+                    cache: false,
+
+                    success: function (html) {
+
+                        $('#detailsQualificationModalBody').html(html);
+
+                    },
+
+                    error: function (xhr) {
+
+                        detailsModal.hide();
+
+                        showError(
+                            xhr.responseJSON?.message ||
+                            'The qualification details could not be loaded.'
+                        );
+
+                    }
+
+                });
+
+            }
+
+
+            /*
+             * Refresh only the qualification content.
+             *
+             * This avoids a full browser refresh while ensuring the
+             * newly created or edited qualification immediately appears.
+             */
+            function refreshQualifications() {
+
+                const content = $('#qualificationContent');
+
+                content.addClass('qualification-refreshing');
+
+                return $.ajax({
+
+                    url: window.location.href,
+
+                    type: 'GET',
+
+                    cache: false,
+
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+
+                    success: function (html) {
+
+                        const responseDocument =
+                            $('<div>').append($.parseHTML(html, document, true));
+
+                        const updatedContent =
+                            responseDocument.find('#qualificationContent').first();
+
+                        if (updatedContent.length) {
+
+                            content.replaceWith(updatedContent);
+
+                        } else {
+
+                            /*
+                             * Fallback if the expected container cannot
+                             * be found in the response.
+                             */
+                            window.location.reload();
+
+                        }
+
+                    },
+
+                    error: function () {
+
+                        /*
+                         * AJAX refresh failed. Fall back to a normal
+                         * browser refresh so the user still sees the
+                         * latest saved data.
+                         */
+                        window.location.reload();
+
+                    }
+
+                });
+
+            }
+
+
+            function initializeQualificationForm(containerSelector) {
+
+                const container = $(containerSelector);
+
+                const form = container.find('form');
+
+                if (!form.length) {
+                    return;
+                }
+
+
+                configureRouteVisibility(container);
+
+
+                container
+                    .off('change.qualificationRoute')
+                    .on(
+                        'change.qualificationRoute',
+                        'input[name="QualificationRoute"], #QualificationRoute',
+                        function () {
+
+                            configureRouteVisibility(container);
+
+                        }
+                    );
+
+
+                initializeSubjectRows(container);
+
+
+                container
+                    .off('click.addSubject')
+                    .on(
+                        'click.addSubject',
+                        '.btn-add-subject',
+                        function () {
+
+                            addSubjectRow(container);
+
+                        }
+                    );
+
+
+                container
+                    .off('click.removeSubject')
+                    .on(
+                        'click.removeSubject',
+                        '.btn-remove-subject',
+                        function () {
+
+                            const rows =
+                                container.find('.subject-row');
+
+                            if (rows.length <= 1) {
+
+                                rows.first()
+                                    .find('input[name$=".SubjectName"]')
+                                    .val('');
+
+                                rows.first()
+                                    .find(
+                                        'select[name$=".Grade"], input[name$=".Grade"]'
+                                    )
+                                    .val('');
+
+                                return;
+
+                            }
+
+                            $(this)
+                                .closest('.subject-row')
+                                .remove();
+
+                            renumberSubjectRows(container);
+
+                        }
+                    );
+
+
+                /*
+                 * Delegated submit handler.
+                 *
+                 * This is important because both Create and Edit forms
+                 * are loaded dynamically through AJAX.
+                 */
+                container
+                    .off('submit.qualification')
+                    .on(
+                        'submit.qualification',
+                        'form',
+                        function (event) {
+
+                            event.preventDefault();
+
+                            const currentForm = $(this);
+
+                            if (!this.checkValidity()) {
+
+                                this.classList.add('was-validated');
+
+                                return;
+                            }
+
+
+                            /*
+                             * Make sure the current subject indexes are
+                             * valid before serializing the form.
+                             */
+                            renumberSubjectRows(container);
+
+
+                            const token =
+                                getAntiForgeryToken(currentForm);
+
+
+                            const submitButton =
+                                currentForm.find(
+                                    'button[type="submit"], .wizard-submit'
+                                ).first();
+
+
+                            const originalButtonHtml =
+                                submitButton.html();
+
+
+                            submitButton.prop('disabled', true);
+
+
+                            submitButton.html(`
+                                <span
+                                    class="spinner-border spinner-border-sm me-1"
+                                    role="status"
+                                    aria-hidden="true">
+                                </span>
+                                Saving...
+                            `);
+
+
+                            $.ajax({
+
+                                url: currentForm.attr('action'),
+
+                                type: 'POST',
+
+                                data: currentForm.serialize(),
+
+                                headers: token
+                                    ? {
+                                        'RequestVerificationToken': token
+                                    }
+                                    : {},
+
+                                success: function (response) {
+
+                                    if (response && response.success) {
+
+                                        /*
+                                         * Close whichever modal contains
+                                         * the submitted form.
+                                         */
+                                        if (
+                                            currentForm.closest(
+                                                '#createQualificationModalBody'
+                                            ).length
+                                        ) {
+
+                                            createModal.hide();
+
+                                        }
+
+                                        if (
+                                            currentForm.closest(
+                                                '#editQualificationModalBody'
+                                            ).length
+                                        ) {
+
+                                            editModal.hide();
+
+                                        }
+
+
+                                        showSuccess(
+                                            response.message ||
+                                            'Qualification saved successfully.'
+                                        ).then(function () {
+
+                                            /*
+                                             * Refresh the qualification
+                                             * list using AJAX.
+                                             */
+                                            refreshQualifications();
+
+                                        });
+
+                                        return;
+                                    }
+
+
+                                    /*
+                                     * If the controller returns HTML
+                                     * containing validation errors, put it
+                                     * back into the modal and reinitialize it.
+                                     */
+                                    if (response && response.html) {
+
+                                        const modalBody =
+                                            currentForm.closest('.modal-body');
+
+                                        modalBody.html(response.html);
+
+                                        initializeQualificationForm(
+                                            modalBody
+                                        );
+
+                                        return;
+                                    }
+
+
+                                    showError(
+                                        response?.message ||
+                                        'The qualification could not be saved.'
+                                    );
+
+                                },
+
+                                error: function (xhr) {
+
+                                    let message =
+                                        'The qualification could not be saved.';
+
+
+                                    if (xhr.responseJSON?.message) {
+
+                                        message =
+                                            xhr.responseJSON.message;
+
+                                    }
+
+
+                                    if (xhr.responseJSON?.errors) {
+
+                                        const errors =
+                                            xhr.responseJSON.errors;
+
+                                        const messages = [];
+
+
+                                        Object.keys(errors).forEach(
+                                            function (key) {
+
+                                                const fieldErrors =
+                                                    errors[key];
+
+                                                if (
+                                                    Array.isArray(fieldErrors)
+                                                ) {
+
+                                                    fieldErrors.forEach(
+                                                        function (error) {
+
+                                                            messages.push(error);
+
+                                                        }
+                                                    );
+
+                                                }
+
+                                            }
+                                        );
+
+
+                                        if (messages.length) {
+
+                                            message =
+                                                messages.join('\n');
+
+                                        }
+
+                                    }
+
+
+                                    showError(message);
+
+                                },
+
+                                complete: function () {
+
+                                    submitButton.prop(
+                                        'disabled',
+                                        false
+                                    );
+
+                                    submitButton.html(
+                                        originalButtonHtml
+                                    );
+
+                                }
+
+                            });
+
+                        }
+                    );
+
+            }
+
+
+            function configureRouteVisibility(container) {
+
+                let route = '';
+
+
+                const selectedRadio =
+                    container.find(
+                        'input[name="QualificationRoute"]:checked'
+                    );
+
+
+                if (selectedRadio.length) {
+
+                    route = selectedRadio.val();
+
+                } else {
+
+                    const select =
+                        container.find('#QualificationRoute');
+
+                    if (select.length) {
+
+                        route = select.val();
+
+                    }
+
+                }
+
+
+                route =
+                    (route || '').toUpperCase();
+
+
+                const kcseSection =
+                    container.find('.kcse-section');
+
+                const knecSection =
+                    container.find('.knec-section');
+
+
+                if (route === 'KCSE') {
+
+                    kcseSection.removeClass('d-none');
+
+                    knecSection.addClass('d-none');
+
+
+                    kcseSection
+                        .find('input, select, textarea')
+                        .prop('disabled', false);
+
+
+                    knecSection
+                        .find('input, select, textarea')
+                        .prop('disabled', true);
+
+                }
+                else if (route === 'KNEC') {
+
+                    kcseSection.addClass('d-none');
+
+                    knecSection.removeClass('d-none');
+
+
+                    kcseSection
+                        .find('input, select, textarea')
+                        .prop('disabled', true);
+
+
+                    knecSection
+                        .find('input, select, textarea')
+                        .prop('disabled', false);
+
+                }
+                else {
+
+                    kcseSection.addClass('d-none');
+
+                    knecSection.addClass('d-none');
+
+                }
+
+            }
+
+
+            function initializeSubjectRows(container) {
+
+                const subjectContainer =
+                    container.find('#subjectsContainer');
+
+
+                if (!subjectContainer.length) {
+                    return;
+                }
+
+
+                if (
+                    !subjectContainer.find('.subject-row').length
+                ) {
+
+                    addSubjectRow(container);
+
+                }
+
+
+                renumberSubjectRows(container);
+
+            }
+
+
+            function addSubjectRow(container) {
+
+                const subjectContainer =
+                    container.find('#subjectsContainer');
+
+
+                if (!subjectContainer.length) {
+                    return;
+                }
+
+
+                const index =
+                    subjectContainer.find('.subject-row').length;
+
+
+                const row = `
+
+                    <div class="subject-row">
+
+                        <div class="row g-2 align-items-end">
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Subject Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="Subjects[${index}].SubjectName"
+                                    maxlength="150"
+                                    placeholder="e.g. Mathematics"
+                                    required />
+
+                                <div class="invalid-feedback">
+                                    Please enter the subject name.
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Grade
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    name="Subjects[${index}].Grade"
+                                    required>
+
+                                    <option value="">
+                                        Select grade
+                                    </option>
+
+                                    <option value="A">A</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B">B</option>
+                                    <option value="B-">B-</option>
+                                    <option value="C+">C+</option>
+                                    <option value="C">C</option>
+                                    <option value="C-">C-</option>
+                                    <option value="D+">D+</option>
+                                    <option value="D">D</option>
+                                    <option value="D-">D-</option>
+                                    <option value="E">E</option>
+
+                                </select>
+
+                                <div class="invalid-feedback">
+                                    Please select the subject grade.
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-2">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger w-100 btn-remove-subject">
+
+                                    <i class="bi bi-trash3"></i>
+                                    Remove
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                subjectContainer.append(row);
+
+                renumberSubjectRows(container);
+
+            }
+
+
+            function renumberSubjectRows(container) {
+
+                container
+                    .find('#subjectsContainer .subject-row')
+                    .each(function (index) {
+
+                        $(this)
+                            .find('[name]')
+                            .each(function () {
+
+                                const name =
+                                    $(this).attr('name');
+
+
+                                if (!name) {
+                                    return;
+                                }
+
+
+                                /*
+                                 * Correct subject collection index
+                                 *
+                                 * Example:
+                                 * Subjects[3].SubjectName
+                                 *
+                                 * becomes:
+                                 * Subjects[0].SubjectName
+                                 */
+                                const updatedName =
+                                    name.replace(
+                                        /Subjects\[\d+\]/,
+                                        `Subjects[${index}]`
+                                    );
+
+
+                                $(this).attr(
+                                    'name',
+                                    updatedName
+                                );
+
+                            });
+
+                    });
+
+            }
+
+
+            /*
+             * Add Qualification
+             */
+            $(document)
+                .off('click.addQualification')
+                .on(
+                    'click.addQualification',
+                    '#btnAddQualification, #btnAddQualificationEmpty',
+                    function () {
+
+                        loadCreateForm();
+
+                    }
+                );
+
+
+            /*
+             * View Qualification
+             */
+            $(document)
+                .off('click.viewQualification')
+                .on(
+                    'click.viewQualification',
+                    '.btn-view-qualification',
+                    function () {
+
+                        const id =
+                            $(this).data('id');
+
+
+                        if (!id) {
+                            return;
+                        }
+
+
+                        loadDetails(id);
+
+                    }
+                );
+
+
+            /*
+             * Edit Qualification
+             */
+            $(document)
+                .off('click.editQualification')
+                .on(
+                    'click.editQualification',
+                    '.btn-edit-qualification',
+                    function () {
+
+                        const id =
+                            $(this).data('id');
+
+
+                        if (!id) {
+                            return;
+                        }
+
+
+                        loadEditForm(id);
+
+                    }
+                );
+
+
+            /*
+             * Delete Qualification
+             */
+            $(document)
+                .off('click.deleteQualification')
+                .on(
+                    'click.deleteQualification',
+                    '.btn-delete-qualification',
+                    function () {
+
+                        const id =
+                            $(this).data('id');
+
+
+                        if (!id) {
+                            return;
+                        }
+
+
+                        Swal.fire({
+
+                            icon: 'warning',
+
+                            title: 'Delete qualification?',
+
+                            text:
+                                'This qualification and its subject details will be removed.',
+
+                            showCancelButton: true,
+
+                            confirmButtonText:
+                                'Yes, delete',
+
+                            cancelButtonText:
+                                'Cancel',
+
+                            confirmButtonColor:
+                                '#dc3545',
+
+                            cancelButtonColor:
+                                '#6c757d'
+
+                        }).then(function (result) {
+
+                            if (!result.isConfirmed) {
+                                return;
+                            }
+
+
+                            $.ajax({
+
+                                url:
+                                    '@Url.Action("Delete", "ApplicantQualifications")',
+
+                                type: 'POST',
+
+                                data: {
+
+                                    id: id,
+
+                                    __RequestVerificationToken:
+                                        $('input[name="__RequestVerificationToken"]')
+                                            .first()
+                                            .val()
+
+                                },
+
+                                success: function (response) {
+
+                                    if (
+                                        response &&
+                                        response.success
+                                    ) {
+
+                                        Swal.fire({
+
+                                            icon: 'success',
+
+                                            title: 'Deleted',
+
+                                            text:
+                                                response.message ||
+                                                'Qualification deleted successfully.',
+
+                                            confirmButtonColor:
+                                                '#d800b8'
+
+                                        }).then(function () {
+
+                                            refreshQualifications();
+
+                                        });
+
+                                        return;
+
+                                    }
+
+
+                                    showError(
+                                        response?.message ||
+                                        'The qualification could not be deleted.'
+                                    );
+
+                                },
+
+                                error: function (xhr) {
+
+                                    showError(
+                                        xhr.responseJSON?.message ||
+                                        'The qualification could not be deleted.'
+                                    );
+
+                                }
+
+                            });
+
+                        });
+
+                    }
+                );
+
+        });
+
+    </script>
+}

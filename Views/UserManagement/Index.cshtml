@@ -1,0 +1,1328 @@
+@model IEnumerable<KISMApplicationManagement.Models.UserManagementViewModels.UserManagementRowViewModel>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container-fluid px-0">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-people me-2"></i>
+                User Management
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage KISM system users, accounts and access.
+            </p>
+
+        </div>
+
+        <button type="button"
+                class="btn btn-kism-primary"
+                id="btnCreateUser">
+
+            <i class="bi bi-person-plus me-1"></i>
+            Add User
+
+        </button>
+
+    </div>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <div class="row g-3 mb-3">
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-semibold">
+                        Role
+                    </label>
+
+                    <select id="roleFilter"
+                            class="form-select">
+
+                        <option value="">
+                            All Roles
+                        </option>
+
+                        @foreach (var role in Model
+                            .SelectMany(u => u.Roles)
+                            .Distinct()
+                            .OrderBy(r => r))
+                        {
+                            <option value="@role">
+                                @role
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-semibold">
+                        Status
+                    </label>
+
+                    <select id="statusFilter"
+                            class="form-select">
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        <option value="Active">
+                            Active
+                        </option>
+
+                        <option value="Inactive">
+                            Inactive
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table id="usersTable"
+                       class="table table-bordered table-hover align-middle w-100">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Email Status</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+
+                                <td></td>
+
+                                <td>
+
+                                    <span class="fw-semibold">
+
+                                        @user.FirstName
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                            user.MiddleName))
+                                        {
+                                            @(" " + user.MiddleName)
+                                        }
+
+                                        @(" " + user.LastName)
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+                                    @user.UserName
+                                </td>
+
+                                <td>
+                                    @user.Email
+                                </td>
+
+                                <td>
+
+                                    @(string.IsNullOrWhiteSpace(
+                                        user.PhoneNumber)
+                                        ? "—"
+                                        : user.PhoneNumber)
+
+                                </td>
+
+                                <td data-search="@string.Join(
+                                    ", ",
+                                    user.Roles)">
+
+                                    @if (user.Roles.Any())
+                                    {
+                                        foreach (var role in user.Roles)
+                                        {
+                                            <span class="badge kism-role-badge me-1">
+                                                @role
+                                            </span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            No role
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td data-search="@(
+                                    user.EmailConfirmed
+                                        ? "Confirmed"
+                                        : "Not Confirmed")">
+
+                                    @if (user.EmailConfirmed)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                            Confirmed
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                            Not Confirmed
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td data-search="@(
+                                    user.IsActive
+                                        ? "Active"
+                                        : "Inactive")">
+
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    @(user.LastLogin.HasValue
+                                        ? user.LastLogin.Value
+                                            .ToLocalTime()
+                                            .ToString(
+                                                "dd MMM yyyy HH:mm")
+                                        : "Never")
+
+                                </td>
+
+                                <td>
+
+                                    @(user.CreatedAt.HasValue
+                                        ? user.CreatedAt.Value
+                                            .ToLocalTime()
+                                            .ToString(
+                                                "dd MMM yyyy")
+                                        : "—")
+
+                                </td>
+
+                                <td>
+
+                                    <div class="d-flex gap-1">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary btn-view-user"
+                                                data-user-id="@user.UserId"
+                                                title="View User">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-edit-user"
+                                                data-user-id="@user.UserId"
+                                                title="Edit User">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-warning btn-manage-user-roles"
+                                                data-user-id="@user.UserId"
+                                                title="Manage Roles">
+
+                                            <i class="bi bi-shield-lock"></i>
+
+                                        </button>
+
+                                        @if (user.IsActive)
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger btn-toggle-user-status"
+                                                    data-user-id="@user.UserId"
+                                                    data-is-active="true"
+                                                    title="Deactivate User">
+
+                                                <i class="bi bi-person-x"></i>
+
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-success btn-toggle-user-status"
+                                                    data-user-id="@user.UserId"
+                                                    data-is-active="false"
+                                                    title="Activate User">
+
+                                                <i class="bi bi-person-check"></i>
+
+                                            </button>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Create User Modal -->
+
+<div class="modal fade"
+     id="createUserModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header kism-modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-person-plus me-2"></i>
+                    Create User
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="createUserModalBody">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- View User Modal -->
+
+<div class="modal fade"
+     id="detailsUserModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header kism-modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-person-circle me-2"></i>
+                    User Details
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="detailsUserModalBody">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Edit User Modal -->
+
+<div class="modal fade"
+     id="editUserModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header kism-modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit User
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="editUserModalBody">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Manage User Roles Modal -->
+
+<div class="modal fade"
+     id="manageUserRolesModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header kism-modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-shield-lock me-2"></i>
+                    Manage User Roles
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="manageUserRolesModalBody">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Styles {
+
+    <style>
+
+        .btn-kism-primary {
+            background-color: #d800b8;
+            border-color: #d800b8;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-kism-primary:hover,
+        .btn-kism-primary:focus,
+        .btn-kism-primary:active {
+            background-color: #ad0093 !important;
+            border-color: #ad0093 !important;
+            color: #ffffff !important;
+        }
+
+        .kism-role-badge {
+            background-color: rgba(216, 0, 184, 0.08);
+            color: #d800b8;
+            border: 1px solid rgba(216, 0, 184, 0.18);
+            font-weight: 500;
+        }
+
+        .kism-modal-header {
+            background-color: #d800b8;
+            color: #ffffff;
+            border-bottom: 0;
+        }
+
+        #usersTable thead th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        #usersTable tbody td {
+            vertical-align: middle;
+        }
+
+        .dataTables_wrapper .dataTables_filter input:focus,
+        .dataTables_wrapper .dataTables_length select:focus {
+            border-color: #d800b8;
+            box-shadow: 0 0 0 0.2rem rgba(216, 0, 184, 0.15);
+        }
+
+    </style>
+
+}
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            const usersTable =
+                $('#usersTable').DataTable({
+
+                    responsive: true,
+
+                    pageLength: 10,
+
+                    lengthMenu: [
+                        [10, 25, 50, 100, -1],
+                        [10, 25, 50, 100, 'All']
+                    ],
+
+                    order: [[1, 'asc']],
+
+                    columnDefs: [
+
+                        {
+                            targets: 0,
+                            orderable: false,
+                            searchable: false
+                        },
+
+                        {
+                            targets: 10,
+                            orderable: false,
+                            searchable: false
+                        }
+
+                    ]
+
+                });
+
+
+            function updateRowNumbers() {
+
+                const pageInfo =
+                    usersTable.page.info();
+
+                usersTable
+                    .rows({
+                        page: 'current'
+                    })
+                    .every(function (rowIndex) {
+
+                        $(this.node())
+                            .find('td:first')
+                            .text(
+                                pageInfo.start +
+                                rowIndex +
+                                1
+                            );
+
+                    });
+
+            }
+
+
+            usersTable.on(
+                'draw',
+                function () {
+                    updateRowNumbers();
+                });
+
+
+            updateRowNumbers();
+
+
+            $('#roleFilter').on(
+                'change',
+                function () {
+
+                    usersTable
+                        .column(5)
+                        .search($(this).val())
+                        .draw();
+
+                });
+
+
+            $('#statusFilter').on(
+                'change',
+                function () {
+
+                    usersTable
+                        .column(7)
+                        .search($(this).val())
+                        .draw();
+
+                });
+
+
+            // -------------------------------------------------
+            // CREATE USER
+            // -------------------------------------------------
+
+            $('#btnCreateUser').on(
+                'click',
+                function () {
+
+                    const modalElement =
+                        document.getElementById(
+                            'createUserModal');
+
+                    const modal =
+                        bootstrap.Modal
+                            .getOrCreateInstance(
+                                modalElement);
+
+                    $('#createUserModalBody').html(`
+                        <div class="text-center py-5">
+
+                            <div class="spinner-border text-kism-primary"
+                                 role="status">
+                            </div>
+
+                            <div class="mt-2 text-muted">
+                                Loading...
+                            </div>
+
+                        </div>
+                    `);
+
+                    modal.show();
+
+                    $.get(
+                        '@Url.Action("Create", "UserManagement")'
+                    )
+                    .done(function (html) {
+
+                        $('#createUserModalBody')
+                            .html(html);
+
+                        initializeCreateUserForm();
+
+                    })
+                    .fail(function () {
+
+                        $('#createUserModalBody').html(`
+                            <div class="alert alert-danger">
+
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+
+                                Unable to load the create user form.
+
+                            </div>
+                        `);
+
+                    });
+
+                });
+
+
+            function initializeCreateUserForm() {
+
+                const form =
+                    $('#createUserForm');
+
+                if (!form.length) {
+                    return;
+                }
+
+                form.off('submit');
+
+                form.on(
+                    'submit',
+                    function (event) {
+
+                        event.preventDefault();
+
+                        if (!this.checkValidity()) {
+
+                            this.classList.add(
+                                'was-validated');
+
+                            return;
+                        }
+
+                        const submitButton =
+                            $('#createUserSubmit');
+
+                        submitButton
+                            .prop('disabled', true)
+                            .html(`
+                                <span class="spinner-border spinner-border-sm me-1">
+                                </span>
+                                Creating...
+                            `);
+
+                        $.ajax({
+
+                            url:
+                                form.attr('action'),
+
+                            type:
+                                'POST',
+
+                            data:
+                                form.serialize()
+
+                        })
+                        .done(function (response) {
+
+                            if (typeof response === 'object'
+                                && response.success) {
+
+                                bootstrap.Modal
+                                    .getInstance(
+                                        document.getElementById(
+                                            'createUserModal'))
+                                    .hide();
+
+                                Swal.fire({
+
+                                    icon: 'success',
+
+                                    title: 'Success',
+
+                                    text: response.message,
+
+                                    confirmButtonColor:
+                                        '#d800b8'
+
+                                })
+                                .then(function () {
+
+                                    window.location.reload();
+
+                                });
+
+                                return;
+                            }
+
+                            $('#createUserModalBody')
+                                .html(response);
+
+                            initializeCreateUserForm();
+
+                        })
+                        .fail(function () {
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Error',
+
+                                text:
+                                    'Unable to create the user.',
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                            submitButton
+                                .prop('disabled', false)
+                                .html(`
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Create User
+                                `);
+
+                        });
+
+                    });
+
+            }
+
+
+            // -------------------------------------------------
+            // VIEW USER
+            // -------------------------------------------------
+
+            $(document).on(
+                'click',
+                '.btn-view-user',
+                function () {
+
+                    const userId =
+                        $(this).data('user-id');
+
+                    const modalElement =
+                        document.getElementById(
+                            'detailsUserModal');
+
+                    const modal =
+                        bootstrap.Modal
+                            .getOrCreateInstance(
+                                modalElement);
+
+                    $('#detailsUserModalBody').html(`
+                        <div class="text-center py-5">
+
+                            <div class="spinner-border text-kism-primary">
+                            </div>
+
+                            <div class="mt-2 text-muted">
+                                Loading user details...
+                            </div>
+
+                        </div>
+                    `);
+
+                    modal.show();
+
+                    $.ajax({
+
+                        url:
+                            '@Url.Action("Details", "UserManagement")'
+                            + '?id='
+                            + encodeURIComponent(
+                                userId),
+
+                        type:
+                            'GET'
+
+                    })
+                    .done(function (html) {
+
+                        $('#detailsUserModalBody')
+                            .html(html);
+
+                    })
+                    .fail(function () {
+
+                        $('#detailsUserModalBody').html(`
+                            <div class="alert alert-danger">
+
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+
+                                Unable to load user details.
+
+                            </div>
+                        `);
+
+                    });
+
+                });
+
+
+            // -------------------------------------------------
+            // EDIT USER
+            // -------------------------------------------------
+
+            $(document).on(
+                'click',
+                '.btn-edit-user',
+                function () {
+
+                    const userId =
+                        $(this).data('user-id');
+
+                    const modalElement =
+                        document.getElementById(
+                            'editUserModal');
+
+                    const modal =
+                        bootstrap.Modal
+                            .getOrCreateInstance(
+                                modalElement);
+
+                    $('#editUserModalBody').html(`
+                        <div class="text-center py-5">
+
+                            <div class="spinner-border text-kism-primary">
+                            </div>
+
+                            <div class="mt-2 text-muted">
+                                Loading user...
+                            </div>
+
+                        </div>
+                    `);
+
+                    modal.show();
+
+                    $.ajax({
+
+                        url:
+                            '@Url.Action("Edit", "UserManagement")'
+                            + '?id='
+                            + encodeURIComponent(
+                                userId),
+
+                        type:
+                            'GET'
+
+                    })
+                    .done(function (html) {
+
+                        $('#editUserModalBody')
+                            .html(html);
+
+                        initializeEditUserForm();
+
+                    })
+                    .fail(function () {
+
+                        $('#editUserModalBody').html(`
+                            <div class="alert alert-danger">
+
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+
+                                Unable to load the edit form.
+
+                            </div>
+                        `);
+
+                    });
+
+                });
+
+
+            function initializeEditUserForm() {
+
+                const form =
+                    $('#editUserForm');
+
+                if (!form.length) {
+                    return;
+                }
+
+                form.off('submit');
+
+                form.on(
+                    'submit',
+                    function (event) {
+
+                        event.preventDefault();
+
+                        if (!this.checkValidity()) {
+
+                            this.classList.add(
+                                'was-validated');
+
+                            return;
+                        }
+
+                        const submitButton =
+                            $('#editUserSubmit');
+
+                        submitButton
+                            .prop('disabled', true)
+                            .html(`
+                                <span class="spinner-border spinner-border-sm me-1">
+                                </span>
+                                Saving...
+                            `);
+
+                        $.ajax({
+
+                            url:
+                                form.attr('action'),
+
+                            type:
+                                'POST',
+
+                            data:
+                                form.serialize()
+
+                        })
+                        .done(function (response) {
+
+                            if (typeof response === 'object'
+                                && response.success) {
+
+                                bootstrap.Modal
+                                    .getInstance(
+                                        document.getElementById(
+                                            'editUserModal'))
+                                    .hide();
+
+                                Swal.fire({
+
+                                    icon: 'success',
+
+                                    title: 'Success',
+
+                                    text:
+                                        response.message,
+
+                                    confirmButtonColor:
+                                        '#d800b8'
+
+                                })
+                                .then(function () {
+
+                                    window.location.reload();
+
+                                });
+
+                                return;
+                            }
+
+                            $('#editUserModalBody')
+                                .html(response);
+
+                            initializeEditUserForm();
+
+                        })
+                        .fail(function () {
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Error',
+
+                                text:
+                                    'Unable to update the user.',
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                            submitButton
+                                .prop('disabled', false)
+                                .html(`
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Save Changes
+                                `);
+
+                        });
+
+                    });
+
+            }
+
+
+            // -------------------------------------------------
+            // MANAGE USER ROLES
+            // -------------------------------------------------
+
+            $(document).on(
+                'click',
+                '.btn-manage-user-roles',
+                function () {
+
+                    const userId =
+                        $(this).data('user-id');
+
+                    const modalElement =
+                        document.getElementById(
+                            'manageUserRolesModal');
+
+                    const modal =
+                        bootstrap.Modal
+                            .getOrCreateInstance(
+                                modalElement);
+
+                    $('#manageUserRolesModalBody').html(`
+                        <div class="text-center py-5">
+
+                            <div class="spinner-border text-kism-primary">
+                            </div>
+
+                            <div class="mt-2 text-muted">
+                                Loading user roles...
+                            </div>
+
+                        </div>
+                    `);
+
+                    modal.show();
+
+                    $.ajax({
+
+                        url:
+                            '@Url.Action("ManageRoles", "UserManagement")'
+                            + '?id='
+                            + encodeURIComponent(
+                                userId),
+
+                        type:
+                            'GET'
+
+                    })
+                    .done(function (html) {
+
+                        $('#manageUserRolesModalBody')
+                            .html(html);
+
+                    })
+                    .fail(function () {
+
+                        $('#manageUserRolesModalBody').html(`
+                            <div class="alert alert-danger">
+
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+
+                                Unable to load user roles.
+
+                            </div>
+                        `);
+
+                    });
+
+                });
+
+
+            // -------------------------------------------------
+            // ACTIVATE / DEACTIVATE USER
+            // -------------------------------------------------
+
+            $(document).on(
+                'click',
+                '.btn-toggle-user-status',
+                function () {
+
+                    const button =
+                        $(this);
+
+                    const userId =
+                        button.data('user-id');
+
+                    const isCurrentlyActive =
+                        button.data('is-active') === true ||
+                        button.data('is-active') === 'true';
+
+                    const actionText =
+                        isCurrentlyActive
+                            ? 'deactivate'
+                            : 'activate';
+
+                    const actionTitle =
+                        isCurrentlyActive
+                            ? 'Deactivate User?'
+                            : 'Activate User?';
+
+                    const actionMessage =
+                        isCurrentlyActive
+                            ? 'This user will be marked as inactive.'
+                            : 'This user will be marked as active.';
+
+                    Swal.fire({
+
+                        icon:
+                            isCurrentlyActive
+                                ? 'warning'
+                                : 'question',
+
+                        title:
+                            actionTitle,
+
+                        text:
+                            actionMessage,
+
+                        showCancelButton:
+                            true,
+
+                        confirmButtonText:
+                            isCurrentlyActive
+                                ? 'Yes, deactivate'
+                                : 'Yes, activate',
+
+                        cancelButtonText:
+                            'Cancel',
+
+                        confirmButtonColor:
+                            isCurrentlyActive
+                                ? '#dc3545'
+                                : '#198754',
+
+                        cancelButtonColor:
+                            '#6c757d'
+
+                    })
+                    .then(function (result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        button
+                            .prop('disabled', true)
+                            .html(`
+                                <span class="spinner-border spinner-border-sm">
+                                </span>
+                            `);
+
+                        const token =
+                            $('input[name="__RequestVerificationToken"]')
+                                .first()
+                                .val();
+
+                        $.ajax({
+
+                            url:
+                                '@Url.Action("ToggleStatus", "UserManagement")',
+
+                            type:
+                                'POST',
+
+                            data: {
+
+                                id:
+                                    userId,
+
+                                __RequestVerificationToken:
+                                    token
+
+                            }
+
+                        })
+                        .done(function (response) {
+
+                            if (response.success) {
+
+                                Swal.fire({
+
+                                    icon:
+                                        'success',
+
+                                    title:
+                                        'Success',
+
+                                    text:
+                                        response.message,
+
+                                    confirmButtonColor:
+                                        '#d800b8'
+
+                                })
+                                .then(function () {
+
+                                    window.location.reload();
+
+                                });
+
+                                return;
+                            }
+
+                            Swal.fire({
+
+                                icon:
+                                    'error',
+
+                                title:
+                                    'Error',
+
+                                text:
+                                    response.message ||
+                                    'Unable to update the user status.',
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                            button
+                                .prop('disabled', false);
+
+                        })
+                        .fail(function (xhr) {
+
+                            let message =
+                                'Unable to update the user status.';
+
+                            if (xhr.responseJSON &&
+                                xhr.responseJSON.message) {
+
+                                message =
+                                    xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+
+                                icon:
+                                    'error',
+
+                                title:
+                                    'Error',
+
+                                text:
+                                    message,
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                            button
+                                .prop('disabled', false);
+
+                        });
+
+                    });
+
+                });
+
+        });
+
+    </script>
+
+}

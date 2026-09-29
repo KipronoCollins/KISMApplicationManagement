@@ -1,0 +1,378 @@
+@using Microsoft.AspNetCore.Identity
+@using KISMApplicationManagement.Models
+@inject SignInManager<ApplicationUser> SignInManager
+
+<aside class="kism-sidebar" id="kismSidebar">
+
+    <div class="kism-sidebar-brand">
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="kism-sidebar-logo-link">
+
+            <img src="https://kism.ac.ke/wp-content/uploads/2021/07/new.png"
+                 alt="KISM Logo"
+                 class="kism-sidebar-logo" />
+
+        </a>
+
+    </div>
+
+
+    <div class="kism-sidebar-content">
+
+        <!-- ========================================================
+             GENERAL
+             ======================================================== -->
+
+        <div class="kism-sidebar-section">
+
+            <div class="kism-sidebar-heading">
+                GENERAL
+            </div>
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="kism-sidebar-link">
+
+                <i class="bi bi-speedometer2"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+            <a asp-area="Identity"
+               asp-page="/Account/Manage/Index"
+               class="kism-sidebar-link">
+
+                <i class="bi bi-person-circle"></i>
+
+                <span>My Profile</span>
+
+            </a>
+
+        </div>
+
+
+        <!-- ========================================================
+             APPLICANT PORTAL
+             ======================================================== -->
+
+        @if (User.IsInRole("Applicant"))
+        {
+            <div class="kism-sidebar-section">
+
+                <div class="kism-sidebar-heading">
+                    APPLICANT PORTAL
+                </div>
+
+                <a asp-controller="Application"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-file-earmark-text"></i>
+
+                    <span>My Applications</span>
+
+                </a>
+
+                <a asp-controller="Application"
+                   asp-action="Create"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-plus-circle"></i>
+
+                    <span>Start Application</span>
+
+                </a>
+
+                <a asp-controller="ApplicantQualifications"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-mortarboard"></i>
+
+                    <span>My Qualifications</span>
+
+                </a>
+
+                <a asp-controller="ApplicationDocument"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-folder2-open"></i>
+
+                    <span>My Documents</span>
+
+                </a>
+
+                <a asp-controller="Payment"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-credit-card"></i>
+
+                    <span>My Payments</span>
+
+                </a>
+
+            </div>
+        }
+
+
+        <!-- ========================================================
+             APPLICATION MANAGEMENT
+             ======================================================== -->
+
+        @if (User.IsInRole("Admissions Officer") ||
+             User.IsInRole("Admissions Administrator") ||
+             User.IsInRole("System Administrator"))
+        {
+            <div class="kism-sidebar-section">
+
+                <div class="kism-sidebar-heading">
+                    APPLICATION MANAGEMENT
+                </div>
+
+                <a asp-controller="Applicant"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-people"></i>
+
+                    <span>Applicants</span>
+
+                </a>
+
+                <a asp-controller="Application"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-file-earmark-text"></i>
+
+                    <span>Applications</span>
+
+                </a>
+
+                <a asp-controller="DocumentVerification"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-file-check"></i>
+
+                    <span>Document Verification</span>
+
+                </a>
+
+            </div>
+        }
+
+
+        <!-- ========================================================
+             COMMITTEE
+             ======================================================== -->
+
+        @if (User.IsInRole("Admissions Administrator") ||
+             User.IsInRole("System Administrator") ||
+             User.IsInRole("Committee Member"))
+        {
+            <div class="kism-sidebar-section">
+
+                <div class="kism-sidebar-heading">
+                    COMMITTEE
+                </div>
+
+                <a asp-controller="CommitteeSittings"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-clipboard-data"></i>
+
+                    <span>Committee Sittings</span>
+
+                </a>
+
+                <a asp-controller="CommitteeResults"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-clipboard2-check"></i>
+
+                    <span>Committee Results</span>
+
+                </a>
+
+            </div>
+        }
+
+
+        <!-- ========================================================
+             REPORTS
+             ======================================================== -->
+
+        @if (User.IsInRole("Admissions Officer") ||
+             User.IsInRole("Admissions Administrator") ||
+             User.IsInRole("System Administrator") ||
+             User.IsInRole("Committee Member"))
+        {
+            <div class="kism-sidebar-section">
+
+                <div class="kism-sidebar-heading">
+                    REPORTS
+                </div>
+
+                <a asp-controller="Reports"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-bar-chart-line"></i>
+
+                    <span>Reports Dashboard</span>
+
+                </a>
+
+            </div>
+        }
+
+
+        <!-- ========================================================
+             SYSTEM ADMINISTRATION
+             ======================================================== -->
+
+        @if (User.IsInRole("System Administrator"))
+        {
+            <div class="kism-sidebar-section">
+
+                <div class="kism-sidebar-heading">
+                    SYSTEM ADMINISTRATION
+                </div>
+
+                <a asp-controller="UserManagement"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-person-gear"></i>
+
+                    <span>User Management</span>
+
+                </a>
+
+                <a asp-controller="RoleManagement"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-shield-lock"></i>
+
+                    <span>Roles &amp; Permissions</span>
+
+                </a>
+
+                <a asp-controller="Programme"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-mortarboard"></i>
+
+                    <span>Programmes</span>
+
+                </a>
+
+                <a asp-controller="ProgrammeRequirement"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-list-check"></i>
+
+                    <span>Programme Requirements</span>
+
+                </a>
+
+                <a asp-controller="Intake"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-calendar-range"></i>
+
+                    <span>Intakes</span>
+
+                </a>
+
+                <a asp-controller="County"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-geo-alt"></i>
+
+                    <span>Counties</span>
+
+                </a>
+
+                <a asp-controller="Subcounty"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-diagram-2"></i>
+
+                    <span>Subcounties</span>
+
+                </a>
+
+                <a asp-controller="Division"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-diagram-3"></i>
+
+                    <span>Divisions</span>
+
+                </a>
+
+                <a asp-controller="Location"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-pin-map"></i>
+
+                    <span>Locations</span>
+
+                </a>
+
+                <a asp-controller="Sublocation"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-pin"></i>
+
+                    <span>Sublocations</span>
+
+                </a>
+
+                <a asp-controller="AuditTrail"
+                   asp-action="Index"
+                   class="kism-sidebar-link">
+
+                    <i class="bi bi-journal-text"></i>
+
+                    <span>Audit Trail</span>
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- ============================================================
+         SIDEBAR FOOTER
+         ============================================================ -->
+
+    <div class="kism-sidebar-footer">
+
+        <i class="bi bi-shield-check me-1"></i>
+
+        KISM Secure System
+
+    </div>
+
+</aside>

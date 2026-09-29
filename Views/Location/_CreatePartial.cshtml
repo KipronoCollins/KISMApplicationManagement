@@ -1,0 +1,552 @@
+@model KISMApplicationManagement.Models.Location
+
+@{
+    var counties =
+        ViewBag.Counties as IEnumerable<KISMApplicationManagement.Models.County>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.County>();
+
+    var subcounties =
+        ViewBag.Subcounties as IEnumerable<KISMApplicationManagement.Models.Subcounty>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.Subcounty>();
+
+    var divisions =
+        ViewBag.Divisions as IEnumerable<KISMApplicationManagement.Models.Division>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.Division>();
+}
+
+<form asp-action="Create"
+      asp-controller="Location"
+      method="post"
+      id="createLocationForm">
+
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         role="alert">
+    </div>
+
+
+    <!-- COUNTY -->
+    <div class="mb-3">
+
+        <label for="createLocationCountyId"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-geo-alt me-1"></i>
+            County
+
+        </label>
+
+        <select id="createLocationCountyId"
+                class="form-select"
+                required>
+
+            <option value="">
+                Select County
+            </option>
+
+            @foreach (var county in counties)
+            {
+                <option value="@county.CountyId">
+
+                    @county.CountyNumber - @county.CountyName
+
+                </option>
+            }
+
+        </select>
+
+        <div class="form-text">
+            Select the county containing this location.
+        </div>
+
+    </div>
+
+
+    <!-- SUBCOUNTY -->
+    <div class="mb-3">
+
+        <label for="createLocationSubcountyId"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-2 me-1"></i>
+            Subcounty
+
+        </label>
+
+        <select id="createLocationSubcountyId"
+                class="form-select"
+                disabled
+                required>
+
+            <option value="">
+                Select a county first
+            </option>
+
+        </select>
+
+        <div class="form-text">
+            Select the subcounty containing this location.
+        </div>
+
+    </div>
+
+
+    <!-- DIVISION -->
+    <div class="mb-3">
+
+        <label asp-for="DivisionId"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-3 me-1"></i>
+            Division
+
+        </label>
+
+        <select asp-for="DivisionId"
+                id="createLocationDivisionId"
+                class="form-select"
+                disabled
+                required>
+
+            <option value="">
+                Select a subcounty first
+            </option>
+
+        </select>
+
+        <div class="form-text">
+            Select the division containing this location.
+        </div>
+
+        <span asp-validation-for="DivisionId"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- LOCATION NAME -->
+    <div class="mb-3">
+
+        <label asp-for="LocationName"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-geo me-1"></i>
+            Location Name
+
+        </label>
+
+        <input asp-for="LocationName"
+               class="form-control"
+               placeholder="Enter location name"
+               autocomplete="off"
+               maxlength="100"
+               required />
+
+        <span asp-validation-for="LocationName"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ACTIVE -->
+    <div class="form-check form-switch mb-3">
+
+        <input asp-for="IsActive"
+               class="form-check-input"
+               role="switch"
+               id="createLocationIsActive" />
+
+        <label class="form-check-label fw-semibold"
+               for="createLocationIsActive">
+
+            Active
+
+        </label>
+
+        <div class="form-text">
+            Active locations will be available for selection in the application system.
+        </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+    <div class="d-flex justify-content-end gap-2 pt-2">
+
+        <button type="button"
+                class="btn btn-light border"
+                data-bs-dismiss="modal">
+
+            Cancel
+
+        </button>
+
+        <button type="submit"
+                class="btn btn-kism-primary"
+                id="createLocationSubmit">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            Save Location
+
+        </button>
+
+    </div>
+
+</form>
+
+
+<script>
+
+    (function () {
+
+        const form =
+            document.getElementById("createLocationForm");
+
+        if (!form) {
+            return;
+        }
+
+
+        /*
+         * ------------------------------------------------------------
+         * HIERARCHY DATA
+         * ------------------------------------------------------------
+         */
+
+        const subcounties = [
+
+            @foreach (var subcounty in subcounties)
+            {
+                <text>
+                {
+                    id: "@subcounty.SubcountyId",
+                    name: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            subcounty.SubcountyName
+                        )
+                    ),
+                    countyId: "@subcounty.CountyId"
+                },
+                </text>
+            }
+
+        ];
+
+
+        const divisions = [
+
+            @foreach (var division in divisions)
+            {
+                <text>
+                {
+                    id: "@division.DivisionId",
+                    name: @Html.Raw(
+                        System.Text.Json.JsonSerializer.Serialize(
+                            division.DivisionName
+                        )
+                    ),
+                    subcountyId: "@division.SubcountyId",
+                    countyId: "@division.Subcounty.CountyId"
+                },
+                </text>
+            }
+
+        ];
+
+
+        const countySelect =
+            document.getElementById(
+                "createLocationCountyId"
+            );
+
+        const subcountySelect =
+            document.getElementById(
+                "createLocationSubcountyId"
+            );
+
+        const divisionSelect =
+            document.getElementById(
+                "createLocationDivisionId"
+            );
+
+
+        /*
+         * ------------------------------------------------------------
+         * COUNTY → SUBCOUNTY
+         * ------------------------------------------------------------
+         */
+
+        countySelect.addEventListener(
+            "change",
+            function () {
+
+                const countyId =
+                    countySelect.value;
+
+
+                subcountySelect.innerHTML = "";
+
+                divisionSelect.innerHTML = "";
+
+
+                /*
+                 * Reset division.
+                 */
+
+                const divisionDefault =
+                    document.createElement("option");
+
+                divisionDefault.value = "";
+
+                divisionDefault.textContent =
+                    "Select a subcounty first";
+
+                divisionSelect.appendChild(
+                    divisionDefault
+                );
+
+                divisionSelect.disabled = true;
+
+
+                /*
+                 * No county.
+                 */
+
+                if (!countyId) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = "";
+
+                    option.textContent =
+                        "Select a county first";
+
+                    subcountySelect.appendChild(
+                        option
+                    );
+
+                    subcountySelect.disabled = true;
+
+                    return;
+
+                }
+
+
+                /*
+                 * Default subcounty option.
+                 */
+
+                const defaultOption =
+                    document.createElement("option");
+
+                defaultOption.value = "";
+
+                defaultOption.textContent =
+                    "Select Subcounty";
+
+                subcountySelect.appendChild(
+                    defaultOption
+                );
+
+
+                /*
+                 * Matching subcounties.
+                 */
+
+                const matchingSubcounties =
+                    subcounties.filter(
+                        function (subcounty) {
+
+                            return String(
+                                subcounty.countyId
+                            ) === String(countyId);
+
+                        }
+                    );
+
+
+                matchingSubcounties.forEach(
+                    function (subcounty) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value =
+                            subcounty.id;
+
+                        option.textContent =
+                            subcounty.name;
+
+                        subcountySelect.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+                subcountySelect.disabled =
+                    matchingSubcounties.length === 0;
+
+            }
+        );
+
+
+        /*
+         * ------------------------------------------------------------
+         * SUBCOUNTY → DIVISION
+         * ------------------------------------------------------------
+         */
+
+        subcountySelect.addEventListener(
+            "change",
+            function () {
+
+                const subcountyId =
+                    subcountySelect.value;
+
+
+                divisionSelect.innerHTML = "";
+
+
+                /*
+                 * No subcounty.
+                 */
+
+                if (!subcountyId) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = "";
+
+                    option.textContent =
+                        "Select a subcounty first";
+
+                    divisionSelect.appendChild(
+                        option
+                    );
+
+                    divisionSelect.disabled = true;
+
+                    return;
+
+                }
+
+
+                /*
+                 * Default division option.
+                 */
+
+                const defaultOption =
+                    document.createElement("option");
+
+                defaultOption.value = "";
+
+                defaultOption.textContent =
+                    "Select Division";
+
+                divisionSelect.appendChild(
+                    defaultOption
+                );
+
+
+                /*
+                 * Matching divisions.
+                 */
+
+                const matchingDivisions =
+                    divisions.filter(
+                        function (division) {
+
+                            return String(
+                                division.subcountyId
+                            ) === String(subcountyId);
+
+                        }
+                    );
+
+
+                matchingDivisions.forEach(
+                    function (division) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value =
+                            division.id;
+
+                        option.textContent =
+                            division.name;
+
+                        divisionSelect.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+                divisionSelect.disabled =
+                    matchingDivisions.length === 0;
+
+            }
+        );
+
+
+        /*
+         * ------------------------------------------------------------
+         * FORM VALIDATION
+         * ------------------------------------------------------------
+         */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                if (!form.checkValidity()) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    form.classList.add(
+                        "was-validated"
+                    );
+
+                    return;
+
+                }
+
+
+                const submitButton =
+                    document.getElementById(
+                        "createLocationSubmit"
+                    );
+
+
+                if (submitButton) {
+
+                    submitButton.disabled = true;
+
+                    submitButton.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"></span>
+                        Saving...
+                    `;
+
+                }
+
+            }
+        );
+
+    })();
+
+</script>

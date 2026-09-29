@@ -1,0 +1,179 @@
+@model KISMApplicationManagement.Models.Location
+
+@{
+    var division =
+        ViewBag.Divisions is IEnumerable<KISMApplicationManagement.Models.Division> divisions
+            ? divisions.FirstOrDefault(d => d.DivisionId == Model.DivisionId)
+            : null;
+}
+
+<form asp-action="Edit"
+      asp-controller="Location"
+      asp-route-id="@Model.LocationId"
+      method="post"
+      id="editLocationForm">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden"
+           asp-for="LocationId" />
+
+    <!--
+        DivisionId is submitted as a hidden value because
+        County, Subcounty and Division are read-only during edit.
+    -->
+    <input type="hidden"
+           asp-for="DivisionId" />
+
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         role="alert">
+    </div>
+
+
+    <!-- COUNTY - READ ONLY -->
+    <div class="mb-3">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-geo-alt me-1"></i>
+
+            County
+
+        </label>
+
+        <input type="text"
+               class="form-control"
+               value="@(division?.Subcounty?.County?.CountyNumber + " - " + division?.Subcounty?.County?.CountyName)"
+               readonly />
+
+        <div class="form-text">
+            County cannot be changed when editing a location.
+        </div>
+
+    </div>
+
+
+    <!-- SUBCOUNTY - READ ONLY -->
+    <div class="mb-3">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-2 me-1"></i>
+
+            Subcounty
+
+        </label>
+
+        <input type="text"
+               class="form-control"
+               value="@division?.Subcounty?.SubcountyName"
+               readonly />
+
+        <div class="form-text">
+            Subcounty cannot be changed when editing a location.
+        </div>
+
+    </div>
+
+
+    <!-- DIVISION - READ ONLY -->
+    <div class="mb-3">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-diagram-3 me-1"></i>
+
+            Division
+
+        </label>
+
+        <input type="text"
+               class="form-control"
+               value="@division?.DivisionName"
+               readonly />
+
+        <div class="form-text">
+            Division cannot be changed when editing a location.
+        </div>
+
+        <span asp-validation-for="DivisionId"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- LOCATION NAME -->
+    <div class="mb-3">
+
+        <label asp-for="LocationName"
+               class="form-label fw-semibold">
+
+            <i class="bi bi-geo me-1"></i>
+
+            Location Name
+
+        </label>
+
+        <input asp-for="LocationName"
+               class="form-control"
+               placeholder="Enter location name"
+               autocomplete="off"
+               maxlength="100"
+               required />
+
+        <span asp-validation-for="LocationName"
+              class="text-danger small">
+        </span>
+
+    </div>
+
+
+    <!-- ACTIVE -->
+    <div class="form-check form-switch mb-3">
+
+        <input asp-for="IsActive"
+               class="form-check-input"
+               role="switch"
+               id="editLocationIsActive" />
+
+        <label class="form-check-label fw-semibold"
+               for="editLocationIsActive">
+
+            Active
+
+        </label>
+
+        <div class="form-text">
+            Active locations will be available for selection in the application system.
+        </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+    <div class="d-flex justify-content-end gap-2 pt-2">
+
+        <button type="button"
+                class="btn btn-light border"
+                data-bs-dismiss="modal">
+
+            Cancel
+
+        </button>
+
+        <button type="submit"
+                class="btn btn-kism-primary"
+                id="editLocationSubmit">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            Save Changes
+
+        </button>
+
+    </div>
+
+</form>

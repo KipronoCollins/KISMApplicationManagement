@@ -1,0 +1,175 @@
+@model KISMApplicationManagement.Models.Programme
+
+<div class="modal-header kism-modal-header">
+
+    <div>
+        <h5 class="modal-title fw-bold mb-1">
+            Programme Details
+        </h5>
+
+        <small>
+            View programme information.
+        </small>
+    </div>
+
+    <button type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal">
+    </button>
+
+</div>
+
+
+<div class="modal-body p-4">
+
+    <div class="programme-details-card">
+
+        <div class="programme-details-icon">
+            <i class="bi bi-mortarboard-fill"></i>
+        </div>
+
+        <div>
+
+            <div class="small text-muted mb-1">
+                @Model.ProgrammeCode
+            </div>
+
+            <h4 class="fw-bold mb-1">
+                @Model.ProgrammeName
+            </h4>
+
+            <span class="programme-award-badge">
+                @Model.AwardType
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4 mt-2">
+
+        <div class="col-md-4">
+
+            <div class="detail-label">
+                Duration
+            </div>
+
+            <div class="detail-value">
+                @Model.DurationYears year@(Model.DurationYears == 1 ? "" : "s")
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">
+                Display Order
+            </div>
+
+            <div class="detail-value">
+                @Model.DisplayOrder
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">
+                Status
+            </div>
+
+            <div class="detail-value">
+
+                @if (Model.IsActive)
+                {
+                    <span class="text-success fw-semibold">
+
+                        <i class="bi bi-check-circle-fill me-1"></i>
+
+                        Active
+
+                    </span>
+                }
+                else
+                {
+                    <span class="text-secondary fw-semibold">
+
+                        <i class="bi bi-pause-circle-fill me-1"></i>
+
+                        Inactive
+
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12">
+
+            <div class="detail-label">
+                Description
+            </div>
+
+            <div class="detail-description">
+
+                @(string.IsNullOrWhiteSpace(Model.Description)
+                    ? "No description has been provided."
+                    : Model.Description)
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="detail-label">
+                Created
+            </div>
+
+            <div class="detail-value">
+                @Model.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="detail-label">
+                Last Updated
+            </div>
+
+            <div class="detail-value">
+
+                @(Model.UpdatedAtUtc.HasValue
+                    ? Model.UpdatedAtUtc.Value
+                        .ToLocalTime()
+                        .ToString("dd MMM yyyy, HH:mm")
+                    : "Never")
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal-footer px-4 py-3">
+
+    <button type="button"
+            class="btn btn-light"
+            data-bs-dismiss="modal">
+
+        Close
+
+    </button>
+
+</div>

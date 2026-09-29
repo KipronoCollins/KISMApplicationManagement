@@ -1,0 +1,223 @@
+@using KISMApplicationManagement.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="kism-user-area">
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <div class="dropdown">
+
+            <button class="btn kism-user-button dropdown-toggle"
+                    type="button"
+                    id="kismUserDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+
+                <span class="kism-user-avatar">
+                    <i class="bi bi-person"></i>
+                </span>
+
+                <span class="kism-user-name">
+                    @(User.Identity?.Name ?? "User")
+                </span>
+
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end kism-user-dropdown"
+                aria-labelledby="kismUserDropdown">
+
+                <li>
+                    <a class="dropdown-item"
+                       asp-area="Identity"
+                       asp-page="/Account/Manage/Index">
+
+                        <i class="bi bi-person-circle me-2"></i>
+                        My Account
+
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item"
+                       asp-area="Identity"
+                       asp-page="/Account/Manage/ChangePassword">
+
+                        <i class="bi bi-key me-2"></i>
+                        Change Password
+
+                    </a>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+
+                    <form asp-area="Identity"
+                          asp-page="/Account/Logout"
+                          asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                          method="post">
+
+                        <button type="submit"
+                                class="dropdown-item kism-logout-item">
+
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Logout
+
+                        </button>
+
+                    </form>
+
+                </li>
+
+            </ul>
+
+        </div>
+    }
+    else
+    {
+        <div class="d-flex align-items-center gap-2">
+
+            <a asp-area="Identity"
+               asp-page="/Account/Register"
+               class="btn btn-sm kism-register-button">
+
+                <i class="bi bi-person-plus me-1"></i>
+                Register
+
+            </a>
+
+            <a asp-area="Identity"
+               asp-page="/Account/Login"
+               class="btn btn-sm kism-login-button">
+
+                <i class="bi bi-box-arrow-in-right me-1"></i>
+                Login
+
+            </a>
+
+        </div>
+    }
+
+</div>
+
+<style>
+
+    .kism-user-area {
+        display: flex;
+        align-items: center;
+    }
+
+    .kism-user-button {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 5px 12px 5px 5px;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.10);
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .kism-user-button:hover,
+    .kism-user-button:focus,
+    .kism-user-button:active {
+        background: rgba(255, 255, 255, 0.16) !important;
+        border-color: #edff0f;
+        color: #ffffff !important;
+        box-shadow: none;
+    }
+
+    .kism-user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #d800b8;
+        font-size: 1rem;
+    }
+
+    .kism-user-name {
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .kism-user-dropdown {
+        min-width: 220px;
+        margin-top: 8px !important;
+        padding: 8px;
+        border: 1px solid #e7e8ef;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(31, 35, 45, 0.15);
+    }
+
+    .kism-user-dropdown .dropdown-item {
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: #555a6c;
+    }
+
+    .kism-user-dropdown .dropdown-item:hover {
+        background: rgba(216, 0, 184, 0.08);
+        color: #d800b8;
+    }
+
+    .kism-user-dropdown .kism-logout-item {
+        color: #dc3545;
+    }
+
+    .kism-user-dropdown .kism-logout-item:hover {
+        background: rgba(220, 53, 69, 0.08);
+        color: #dc3545;
+    }
+
+    .kism-register-button {
+        background: #ffffff;
+        border: 1px solid #ffffff;
+        color: #d800b8;
+        font-weight: 600;
+    }
+
+    .kism-register-button:hover,
+    .kism-register-button:focus {
+        background: #edff0f;
+        border-color: #edff0f;
+        color: #30323d;
+    }
+
+    .kism-login-button {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .kism-login-button:hover,
+    .kism-login-button:focus {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: #edff0f;
+        color: #edff0f;
+    }
+
+    @@media (max-width: 575.98px) {
+
+        .kism-user-name {
+            display: none;
+        }
+
+        .kism-user-button {
+            padding-right: 5px;
+        }
+
+    }
+
+</style>

@@ -1,0 +1,1602 @@
+@model IEnumerable<KISMApplicationManagement.Models.Location>
+
+@{
+    ViewData["Title"] = "Location Management";
+
+    var counties =
+        ViewBag.Counties as IEnumerable<KISMApplicationManagement.Models.County>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.County>();
+
+    var subcounties =
+        ViewBag.Subcounties as IEnumerable<KISMApplicationManagement.Models.Subcounty>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.Subcounty>();
+
+    var divisions =
+        ViewBag.Divisions as IEnumerable<KISMApplicationManagement.Models.Division>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.Division>();
+}
+
+<style>
+    .kism-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .kism-page-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+        color: #333;
+        font-weight: 700;
+    }
+
+    .kism-page-title i {
+        color: #d800b8;
+        font-size: 1.7rem;
+    }
+
+    .btn-kism-primary {
+        background-color: #d800b8;
+        border-color: #d800b8;
+        color: #fff;
+    }
+
+    .btn-kism-primary:hover,
+    .btn-kism-primary:focus {
+        background-color: #b40099;
+        border-color: #b40099;
+        color: #fff;
+    }
+
+    .kism-filter-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .kism-filter-label {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+    }
+
+    #locationsTable {
+        width: 100% !important;
+    }
+
+    #locationsTable th,
+    #locationsTable td {
+        border: 1px solid #dee2e6 !important;
+        vertical-align: middle;
+    }
+
+    #locationsTable thead th {
+        background-color: #f8f9fa;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.65rem;
+        border-radius: 50rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+        min-width: 38px;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 0.75rem;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+        margin-bottom: 0.75rem;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 1rem;
+    }
+
+    .modal-header {
+        background-color: #d800b8;
+        color: #fff;
+    }
+
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+
+    .modal-title {
+        font-weight: 700;
+    }
+</style>
+
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="kism-page-header">
+
+        <div>
+
+            <h2 class="kism-page-title">
+
+                <i class="bi bi-geo-alt"></i>
+
+                Location Management
+
+            </h2>
+
+            <div class="text-muted mt-1">
+                Manage locations within the KISM administrative location hierarchy.
+            </div>
+
+        </div>
+
+
+        <button type="button"
+                class="btn btn-kism-primary"
+                id="btnCreateLocation">
+
+            <i class="bi bi-plus-circle me-1"></i>
+
+            Add Location
+
+        </button>
+
+    </div>
+
+
+    <!-- SUCCESS MESSAGE -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- FILTERS -->
+    <div class="kism-filter-card">
+
+        <div class="row g-3">
+
+            <!-- COUNTY -->
+            <div class="col-lg-4 col-md-6">
+
+                <label for="countyFilter"
+                       class="form-label kism-filter-label">
+
+                    <i class="bi bi-geo-alt me-1"></i>
+
+                    County
+
+                </label>
+
+                <select id="countyFilter"
+                        class="form-select">
+
+                    <option value="">
+                        All Counties
+                    </option>
+
+                    @foreach (var county in counties)
+                    {
+                        <option value="@county.CountyId"
+                                data-county-name="@county.CountyName">
+
+                            @county.CountyNumber - @county.CountyName
+
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- SUBCOUNTY -->
+            <div class="col-lg-4 col-md-6">
+
+                <label for="subcountyFilter"
+                       class="form-label kism-filter-label">
+
+                    <i class="bi bi-diagram-2 me-1"></i>
+
+                    Subcounty
+
+                </label>
+
+                <select id="subcountyFilter"
+                        class="form-select"
+                        disabled>
+
+                    <option value="">
+                        Select a county first
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DIVISION -->
+            <div class="col-lg-4 col-md-12">
+
+                <label for="divisionFilter"
+                       class="form-label kism-filter-label">
+
+                    <i class="bi bi-diagram-3 me-1"></i>
+
+                    Division
+
+                </label>
+
+                <select id="divisionFilter"
+                        class="form-select"
+                        disabled>
+
+                    <option value="">
+                        Select a subcounty first
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- LOCATION TABLE -->
+    <div class="card border shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="locationsTable"
+                       class="table table-striped table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                No.
+                            </th>
+
+                            <th>
+                                Location Name
+                            </th>
+
+                            <th>
+                                Division
+                            </th>
+
+                            <th>
+                                Subcounty
+                            </th>
+
+                            <th>
+                                County
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th class="text-center">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var location in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @location.Division.Subcounty.County.CountyNumber
+                                </td>
+
+                                <td>
+                                    @location.LocationName
+                                </td>
+
+                                <td>
+                                    @location.Division.DivisionName
+                                </td>
+
+                                <td>
+                                    @location.Division.Subcounty.SubcountyName
+                                </td>
+
+                                <td>
+                                    @location.Division.Subcounty.County.CountyName
+                                </td>
+
+                                <td>
+
+                                    @if (location.IsActive)
+                                    {
+                                        <span class="status-badge status-active">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    @location.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+                                        <!-- EDIT -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-edit-location"
+                                                data-id="@location.LocationId"
+                                                title="Edit">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </button>
+
+
+                                        <!-- STATUS -->
+                                        <button type="button"
+                                                class="btn btn-sm @(location.IsActive ? "btn-outline-danger" : "btn-outline-success") btn-toggle-location"
+                                                data-id="@location.LocationId"
+                                                data-name="@location.LocationName"
+                                                data-active="@location.IsActive"
+                                                title="@(location.IsActive ? "Deactivate" : "Activate")">
+
+                                            @if (location.IsActive)
+                                            {
+                                                <i class="bi bi-toggle-on"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-toggle-off"></i>
+                                            }
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CREATE MODAL -->
+<div class="modal fade"
+     id="createLocationModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-plus-circle me-2"></i>
+
+                    Add Location
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="createLocationModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         role="status">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- EDIT MODAL -->
+<div class="modal fade"
+     id="editLocationModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="bi bi-pencil-square me-2"></i>
+
+                    Edit Location
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="editLocationModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         role="status">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+
+        $(document).ready(function () {
+
+            /*
+             * ============================================================
+             * DATATABLE
+             * ============================================================
+             */
+
+            const locationsTable =
+                $("#locationsTable").DataTable({
+
+                    responsive: true,
+
+                    pageLength: 10,
+
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, "All"]
+                    ],
+
+                    order: [
+                        [0, "asc"]
+                    ],
+
+                    columnDefs: [
+                        {
+                            targets: 7,
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+
+                });
+
+
+            /*
+             * ============================================================
+             * LOCATION HIERARCHY DATA
+             * ============================================================
+             */
+
+            const allSubcounties = [
+
+                @foreach (var subcounty in subcounties)
+                {
+                    <text>
+                    {
+                        id: "@subcounty.SubcountyId",
+                        name: @Html.Raw(
+                            System.Text.Json.JsonSerializer.Serialize(
+                                subcounty.SubcountyName
+                            )
+                        ),
+                        countyId: "@subcounty.CountyId"
+                    },
+                    </text>
+                }
+
+            ];
+
+
+            const allDivisions = [
+
+                @foreach (var division in divisions)
+                {
+                    <text>
+                    {
+                        id: "@division.DivisionId",
+                        name: @Html.Raw(
+                            System.Text.Json.JsonSerializer.Serialize(
+                                division.DivisionName
+                            )
+                        ),
+                        subcountyId: "@division.SubcountyId",
+                        countyId: "@division.Subcounty.CountyId"
+                    },
+                    </text>
+                }
+
+            ];
+
+
+            /*
+             * ============================================================
+             * FILTER ELEMENTS
+             * ============================================================
+             */
+
+            const countyFilter =
+                document.getElementById("countyFilter");
+
+            const subcountyFilter =
+                document.getElementById("subcountyFilter");
+
+            const divisionFilter =
+                document.getElementById("divisionFilter");
+
+
+            /*
+             * ============================================================
+             * REBUILD SUBCOUNTY FILTER
+             * ============================================================
+             */
+
+            function rebuildSubcountyFilter() {
+
+                const countyId =
+                    countyFilter.value;
+
+                subcountyFilter.innerHTML = "";
+
+                divisionFilter.innerHTML = "";
+
+
+                const divisionDefault =
+                    document.createElement("option");
+
+                divisionDefault.value = "";
+
+                divisionDefault.textContent =
+                    "Select a subcounty first";
+
+                divisionFilter.appendChild(
+                    divisionDefault
+                );
+
+                divisionFilter.disabled = true;
+
+
+                if (!countyId) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = "";
+
+                    option.textContent =
+                        "Select a county first";
+
+                    subcountyFilter.appendChild(
+                        option
+                    );
+
+                    subcountyFilter.disabled = true;
+
+                    return;
+
+                }
+
+
+                const defaultOption =
+                    document.createElement("option");
+
+                defaultOption.value = "";
+
+                defaultOption.textContent =
+                    "All Subcounties";
+
+                subcountyFilter.appendChild(
+                    defaultOption
+                );
+
+
+                const matchingSubcounties =
+                    allSubcounties.filter(
+                        function (subcounty) {
+
+                            return String(
+                                subcounty.countyId
+                            ) === String(countyId);
+
+                        }
+                    );
+
+
+                matchingSubcounties.forEach(
+                    function (subcounty) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value =
+                            subcounty.id;
+
+                        option.textContent =
+                            subcounty.name;
+
+                        subcountyFilter.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+                subcountyFilter.disabled =
+                    matchingSubcounties.length === 0;
+
+            }
+
+
+            /*
+             * ============================================================
+             * REBUILD DIVISION FILTER
+             * ============================================================
+             */
+
+            function rebuildDivisionFilter() {
+
+                const countyId =
+                    countyFilter.value;
+
+                const subcountyId =
+                    subcountyFilter.value;
+
+
+                divisionFilter.innerHTML = "";
+
+
+                if (!countyId || !subcountyId) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = "";
+
+                    option.textContent =
+                        "Select a subcounty first";
+
+                    divisionFilter.appendChild(
+                        option
+                    );
+
+                    divisionFilter.disabled = true;
+
+                    return;
+
+                }
+
+
+                const defaultOption =
+                    document.createElement("option");
+
+                defaultOption.value = "";
+
+                defaultOption.textContent =
+                    "All Divisions";
+
+                divisionFilter.appendChild(
+                    defaultOption
+                );
+
+
+                const matchingDivisions =
+                    allDivisions.filter(
+                        function (division) {
+
+                            return (
+                                String(
+                                    division.countyId
+                                ) === String(countyId)
+                                &&
+                                String(
+                                    division.subcountyId
+                                ) === String(subcountyId)
+                            );
+
+                        }
+                    );
+
+
+                matchingDivisions.forEach(
+                    function (division) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value =
+                            division.id;
+
+                        option.textContent =
+                            division.name;
+
+                        divisionFilter.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+                divisionFilter.disabled =
+                    matchingDivisions.length === 0;
+
+            }
+
+
+            /*
+             * ============================================================
+             * COUNTY TABLE FILTER
+             * ============================================================
+             */
+
+            function filterTableByCounty() {
+
+                const countyId =
+                    countyFilter.value;
+
+
+                if (!countyId) {
+
+                    locationsTable
+                        .column(4)
+                        .search("")
+                        .draw();
+
+                    return;
+
+                }
+
+
+                const selectedOption =
+                    countyFilter.options[
+                        countyFilter.selectedIndex
+                    ];
+
+
+                const countyName =
+                    selectedOption.getAttribute(
+                        "data-county-name"
+                    );
+
+
+                locationsTable
+                    .column(4)
+                    .search(
+                        "^" +
+                        $.fn.dataTable.util.escapeRegex(
+                            countyName
+                        ) +
+                        "$",
+                        true,
+                        false
+                    )
+                    .draw();
+
+            }
+
+
+            /*
+             * ============================================================
+             * SUBCOUNTY TABLE FILTER
+             * ============================================================
+             */
+
+            function filterTableBySubcounty() {
+
+                const subcountyId =
+                    subcountyFilter.value;
+
+
+                if (!subcountyId) {
+
+                    filterTableByCounty();
+
+                    return;
+
+                }
+
+
+                const selectedOption =
+                    subcountyFilter.options[
+                        subcountyFilter.selectedIndex
+                    ];
+
+
+                const subcountyName =
+                    selectedOption.textContent;
+
+
+                locationsTable
+                    .column(3)
+                    .search(
+                        "^" +
+                        $.fn.dataTable.util.escapeRegex(
+                            subcountyName
+                        ) +
+                        "$",
+                        true,
+                        false
+                    )
+                    .draw();
+
+            }
+
+
+            /*
+             * ============================================================
+             * DIVISION TABLE FILTER
+             * ============================================================
+             */
+
+            function filterTableByDivision() {
+
+                const divisionId =
+                    divisionFilter.value;
+
+
+                if (!divisionId) {
+
+                    filterTableBySubcounty();
+
+                    return;
+
+                }
+
+
+                const selectedOption =
+                    divisionFilter.options[
+                        divisionFilter.selectedIndex
+                    ];
+
+
+                const divisionName =
+                    selectedOption.textContent;
+
+
+                locationsTable
+                    .column(2)
+                    .search(
+                        "^" +
+                        $.fn.dataTable.util.escapeRegex(
+                            divisionName
+                        ) +
+                        "$",
+                        true,
+                        false
+                    )
+                    .draw();
+
+            }
+
+
+            /*
+             * ============================================================
+             * COUNTY CHANGE
+             * ============================================================
+             */
+
+            countyFilter.addEventListener(
+                "change",
+                function () {
+
+                    locationsTable
+                        .column(2)
+                        .search("");
+
+                    locationsTable
+                        .column(3)
+                        .search("");
+
+                    locationsTable
+                        .column(4)
+                        .search("");
+
+
+                    rebuildSubcountyFilter();
+
+
+                    filterTableByCounty();
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * SUBCOUNTY CHANGE
+             * ============================================================
+             */
+
+            subcountyFilter.addEventListener(
+                "change",
+                function () {
+
+                    locationsTable
+                        .column(2)
+                        .search("");
+
+
+                    rebuildDivisionFilter();
+
+
+                    filterTableBySubcounty();
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * DIVISION CHANGE
+             * ============================================================
+             */
+
+            divisionFilter.addEventListener(
+                "change",
+                function () {
+
+                    filterTableByDivision();
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * INITIAL STATE
+             * ============================================================
+             */
+
+            rebuildSubcountyFilter();
+
+
+            /*
+             * ============================================================
+             * CREATE LOCATION
+             * ============================================================
+             */
+
+            $("#btnCreateLocation").on(
+                "click",
+                function () {
+
+                    $("#createLocationModalBody").html(`
+                        <div class="text-center py-4">
+                            <div class="spinner-border"
+                                 role="status">
+                            </div>
+                        </div>
+                    `);
+
+
+                    const modal =
+                        new bootstrap.Modal(
+                            document.getElementById(
+                                "createLocationModal"
+                            )
+                        );
+
+
+                    modal.show();
+
+
+                    $.get(
+                        "@Url.Action("Create", "Location")",
+                        function (response) {
+
+                            $("#createLocationModalBody")
+                                .html(response);
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * EDIT LOCATION
+             * ============================================================
+             */
+
+            $(document).on(
+                "click",
+                ".btn-edit-location",
+                function () {
+
+                    const id =
+                        $(this).data("id");
+
+
+                    $("#editLocationModalBody").html(`
+                        <div class="text-center py-4">
+                            <div class="spinner-border"
+                                 role="status">
+                            </div>
+                        </div>
+                    `);
+
+
+                    const modal =
+                        new bootstrap.Modal(
+                            document.getElementById(
+                                "editLocationModal"
+                            )
+                        );
+
+
+                    modal.show();
+
+
+                    $.get(
+                        "@Url.Action("Edit", "Location")/" + id,
+                        function (response) {
+
+                            $("#editLocationModalBody")
+                                .html(response);
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * CREATE FORM SUBMISSION
+             * ============================================================
+             */
+
+            $(document).on(
+                "submit",
+                "#createLocationForm",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    const form =
+                        $(this);
+
+
+                    if (!this.checkValidity()) {
+
+                        this.classList.add(
+                            "was-validated"
+                        );
+
+                        return;
+
+                    }
+
+
+                    const submitButton =
+                        form.find(
+                            "#createLocationSubmit"
+                        );
+
+
+                    submitButton.prop(
+                        "disabled",
+                        true
+                    );
+
+
+                    submitButton.html(`
+                        <span class="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"></span>
+                        Saving...
+                    `);
+
+
+                    $.ajax({
+
+                        url: form.attr("action"),
+
+                        type: "POST",
+
+                        data: form.serialize(),
+
+                        success: function (response) {
+
+                            if (
+                                typeof response === "string" &&
+                                response.indexOf(
+                                    "locationsTable"
+                                ) !== -1
+                            ) {
+
+                                Swal.fire({
+
+                                    icon: "success",
+
+                                    title: "Location Created",
+
+                                    text:
+                                        "The location was created successfully.",
+
+                                    confirmButtonColor:
+                                        "#d800b8"
+
+                                }).then(function () {
+
+                                    window.location.replace(
+                                        "@Url.Action("Index", "Location")"
+                                    );
+
+                                });
+
+                                return;
+
+                            }
+
+
+                            $("#createLocationModalBody")
+                                .html(response);
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire({
+
+                                icon: "error",
+
+                                title: "Error",
+
+                                text:
+                                    "An unexpected error occurred while creating the location."
+
+                            });
+
+
+                            submitButton.prop(
+                                "disabled",
+                                false
+                            );
+
+
+                            submitButton.html(`
+                                <i class="bi bi-check-circle me-1"></i>
+                                Save Location
+                            `);
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * EDIT FORM SUBMISSION
+             * ============================================================
+             */
+
+            $(document).on(
+                "submit",
+                "#editLocationForm",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    const form =
+                        $(this);
+
+
+                    if (!this.checkValidity()) {
+
+                        this.classList.add(
+                            "was-validated"
+                        );
+
+                        return;
+
+                    }
+
+
+                    const submitButton =
+                        form.find(
+                            "#editLocationSubmit"
+                        );
+
+
+                    submitButton.prop(
+                        "disabled",
+                        true
+                    );
+
+
+                    submitButton.html(`
+                        <span class="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"></span>
+                        Saving...
+                    `);
+
+
+                    $.ajax({
+
+                        url: form.attr("action"),
+
+                        type: "POST",
+
+                        data: form.serialize(),
+
+                        success: function (response) {
+
+                            if (
+                                typeof response === "string" &&
+                                response.indexOf(
+                                    "locationsTable"
+                                ) !== -1
+                            ) {
+
+                                /*
+                                 * Close the edit modal first.
+                                 */
+
+                                const editModalElement =
+                                    document.getElementById(
+                                        "editLocationModal"
+                                    );
+
+                                const editModal =
+                                    bootstrap.Modal.getInstance(
+                                        editModalElement
+                                    );
+
+
+                                if (editModal) {
+
+                                    editModal.hide();
+
+                                }
+
+
+                                /*
+                                 * Display SweetAlert2 success
+                                 * notification.
+                                 */
+
+                                Swal.fire({
+
+                                    icon: "success",
+
+                                    title: "Location Updated",
+
+                                    text:
+                                        "The location was updated successfully.",
+
+                                    confirmButtonColor:
+                                        "#d800b8"
+
+                                }).then(function () {
+
+                                    /*
+                                     * Refresh the page after
+                                     * the user closes the alert.
+                                     */
+
+                                    window.location.replace(
+                                        "@Url.Action("Index", "Location")"
+                                    );
+
+                                });
+
+                                return;
+
+                            }
+
+
+                            /*
+                             * Validation errors returned
+                             * from the controller.
+                             */
+
+                            $("#editLocationModalBody")
+                                .html(response);
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire({
+
+                                icon: "error",
+
+                                title: "Error",
+
+                                text:
+                                    "An unexpected error occurred while updating the location."
+
+                            });
+
+
+                            submitButton.prop(
+                                "disabled",
+                                false
+                            );
+
+
+                            submitButton.html(`
+                                <i class="bi bi-check-circle me-1"></i>
+                                Save Changes
+                            `);
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * TOGGLE STATUS
+             * ============================================================
+             */
+
+            $(document).on(
+                "click",
+                ".btn-toggle-location",
+                function () {
+
+                    const button =
+                        $(this);
+
+                    const id =
+                        button.data("id");
+
+                    const name =
+                        button.data("name");
+
+                    const isActive =
+                        String(
+                            button.data("active")
+                        ).toLowerCase() === "true";
+
+
+                    Swal.fire({
+
+                        icon: isActive
+                            ? "warning"
+                            : "question",
+
+                        title: isActive
+                            ? "Deactivate Location?"
+                            : "Activate Location?",
+
+                        text:
+                            "Are you sure you want to " +
+                            (isActive
+                                ? "deactivate "
+                                : "activate ") +
+                            name +
+                            "?",
+
+                        showCancelButton: true,
+
+                        confirmButtonText:
+                            isActive
+                                ? "Yes, deactivate"
+                                : "Yes, activate",
+
+                        cancelButtonText:
+                            "Cancel",
+
+                        confirmButtonColor:
+                            "#d800b8"
+
+                    }).then(function (result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+
+                        $.ajax({
+
+                            url:
+                                "@Url.Action("ToggleStatus", "Location")/" +
+                                id,
+
+                            type: "POST",
+
+                            data: {
+                                __RequestVerificationToken:
+                                    getAntiForgeryToken()
+                            },
+
+                            success: function () {
+
+                                Swal.fire({
+
+                                    icon: "success",
+
+                                    title: isActive
+                                        ? "Location Deactivated"
+                                        : "Location Activated",
+
+                                    text:
+                                        isActive
+                                            ? "The location was deactivated successfully."
+                                            : "The location was activated successfully.",
+
+                                    confirmButtonColor:
+                                        "#d800b8"
+
+                                }).then(function () {
+
+                                    window.location.replace(
+                                        "@Url.Action("Index", "Location")"
+                                    );
+
+                                });
+
+                            },
+
+                            error: function () {
+
+                                Swal.fire({
+
+                                    icon: "error",
+
+                                    title: "Error",
+
+                                    text:
+                                        "Unable to change the location status."
+
+                                });
+
+                            }
+
+                        });
+
+                    });
+
+                }
+            );
+
+
+            /*
+             * ============================================================
+             * ANTI-FORGERY TOKEN
+             * ============================================================
+             */
+
+            function getAntiForgeryToken() {
+
+                const token =
+                    document.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    );
+
+                return token
+                    ? token.value
+                    : "";
+
+            }
+
+        });
+
+    </script>
+}

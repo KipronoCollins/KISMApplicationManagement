@@ -1,0 +1,1398 @@
+@model IEnumerable<KISMApplicationManagement.Models.Programme>
+
+@{
+    ViewData["Title"] = "Programmes";
+}
+
+<div class="container-fluid px-0">
+
+    <!-- ========================================================= -->
+    <!-- Header -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+        <div>
+
+            <div class="d-flex align-items-center gap-2 mb-1">
+
+                <span class="page-icon">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </span>
+
+                <h1 class="h3 fw-bold mb-0">
+                    Programmes
+                </h1>
+
+            </div>
+
+            <p class="text-muted mb-0">
+                Manage KISM academic programmes and programme configuration.
+            </p>
+
+        </div>
+
+
+        <button type="button"
+                class="btn btn-kism-primary"
+                id="btnCreateProgramme">
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Programme
+
+        </button>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- Statistics -->
+    <!-- ========================================================= -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="programme-stat-card">
+
+                <div class="programme-stat-icon">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+
+                <div>
+
+                    <div class="stat-label">
+                        Total Programmes
+                    </div>
+
+                    <div class="stat-value"
+                         id="totalProgrammes">
+                        @Model.Count()
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="programme-stat-card">
+
+                <div class="programme-stat-icon active">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <div>
+
+                    <div class="stat-label">
+                        Active Programmes
+                    </div>
+
+                    <div class="stat-value"
+                         id="activeProgrammes">
+
+                        @Model.Count(programme =>
+                            programme.IsActive)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="programme-stat-card">
+
+                <div class="programme-stat-icon inactive">
+                    <i class="bi bi-pause-circle"></i>
+                </div>
+
+                <div>
+
+                    <div class="stat-label">
+                        Inactive Programmes
+                    </div>
+
+                    <div class="stat-value"
+                         id="inactiveProgrammes">
+
+                        @Model.Count(programme =>
+                            !programme.IsActive)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- Table Card -->
+    <!-- ========================================================= -->
+
+    <div class="card programme-table-card">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table id="programmesTable"
+                       class="table table-hover align-middle mb-0 w-100">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Code
+                            </th>
+
+                            <th>
+                                Programme
+                            </th>
+
+                            <th>
+                                Award
+                            </th>
+
+                            <th>
+                                Duration
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Order
+                            </th>
+
+                            <th class="text-end">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var programme in Model)
+                        {
+                            <tr data-programme-id="@programme.ProgrammeId">
+
+                                <td>
+
+                                    <span class="programme-code">
+                                        @programme.ProgrammeCode
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="programme-name">
+                                        @programme.ProgrammeName
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="award-badge">
+                                        @programme.AwardType
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    @programme.DurationYears
+                                    year@(programme.DurationYears == 1 ? "" : "s")
+
+                                </td>
+
+
+                                <td>
+
+                                    @if (programme.IsActive)
+                                    {
+                                        <span class="status-badge active">
+                                            <i class="bi bi-check-circle-fill me-1"></i>
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge inactive">
+                                            <i class="bi bi-pause-circle-fill me-1"></i>
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td>
+                                    @programme.DisplayOrder
+                                </td>
+
+
+                                <td class="text-end">
+
+                                    <div class="btn-group">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary btn-view-programme"
+                                                data-id="@programme.ProgrammeId"
+                                                title="View">
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-edit-programme"
+                                                data-id="@programme.ProgrammeId"
+                                                title="Edit">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </button>
+
+
+                                        @if (programme.IsActive)
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger btn-toggle-programme"
+                                                    data-id="@programme.ProgrammeId"
+                                                    data-is-active="true"
+                                                    title="Deactivate">
+
+                                                <i class="bi bi-pause-circle"></i>
+
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-success btn-toggle-programme"
+                                                    data-id="@programme.ProgrammeId"
+                                                    data-is-active="false"
+                                                    title="Activate">
+
+                                                <i class="bi bi-play-circle"></i>
+
+                                            </button>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- Create Modal -->
+<!-- ============================================================= -->
+
+<div class="modal fade"
+     id="createProgrammeModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content"
+             id="createProgrammeModalContent">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- Edit Modal -->
+<!-- ============================================================= -->
+
+<div class="modal fade"
+     id="editProgrammeModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content"
+             id="editProgrammeModalContent">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- Details Modal -->
+<!-- ============================================================= -->
+
+<div class="modal fade"
+     id="detailsProgrammeModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content"
+             id="detailsProgrammeModalContent">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+       Header
+       ========================================================= */
+
+    .page-icon {
+        width: 42px;
+        height: 42px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        background: rgba(216, 0, 184, 0.10);
+        color: #d800b8;
+
+        font-size: 20px;
+    }
+
+
+    /* =========================================================
+       Statistics
+       ========================================================= */
+
+    .programme-stat-card {
+        background: #ffffff;
+
+        border: 1px solid #ececf2;
+        border-radius: 14px;
+
+        padding: 18px;
+
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        box-shadow:
+            0 3px 12px
+            rgba(0, 0, 0, 0.035);
+    }
+
+
+    .programme-stat-icon {
+        width: 44px;
+        height: 44px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: rgba(216, 0, 184, 0.09);
+        color: #d800b8;
+
+        font-size: 19px;
+    }
+
+
+    .programme-stat-icon.active {
+        background: rgba(25, 135, 84, 0.10);
+        color: #198754;
+    }
+
+
+    .programme-stat-icon.inactive {
+        background: rgba(108, 117, 125, 0.10);
+        color: #6c757d;
+    }
+
+
+    .stat-label {
+        color: #858991;
+        font-size: 12px;
+    }
+
+
+    .stat-value {
+        color: #2c2f37;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+       Table
+       ========================================================= */
+
+    .programme-table-card {
+        border: 1px solid #ececf2;
+        border-radius: 15px;
+        overflow: hidden;
+
+        box-shadow:
+            0 4px 16px
+            rgba(0, 0, 0, 0.035);
+    }
+
+
+    #programmesTable thead th {
+        background: #fafafd;
+        border-bottom: 1px solid #ececf2;
+
+        color: #6c7079;
+
+        font-size: 12px;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+
+        padding: 15px;
+        white-space: nowrap;
+    }
+
+
+    #programmesTable tbody td {
+        padding: 15px;
+        border-bottom-color: #f0f0f4;
+    }
+
+
+    .programme-code {
+        display: inline-flex;
+
+        padding: 5px 9px;
+
+        border-radius: 7px;
+
+        background: rgba(216, 0, 184, 0.08);
+        color: #d800b8;
+
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    .programme-name {
+        font-weight: 600;
+        color: #30333b;
+    }
+
+
+    .award-badge {
+        display: inline-flex;
+
+        padding: 5px 9px;
+
+        border-radius: 20px;
+
+        background: #f1f2f5;
+        color: #656a73;
+
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+
+        padding: 5px 9px;
+
+        border-radius: 20px;
+
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+
+    .status-badge.active {
+        background: rgba(25, 135, 84, 0.10);
+        color: #198754;
+    }
+
+
+    .status-badge.inactive {
+        background: rgba(108, 117, 125, 0.10);
+        color: #6c757d;
+    }
+
+
+    /* =========================================================
+       Buttons
+       ========================================================= */
+
+    .btn-kism-primary {
+        background: #d800b8;
+        border-color: #d800b8;
+        color: #ffffff;
+
+        min-height: 42px;
+
+        border-radius: 9px;
+
+        font-weight: 600;
+
+        box-shadow:
+            0 4px 10px
+            rgba(216, 0, 184, 0.16);
+    }
+
+
+    .btn-kism-primary:hover,
+    .btn-kism-primary:focus {
+        background: #ad0093;
+        border-color: #ad0093;
+        color: #ffffff;
+    }
+
+
+    /* =========================================================
+       Modal
+       ========================================================= */
+
+    .kism-modal-header {
+        background: #d800b8;
+        color: #ffffff;
+        border-bottom: 0;
+        padding: 18px 22px;
+    }
+
+
+    .kism-modal-header small {
+        opacity: 0.85;
+    }
+
+
+    /* =========================================================
+       Details
+       ========================================================= */
+
+    .programme-details-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        padding: 18px;
+
+        border-radius: 13px;
+
+        background: #faf5f9;
+        border: 1px solid #f0dceb;
+    }
+
+
+    .programme-details-icon {
+        width: 52px;
+        height: 52px;
+
+        flex-shrink: 0;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 13px;
+
+        background: rgba(216, 0, 184, 0.10);
+        color: #d800b8;
+
+        font-size: 22px;
+    }
+
+
+    .programme-award-badge {
+        display: inline-flex;
+
+        margin-top: 4px;
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        background: #ffffff;
+        color: #6c7079;
+
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+
+    .detail-label {
+        color: #858991;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+
+        margin-bottom: 5px;
+    }
+
+
+    .detail-value {
+        color: #30333b;
+        font-weight: 600;
+    }
+
+
+    .detail-description {
+        color: #555a64;
+        line-height: 1.7;
+    }
+
+
+    /* =========================================================
+       Form
+       ========================================================= */
+
+    .modal-body .form-label {
+        font-weight: 600;
+        color: #363942;
+        margin-bottom: 7px;
+    }
+
+
+    .modal-body .form-control,
+    .modal-body .form-select {
+        min-height: 44px;
+        border-radius: 9px;
+        border-color: #dfe1e7;
+    }
+
+
+    .modal-body .form-control:focus,
+    .modal-body .form-select:focus {
+        border-color: #d800b8;
+
+        box-shadow:
+            0 0 0 0.2rem
+            rgba(216, 0, 184, 0.10);
+    }
+
+
+    @@media (max-width: 767.98px) {
+
+        .programme-stat-card {
+            padding: 15px;
+        }
+
+    }
+
+</style>
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            // =====================================================
+            // DataTable
+            // =====================================================
+
+            const table =
+                $('#programmesTable').DataTable({
+
+                    responsive: true,
+
+                    pageLength: 10,
+
+                    lengthMenu: [
+                        [10, 25, 50, 100, -1],
+                        [10, 25, 50, 100, 'All']
+                    ],
+
+                    order: [
+                        [5, 'asc']
+                    ],
+
+                    columnDefs: [
+                        {
+                            targets: 6,
+                            orderable: false,
+                            searchable: false
+                        }
+                    ],
+
+                    language: {
+                        emptyTable:
+                            'No programmes found.'
+                    }
+
+                });
+
+
+            // =====================================================
+            // Modal references
+            // =====================================================
+
+            const createModal =
+                new bootstrap.Modal(
+                    document.getElementById(
+                        'createProgrammeModal'
+                    )
+                );
+
+            const editModal =
+                new bootstrap.Modal(
+                    document.getElementById(
+                        'editProgrammeModal'
+                    )
+                );
+
+            const detailsModal =
+                new bootstrap.Modal(
+                    document.getElementById(
+                        'detailsProgrammeModal'
+                    )
+                );
+
+
+            // =====================================================
+            // Create
+            // =====================================================
+
+            $('#btnCreateProgramme').on(
+                'click',
+                function () {
+
+                    $('#createProgrammeModalContent')
+                        .html(
+                            '<div class="modal-body text-center p-5">' +
+                            '<div class="spinner-border text-secondary"></div>' +
+                            '<div class="mt-3 text-muted">Loading...</div>' +
+                            '</div>'
+                        );
+
+                    createModal.show();
+
+
+                    $.get(
+                        '@Url.Action("Create", "Programmes")',
+                        function (html) {
+
+                            $('#createProgrammeModalContent')
+                                .html(html);
+
+                        }
+                    )
+                    .fail(function () {
+
+                        createModal.hide();
+
+                        Swal.fire({
+
+                            icon: 'error',
+
+                            title: 'Unable to load',
+
+                            text:
+                                'The programme form could not be loaded.',
+
+                            confirmButtonColor:
+                                '#d800b8'
+
+                        });
+
+                    });
+
+                }
+            );
+
+
+            // =====================================================
+            // Create submit
+            // =====================================================
+
+            $(document).on(
+                'submit',
+                '#createProgrammeForm',
+                function (event) {
+
+                    event.preventDefault();
+
+                    const form =
+                        $(this);
+
+                    const button =
+                        $('#saveProgrammeButton');
+
+                    if (!this.checkValidity()) {
+
+                        this.reportValidity();
+
+                        return;
+
+                    }
+
+                    button.prop(
+                        'disabled',
+                        true
+                    );
+
+                    $('.save-programme-content')
+                        .addClass('d-none');
+
+                    $('.save-programme-loading')
+                        .removeClass('d-none');
+
+
+                    $.ajax({
+
+                        url:
+                            form.attr('action'),
+
+                        type:
+                            'POST',
+
+                        data:
+                            form.serialize()
+
+                    })
+                    .done(function (response) {
+
+                        if (response.success) {
+
+                            createModal.hide();
+
+                            Swal.fire({
+
+                                icon: 'success',
+
+                                title: 'Programme Created',
+
+                                text:
+                                    response.message,
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            }).then(function () {
+
+                                window.location.reload();
+
+                            });
+
+                        }
+                        else {
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Unable to save',
+
+                                text:
+                                    response.message ||
+                                    'Unable to create programme.',
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                        }
+
+                    })
+                    .fail(function (xhr) {
+
+                        const message =
+                            xhr.responseJSON?.message ||
+                            'Unable to create programme.';
+
+                        Swal.fire({
+
+                            icon: 'error',
+
+                            title: 'Save Failed',
+
+                            text: message,
+
+                            confirmButtonColor:
+                                '#d800b8'
+
+                        });
+
+                    })
+                    .always(function () {
+
+                        button.prop(
+                            'disabled',
+                            false
+                        );
+
+                        $('.save-programme-content')
+                            .removeClass('d-none');
+
+                        $('.save-programme-loading')
+                            .addClass('d-none');
+
+                    });
+
+                }
+            );
+
+
+            // =====================================================
+            // Edit
+            // =====================================================
+
+            $(document).on(
+                'click',
+                '.btn-edit-programme',
+                function () {
+
+                    const id =
+                        $(this).data('id');
+
+                    $('#editProgrammeModalContent')
+                        .html(
+                            '<div class="modal-body text-center p-5">' +
+                            '<div class="spinner-border text-secondary"></div>' +
+                            '<div class="mt-3 text-muted">Loading...</div>' +
+                            '</div>'
+                        );
+
+                    editModal.show();
+
+
+                    $.get(
+                        '@Url.Action("Edit", "Programmes")',
+                        {
+                            id: id
+                        },
+                        function (html) {
+
+                            $('#editProgrammeModalContent')
+                                .html(html);
+
+                        }
+                    )
+                    .fail(function () {
+
+                        editModal.hide();
+
+                        Swal.fire({
+
+                            icon: 'error',
+
+                            title: 'Unable to load',
+
+                            text:
+                                'The programme could not be loaded.',
+
+                            confirmButtonColor:
+                                '#d800b8'
+
+                        });
+
+                    });
+
+                }
+            );
+
+
+            // =====================================================
+            // Edit submit
+            // =====================================================
+
+            $(document).on(
+                'submit',
+                '#editProgrammeForm',
+                function (event) {
+
+                    event.preventDefault();
+
+                    const form =
+                        $(this);
+
+                    const button =
+                        $('#updateProgrammeButton');
+
+                    if (!this.checkValidity()) {
+
+                        this.reportValidity();
+
+                        return;
+
+                    }
+
+                    button.prop(
+                        'disabled',
+                        true
+                    );
+
+                    $('.update-programme-content')
+                        .addClass('d-none');
+
+                    $('.update-programme-loading')
+                        .removeClass('d-none');
+
+
+                    $.ajax({
+
+                        url:
+                            form.attr('action'),
+
+                        type:
+                            'POST',
+
+                        data:
+                            form.serialize()
+
+                    })
+                    .done(function (response) {
+
+                        if (response.success) {
+
+                            editModal.hide();
+
+                            Swal.fire({
+
+                                icon: 'success',
+
+                                title: 'Programme Updated',
+
+                                text:
+                                    response.message,
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            }).then(function () {
+
+                                window.location.reload();
+
+                            });
+
+                        }
+                        else {
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Unable to save',
+
+                                text:
+                                    response.message ||
+                                    'Unable to update programme.',
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                        }
+
+                    })
+                    .fail(function (xhr) {
+
+                        const message =
+                            xhr.responseJSON?.message ||
+                            'Unable to update programme.';
+
+                        Swal.fire({
+
+                            icon: 'error',
+
+                            title: 'Save Failed',
+
+                            text: message,
+
+                            confirmButtonColor:
+                                '#d800b8'
+
+                        });
+
+                    })
+                    .always(function () {
+
+                        button.prop(
+                            'disabled',
+                            false
+                        );
+
+                        $('.update-programme-content')
+                            .removeClass('d-none');
+
+                        $('.update-programme-loading')
+                            .addClass('d-none');
+
+                    });
+
+                }
+            );
+
+
+            // =====================================================
+            // Details
+            // =====================================================
+
+            $(document).on(
+                'click',
+                '.btn-view-programme',
+                function () {
+
+                    const id =
+                        $(this).data('id');
+
+                    $('#detailsProgrammeModalContent')
+                        .html(
+                            '<div class="modal-body text-center p-5">' +
+                            '<div class="spinner-border text-secondary"></div>' +
+                            '<div class="mt-3 text-muted">Loading...</div>' +
+                            '</div>'
+                        );
+
+                    detailsModal.show();
+
+
+                    $.get(
+                        '@Url.Action("Details", "Programmes")',
+                        {
+                            id: id
+                        },
+                        function (html) {
+
+                            $('#detailsProgrammeModalContent')
+                                .html(html);
+
+                        }
+                    )
+                    .fail(function () {
+
+                        detailsModal.hide();
+
+                        Swal.fire({
+
+                            icon: 'error',
+
+                            title: 'Unable to load',
+
+                            text:
+                                'The programme details could not be loaded.',
+
+                            confirmButtonColor:
+                                '#d800b8'
+
+                        });
+
+                    });
+
+                }
+            );
+
+
+            // =====================================================
+            // Toggle status
+            // =====================================================
+
+            $(document).on(
+                'click',
+                '.btn-toggle-programme',
+                function () {
+
+                    const button =
+                        $(this);
+
+                    const id =
+                        button.data('id');
+
+                    const isActive =
+                        button.data('is-active') === true ||
+                        button.data('is-active') === 'true';
+
+                    const actionText =
+                        isActive
+                            ? 'deactivate'
+                            : 'activate';
+
+
+                    Swal.fire({
+
+                        icon:
+                            isActive
+                                ? 'warning'
+                                : 'question',
+
+                        title:
+                            `${actionText.charAt(0).toUpperCase() +
+                            actionText.slice(1)} programme?`,
+
+                        text:
+                            `Are you sure you want to ${actionText} this programme?`,
+
+                        showCancelButton:
+                            true,
+
+                        confirmButtonText:
+                            isActive
+                                ? 'Yes, deactivate'
+                                : 'Yes, activate',
+
+                        cancelButtonText:
+                            'Cancel',
+
+                        confirmButtonColor:
+                            isActive
+                                ? '#dc3545'
+                                : '#198754'
+
+                    }).then(function (result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+
+                        const token =
+                            $('input[name="__RequestVerificationToken"]')
+                                .first()
+                                .val();
+
+
+                        $.ajax({
+
+                            url:
+                                '@Url.Action("ToggleStatus", "Programmes")',
+
+                            type:
+                                'POST',
+
+                            data: {
+                                id: id,
+                                __RequestVerificationToken:
+                                    token
+                            }
+
+                        })
+                        .done(function (response) {
+
+                            if (response.success) {
+
+                                Swal.fire({
+
+                                    icon: 'success',
+
+                                    title: 'Status Updated',
+
+                                    text:
+                                        response.message,
+
+                                    confirmButtonColor:
+                                        '#d800b8'
+
+                                }).then(function () {
+
+                                    window.location.reload();
+
+                                });
+
+                            }
+                            else {
+
+                                Swal.fire({
+
+                                    icon: 'error',
+
+                                    title: 'Unable to update',
+
+                                    text:
+                                        response.message,
+
+                                    confirmButtonColor:
+                                        '#d800b8'
+
+                                });
+
+                            }
+
+                        })
+                        .fail(function (xhr) {
+
+                            const message =
+                                xhr.responseJSON?.message ||
+                                'Unable to update programme status.';
+
+                            Swal.fire({
+
+                                icon: 'error',
+
+                                title: 'Update Failed',
+
+                                text: message,
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                        });
+
+                    });
+
+                }
+            );
+
+        });
+
+    </script>
+}

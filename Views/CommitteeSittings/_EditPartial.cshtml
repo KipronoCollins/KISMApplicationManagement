@@ -1,0 +1,367 @@
+@model KISMApplicationManagement.Models.CommitteeSittingViewModels.CommitteeSittingViewModel
+
+<div class="modal-header modal-header-kism">
+    <div>
+        <h5 class="modal-title fw-bold mb-1">
+            <i class="bi bi-pencil-square me-2"></i>
+            Edit Committee Sitting
+        </h5>
+
+        <div class="small text-white-50">
+            Update the scheduled committee session.
+        </div>
+    </div>
+
+    <button type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+</div>
+
+
+<form id="editCommitteeSittingForm"
+      asp-controller="CommitteeSittings"
+      asp-action="Edit"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input asp-for="CommitteeSittingId"
+           type="hidden" />
+
+
+    <div class="modal-body">
+
+        <div class="alert border-0 mb-4"
+             style="background:#fff8fe;">
+
+            <div class="d-flex gap-2">
+
+                <i class="bi bi-info-circle-fill mt-1"
+                   style="color:#d800b8;"></i>
+
+                <div class="small">
+
+                    Only <strong>Scheduled</strong> committee sittings can
+                    be edited. Once a sitting is in progress, its meeting
+                    details are locked.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="editCommitteeSittingValidation"
+             class="alert alert-danger d-none">
+        </div>
+
+
+        <div class="row g-3">
+
+            <!-- Intake -->
+
+            <div class="col-12">
+
+                <label asp-for="IntakeId"
+                       class="form-label fw-semibold">
+
+                    Intake
+                    <span class="text-danger">*</span>
+
+                </label>
+
+                <select asp-for="IntakeId"
+                        class="form-select">
+
+                    <option value="">
+                        -- Select Intake --
+                    </option>
+
+                    @foreach (var intake in Model.Intakes)
+                    {
+                        <option value="@intake.IntakeId">
+
+                            @intake.IntakeName
+                            -
+                            @intake.AcademicYear
+                            @if (!string.IsNullOrWhiteSpace(intake.IntakePeriod))
+                            {
+                                <text> (@intake.IntakePeriod)</text>
+                            }
+
+                        </option>
+                    }
+
+                </select>
+
+                <span asp-validation-for="IntakeId"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <!-- Sitting Date -->
+
+            <div class="col-md-6">
+
+                <label asp-for="SittingDate"
+                       class="form-label fw-semibold">
+
+                    Sitting Date
+                    <span class="text-danger">*</span>
+
+                </label>
+
+                <input asp-for="SittingDate"
+                       type="date"
+                       class="form-control" />
+
+                <span asp-validation-for="SittingDate"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <!-- Reference Number -->
+
+            <div class="col-md-6">
+
+                <label asp-for="ReferenceNumber"
+                       class="form-label fw-semibold">
+
+                    Reference Number
+                    <span class="text-danger">*</span>
+
+                </label>
+
+                <input asp-for="ReferenceNumber"
+                       class="form-control"
+                       maxlength="100"
+                       placeholder="e.g. KISM/ADM/COM/001/2026" />
+
+                <div class="form-text">
+                    The reference number must be unique.
+                </div>
+
+                <span asp-validation-for="ReferenceNumber"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <!-- Remarks -->
+
+            <div class="col-12">
+
+                <label asp-for="Remarks"
+                       class="form-label fw-semibold">
+
+                    Remarks
+
+                </label>
+
+                <textarea asp-for="Remarks"
+                          class="form-control"
+                          rows="4"
+                          maxlength="2000"
+                          placeholder="Optional notes about this committee sitting..."></textarea>
+
+                <span asp-validation-for="Remarks"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+        <button type="button"
+                class="btn btn-light border"
+                data-bs-dismiss="modal">
+
+            <i class="bi bi-x-lg me-1"></i>
+            Close
+
+        </button>
+
+        <button type="submit"
+                class="btn text-white"
+                id="btnUpdateCommitteeSitting"
+                style="background:#d800b8;">
+
+            <i class="bi bi-save me-1"></i>
+            Save Changes
+
+        </button>
+
+    </div>
+
+</form>
+
+
+<style>
+
+    .modal-header-kism {
+        background: #d800b8;
+        color: #ffffff;
+        border-bottom: 0;
+    }
+
+    #editCommitteeSittingForm .form-control:focus,
+    #editCommitteeSittingForm .form-select:focus {
+        border-color: #d800b8;
+        box-shadow: 0 0 0 0.2rem rgba(216, 0, 184, 0.15);
+    }
+
+</style>
+
+
+<script>
+
+    $(function () {
+
+        $('#editCommitteeSittingForm').on(
+            'submit',
+            function (event) {
+
+                event.preventDefault();
+
+                const form =
+                    $(this);
+
+                const button =
+                    $('#btnUpdateCommitteeSitting');
+
+                const validation =
+                    $('#editCommitteeSittingValidation');
+
+
+                validation
+                    .addClass('d-none')
+                    .text('');
+
+
+                if (!form[0].checkValidity()) {
+
+                    form[0].reportValidity();
+
+                    return;
+
+                }
+
+
+                button
+                    .prop('disabled', true)
+                    .html(
+                        '<span class="spinner-border spinner-border-sm me-1"></span>' +
+                        'Saving...'
+                    );
+
+
+                $.ajax({
+
+                    url:
+                        form.attr('action'),
+
+                    type:
+                        'POST',
+
+                    data:
+                        form.serialize(),
+
+                    success:
+                        function (response) {
+
+                            if (!response.success) {
+
+                                validation
+                                    .removeClass('d-none')
+                                    .text(
+                                        response.message ||
+                                        'Unable to update the committee sitting.'
+                                    );
+
+                                return;
+
+                            }
+
+
+                            $('#editCommitteeSittingModal')
+                                .modal('hide');
+
+
+                            Swal.fire({
+
+                                icon:
+                                    'success',
+
+                                title:
+                                    'Committee Sitting Updated',
+
+                                text:
+                                    response.message,
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            })
+                            .then(function () {
+
+                                window.location.reload();
+
+                            });
+
+                        },
+
+                    error:
+                        function (xhr) {
+
+                            let message =
+                                'Unable to update the committee sitting.';
+
+
+                            if (
+                                xhr.responseJSON &&
+                                xhr.responseJSON.message
+                            ) {
+
+                                message =
+                                    xhr.responseJSON.message;
+
+                            }
+
+
+                            validation
+                                .removeClass('d-none')
+                                .text(message);
+
+                        },
+
+                    complete:
+                        function () {
+
+                            button
+                                .prop('disabled', false)
+                                .html(
+                                    '<i class="bi bi-save me-1"></i>' +
+                                    'Save Changes'
+                                );
+
+                        }
+
+                });
+
+            });
+
+    });
+
+</script>

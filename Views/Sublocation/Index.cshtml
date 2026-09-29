@@ -1,0 +1,1615 @@
+@model IEnumerable<KISMApplicationManagement.Models.Sublocation>
+
+@using KISMApplicationManagement.Models
+
+@{
+    ViewData["Title"] = "Sublocations";
+
+    var counties =
+        ViewBag.Counties as IEnumerable<County>
+        ?? Enumerable.Empty<County>();
+
+    var subcounties =
+        ViewBag.Subcounties as IEnumerable<Subcounty>
+        ?? Enumerable.Empty<Subcounty>();
+
+    var divisions =
+        ViewBag.Divisions as IEnumerable<Division>
+        ?? Enumerable.Empty<Division>();
+
+    var locations =
+        ViewBag.Locations as IEnumerable<Location>
+        ?? Enumerable.Empty<Location>();
+}
+
+
+<div class="container-fluid">
+
+    <!-- ========================================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="bi bi-pin-map-fill me-2"
+                   style="color:#d800b8;"></i>
+
+                Sublocations
+
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage sublocations within the KISM location hierarchy.
+            </p>
+
+        </div>
+
+
+        <button type="button"
+                class="btn btn-kism-primary"
+                id="btnCreateSublocation">
+
+            <i class="bi bi-plus-circle me-1"></i>
+
+            Add Sublocation
+
+        </button>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MAIN CARD -->
+    <!-- ========================================================= -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+
+            <!-- ================================================= -->
+            <!-- FILTERS -->
+            <!-- ================================================= -->
+
+            <div class="row g-3 mb-4">
+
+
+                <!-- COUNTY -->
+                <div class="col-md-3">
+
+                    <label for="countyFilter"
+                           class="form-label fw-semibold">
+
+                        <i class="bi bi-geo-alt me-1"></i>
+
+                        County
+
+                    </label>
+
+                    <select id="countyFilter"
+                            class="form-select">
+
+                        <option value="">
+                            All Counties
+                        </option>
+
+                        @foreach (var county in counties)
+                        {
+                            <option value="@county.CountyId">
+
+                                @county.CountyNumber -
+                                @county.CountyName
+
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- SUBCOUNTY -->
+                <div class="col-md-3">
+
+                    <label for="subcountyFilter"
+                           class="form-label fw-semibold">
+
+                        <i class="bi bi-diagram-2 me-1"></i>
+
+                        Subcounty
+
+                    </label>
+
+                    <select id="subcountyFilter"
+                            class="form-select"
+                            disabled>
+
+                        <option value="">
+                            All Subcounties
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- DIVISION -->
+                <div class="col-md-3">
+
+                    <label for="divisionFilter"
+                           class="form-label fw-semibold">
+
+                        <i class="bi bi-diagram-3 me-1"></i>
+
+                        Division
+
+                    </label>
+
+                    <select id="divisionFilter"
+                            class="form-select"
+                            disabled>
+
+                        <option value="">
+                            All Divisions
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- LOCATION -->
+                <div class="col-md-3">
+
+                    <label for="locationFilter"
+                           class="form-label fw-semibold">
+
+                        <i class="bi bi-geo me-1"></i>
+
+                        Location
+
+                    </label>
+
+                    <select id="locationFilter"
+                            class="form-select"
+                            disabled>
+
+                        <option value="">
+                            All Locations
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- TABLE -->
+            <!-- ================================================= -->
+
+            <div class="table-responsive">
+
+                <table id="sublocationsTable"
+                       class="table table-bordered table-hover align-middle w-100">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>
+                                No.
+                            </th>
+
+                            <th>
+                                Sublocation Name
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Division
+                            </th>
+
+                            <th>
+                                Subcounty
+                            </th>
+
+                            <th>
+                                County
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item.Location.Division.Subcounty.County.CountyNumber
+                                </td>
+
+
+                                <td class="fw-semibold">
+
+                                    @item.SublocationName
+
+                                </td>
+
+
+                                <td>
+
+                                    @item.Location.LocationName
+
+                                </td>
+
+
+                                <td>
+
+                                    @item.Location.Division.DivisionName
+
+                                </td>
+
+
+                                <td>
+
+                                    @item.Location.Division.Subcounty.SubcountyName
+
+                                </td>
+
+
+                                <td>
+
+                                    @item.Location.Division.Subcounty.County.CountyName
+
+                                </td>
+
+
+                                <td>
+
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td data-order="@item.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm:ss")">
+
+                                    @item.CreatedAtUtc.ToLocalTime().ToString("dd MMM yyyy")
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="d-flex gap-1">
+
+
+                                        <!-- EDIT -->
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-edit-sublocation"
+                                                data-id="@item.SublocationId"
+                                                title="Edit Sublocation">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </button>
+
+
+                                        <!-- STATUS -->
+
+                                        @if (item.IsActive)
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger btn-toggle-sublocation"
+                                                    data-id="@item.SublocationId"
+                                                    data-name="@item.SublocationName"
+                                                    data-status="active"
+                                                    title="Deactivate">
+
+                                                <i class="bi bi-toggle-on"></i>
+
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-success btn-toggle-sublocation"
+                                                    data-id="@item.SublocationId"
+                                                    data-name="@item.SublocationName"
+                                                    data-status="inactive"
+                                                    title="Activate">
+
+                                                <i class="bi bi-toggle-off"></i>
+
+                                            </button>
+                                        }
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- CREATE MODAL -->
+<!-- ============================================================= -->
+
+<div class="modal fade"
+     id="createSublocationModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title fw-bold">
+
+                    <i class="bi bi-plus-circle me-2"
+                       style="color:#d800b8;"></i>
+
+                    Add Sublocation
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body"
+                 id="createSublocationModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         style="color:#d800b8;"
+                         role="status">
+
+                    </div>
+
+                    <div class="mt-2 text-muted">
+                        Loading...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- EDIT MODAL -->
+<!-- ============================================================= -->
+
+<div class="modal fade"
+     id="editSublocationModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title fw-bold">
+
+                    <i class="bi bi-pencil-square me-2"
+                       style="color:#d800b8;"></i>
+
+                    Edit Sublocation
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body"
+                 id="editSublocationModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         style="color:#d800b8;"
+                         role="status">
+
+                    </div>
+
+                    <div class="mt-2 text-muted">
+                        Loading...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Styles {
+
+    <style>
+
+        .btn-kism-primary {
+            background-color: #d800b8;
+            border-color: #d800b8;
+            color: #ffffff;
+        }
+
+        .btn-kism-primary:hover,
+        .btn-kism-primary:focus {
+            background-color: #b5009b;
+            border-color: #b5009b;
+            color: #ffffff;
+        }
+
+
+        #sublocationsTable {
+            border-collapse: collapse !important;
+        }
+
+
+        #sublocationsTable th,
+        #sublocationsTable td {
+            border: 1px solid #dee2e6 !important;
+        }
+
+
+        #sublocationsTable thead th {
+            white-space: nowrap;
+        }
+
+
+        #sublocationsTable tbody tr:hover {
+            background-color: rgba(216, 0, 184, 0.04);
+        }
+
+
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 6px 10px;
+        }
+
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 5px 8px;
+        }
+
+
+        .dataTables_wrapper .dataTables_paginate
+        .paginate_button.current {
+            background: #d800b8 !important;
+            border-color: #d800b8 !important;
+            color: #ffffff !important;
+        }
+
+
+        .dataTables_wrapper .dataTables_paginate
+        .paginate_button:hover {
+            background: #d800b8 !important;
+            border-color: #d800b8 !important;
+            color: #ffffff !important;
+        }
+
+    </style>
+
+}
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+
+            // =====================================================
+            // DATA
+            // =====================================================
+
+            const counties = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    counties.Select(c => new
+                    {
+                        id = c.CountyId,
+                        number = c.CountyNumber,
+                        name = c.CountyName
+                    })
+                )
+            );
+
+
+            const subcounties = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    subcounties.Select(s => new
+                    {
+                        id = s.SubcountyId,
+                        countyId = s.CountyId,
+                        name = s.SubcountyName
+                    })
+                )
+            );
+
+
+            const divisions = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    divisions.Select(d => new
+                    {
+                        id = d.DivisionId,
+                        subcountyId = d.SubcountyId,
+                        name = d.DivisionName
+                    })
+                )
+            );
+
+
+            const locations = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    locations.Select(l => new
+                    {
+                        id = l.LocationId,
+                        divisionId = l.DivisionId,
+                        name = l.LocationName
+                    })
+                )
+            );
+
+
+            // =====================================================
+            // DATATABLE
+            // =====================================================
+
+            const table =
+                $("#sublocationsTable").DataTable({
+
+                    responsive: true,
+
+                    pageLength: 10,
+
+                    lengthMenu: [
+                        [10, 25, 50, 100, -1],
+                        [10, 25, 50, 100, "All"]
+                    ],
+
+                    order: [
+                        [0, "asc"],
+                        [1, "asc"]
+                    ],
+
+                    columnDefs: [
+                        {
+                            targets: 8,
+                            orderable: false,
+                            searchable: false
+                        }
+                    ],
+
+                    language: {
+
+                        emptyTable:
+                            "No sublocations found.",
+
+                        zeroRecords:
+                            "No matching sublocations found."
+
+                    }
+
+                });
+
+
+            // =====================================================
+            // FILTER REFERENCES
+            // =====================================================
+
+            const countyFilter =
+                $("#countyFilter");
+
+            const subcountyFilter =
+                $("#subcountyFilter");
+
+            const divisionFilter =
+                $("#divisionFilter");
+
+            const locationFilter =
+                $("#locationFilter");
+
+
+            // =====================================================
+            // RESET CHILD FILTERS
+            // =====================================================
+
+            function resetSubcountyFilter() {
+
+                subcountyFilter
+                    .empty()
+                    .append(
+                        '<option value="">All Subcounties</option>'
+                    )
+                    .prop("disabled", true);
+
+            }
+
+
+            function resetDivisionFilter() {
+
+                divisionFilter
+                    .empty()
+                    .append(
+                        '<option value="">All Divisions</option>'
+                    )
+                    .prop("disabled", true);
+
+            }
+
+
+            function resetLocationFilter() {
+
+                locationFilter
+                    .empty()
+                    .append(
+                        '<option value="">All Locations</option>'
+                    )
+                    .prop("disabled", true);
+
+            }
+
+
+            // =====================================================
+            // COUNTY -> SUBCOUNTY
+            // =====================================================
+
+            countyFilter.on("change", function () {
+
+                const countyId =
+                    $(this).val();
+
+
+                resetSubcountyFilter();
+
+                resetDivisionFilter();
+
+                resetLocationFilter();
+
+
+                if (!countyId) {
+
+                    table
+                        .column(5)
+                        .search("")
+                        .draw();
+
+                    return;
+
+                }
+
+
+                const matchingSubcounties =
+                    subcounties.filter(function (item) {
+
+                        return String(item.countyId) ===
+                            String(countyId);
+
+                    });
+
+
+                matchingSubcounties.forEach(function (item) {
+
+                    subcountyFilter.append(
+                        new Option(
+                            item.name,
+                            item.id
+                        )
+                    );
+
+                });
+
+
+                subcountyFilter.prop(
+                    "disabled",
+                    matchingSubcounties.length === 0
+                );
+
+
+                const selectedCounty =
+                    counties.find(function (item) {
+
+                        return String(item.id) ===
+                            String(countyId);
+
+                    });
+
+
+                if (selectedCounty) {
+
+                    table
+                        .column(5)
+                        .search(
+                            "^" +
+                            selectedCounty.name +
+                            "$",
+                            true,
+                            false
+                        )
+                        .draw();
+
+                }
+
+            });
+
+
+            // =====================================================
+            // SUBCOUNTY -> DIVISION
+            // =====================================================
+
+            subcountyFilter.on("change", function () {
+
+                const subcountyId =
+                    $(this).val();
+
+
+                resetDivisionFilter();
+
+                resetLocationFilter();
+
+
+                if (!subcountyId) {
+
+                    divisionFilter.prop(
+                        "disabled",
+                        true
+                    );
+
+                    locationFilter.prop(
+                        "disabled",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const matchingDivisions =
+                    divisions.filter(function (item) {
+
+                        return String(item.subcountyId) ===
+                            String(subcountyId);
+
+                    });
+
+
+                matchingDivisions.forEach(function (item) {
+
+                    divisionFilter.append(
+                        new Option(
+                            item.name,
+                            item.id
+                        )
+                    );
+
+                });
+
+
+                divisionFilter.prop(
+                    "disabled",
+                    matchingDivisions.length === 0
+                );
+
+
+                const selectedSubcounty =
+                    subcounties.find(function (item) {
+
+                        return String(item.id) ===
+                            String(subcountyId);
+
+                    });
+
+
+                if (selectedSubcounty) {
+
+                    table
+                        .column(4)
+                        .search(
+                            "^" +
+                            selectedSubcounty.name +
+                            "$",
+                            true,
+                            false
+                        )
+                        .draw();
+
+                }
+
+            });
+
+
+            // =====================================================
+            // DIVISION -> LOCATION
+            // =====================================================
+
+            divisionFilter.on("change", function () {
+
+                const divisionId =
+                    $(this).val();
+
+
+                resetLocationFilter();
+
+
+                if (!divisionId) {
+
+                    locationFilter.prop(
+                        "disabled",
+                        true
+                    );
+
+                    return;
+
+                }
+
+
+                const matchingLocations =
+                    locations.filter(function (item) {
+
+                        return String(item.divisionId) ===
+                            String(divisionId);
+
+                    });
+
+
+                matchingLocations.forEach(function (item) {
+
+                    locationFilter.append(
+                        new Option(
+                            item.name,
+                            item.id
+                        )
+                    );
+
+                });
+
+
+                locationFilter.prop(
+                    "disabled",
+                    matchingLocations.length === 0
+                );
+
+
+                const selectedDivision =
+                    divisions.find(function (item) {
+
+                        return String(item.id) ===
+                            String(divisionId);
+
+                    });
+
+
+                if (selectedDivision) {
+
+                    table
+                        .column(3)
+                        .search(
+                            "^" +
+                            selectedDivision.name +
+                            "$",
+                            true,
+                            false
+                        )
+                        .draw();
+
+                }
+
+            });
+
+
+            // =====================================================
+            // LOCATION FILTER
+            // =====================================================
+
+            locationFilter.on("change", function () {
+
+                const locationId =
+                    $(this).val();
+
+
+                if (!locationId) {
+
+                    table
+                        .column(2)
+                        .search("")
+                        .draw();
+
+                    return;
+
+                }
+
+
+                const selectedLocation =
+                    locations.find(function (item) {
+
+                        return String(item.id) ===
+                            String(locationId);
+
+                    });
+
+
+                if (selectedLocation) {
+
+                    table
+                        .column(2)
+                        .search(
+                            "^" +
+                            selectedLocation.name +
+                            "$",
+                            true,
+                            false
+                        )
+                        .draw();
+
+                }
+
+            });
+
+
+            // =====================================================
+            // CREATE MODAL
+            // =====================================================
+
+            $("#btnCreateSublocation").on(
+                "click",
+                function () {
+
+                    const modalElement =
+                        document.getElementById(
+                            "createSublocationModal"
+                        );
+
+
+                    const modal =
+                        new bootstrap.Modal(
+                            modalElement
+                        );
+
+
+                    $("#createSublocationModalBody")
+                        .html(`
+                            <div class="text-center py-4">
+
+                                <div class="spinner-border"
+                                     style="color:#d800b8;"
+                                     role="status">
+                                </div>
+
+                                <div class="mt-2 text-muted">
+                                    Loading...
+                                </div>
+
+                            </div>
+                        `);
+
+
+                    modal.show();
+
+
+                    $.get(
+                        "@Url.Action("Create", "Sublocation")",
+                        function (response) {
+
+                            $("#createSublocationModalBody")
+                                .html(response);
+
+                        }
+                    );
+
+                }
+            );
+
+
+            // =====================================================
+            // CREATE SUBLOCATION
+            // =====================================================
+
+            $(document).on(
+                "submit",
+                "#createSublocationForm",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    const form =
+                        $(this);
+
+
+                    const submitButton =
+                        $("#createSublocationSubmit");
+
+
+                    if (!this.checkValidity()) {
+
+                        this.classList.add(
+                            "was-validated"
+                        );
+
+                        return;
+
+                    }
+
+
+                    submitButton
+                        .prop("disabled", true)
+                        .html(`
+                            <span class="spinner-border spinner-border-sm me-1"
+                                  role="status"
+                                  aria-hidden="true"></span>
+                            Saving...
+                        `);
+
+
+                    $.ajax({
+
+                        url:
+                            form.attr("action"),
+
+                        type:
+                            "POST",
+
+                        data:
+                            form.serialize(),
+
+                        success:
+                            function (response) {
+
+                                if (
+                                    typeof response === "string" &&
+                                    response.indexOf(
+                                        "sublocationsTable"
+                                    ) !== -1
+                                ) {
+
+                                    const modalElement =
+                                        document.getElementById(
+                                            "createSublocationModal"
+                                        );
+
+
+                                    const modal =
+                                        bootstrap.Modal
+                                            .getInstance(
+                                                modalElement
+                                            );
+
+
+                                    if (modal) {
+
+                                        modal.hide();
+
+                                    }
+
+
+                                    Swal.fire({
+
+                                        icon: "success",
+
+                                        title:
+                                            "Sublocation Created",
+
+                                        text:
+                                            "The sublocation was created successfully.",
+
+                                        confirmButtonColor:
+                                            "#d800b8"
+
+                                    }).then(function () {
+
+                                        window.location.replace(
+                                            "@Url.Action("Index", "Sublocation")"
+                                        );
+
+                                    });
+
+
+                                    return;
+
+                                }
+
+
+                                $("#createSublocationModalBody")
+                                    .html(response);
+
+                            },
+
+                        error:
+                            function () {
+
+                                Swal.fire({
+
+                                    icon: "error",
+
+                                    title:
+                                        "Unable to Save",
+
+                                    text:
+                                        "The sublocation could not be saved.",
+
+                                    confirmButtonColor:
+                                        "#d800b8"
+
+                                });
+
+
+                                submitButton
+                                    .prop("disabled", false)
+                                    .html(`
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Save Sublocation
+                                    `);
+
+                            }
+
+                    });
+
+                }
+            );
+
+
+            // =====================================================
+            // EDIT MODAL
+            // =====================================================
+
+            $(document).on(
+                "click",
+                ".btn-edit-sublocation",
+                function () {
+
+                    const id =
+                        $(this).data("id");
+
+
+                    const modalElement =
+                        document.getElementById(
+                            "editSublocationModal"
+                        );
+
+
+                    const modal =
+                        new bootstrap.Modal(
+                            modalElement
+                        );
+
+
+                    $("#editSublocationModalBody")
+                        .html(`
+                            <div class="text-center py-4">
+
+                                <div class="spinner-border"
+                                     style="color:#d800b8;"
+                                     role="status">
+                                </div>
+
+                                <div class="mt-2 text-muted">
+                                    Loading...
+                                </div>
+
+                            </div>
+                        `);
+
+
+                    modal.show();
+
+
+                    $.get(
+                        "@Url.Action("Edit", "Sublocation")/" +
+                        id,
+
+                        function (response) {
+
+                            $("#editSublocationModalBody")
+                                .html(response);
+
+                        }
+                    );
+
+                }
+            );
+
+
+            // =====================================================
+            // EDIT SUBLOCATION
+            // =====================================================
+
+            $(document).on(
+                "submit",
+                "#editSublocationForm",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    const form =
+                        $(this);
+
+
+                    const submitButton =
+                        $("#editSublocationSubmit");
+
+
+                    if (!this.checkValidity()) {
+
+                        this.classList.add(
+                            "was-validated"
+                        );
+
+                        return;
+
+                    }
+
+
+                    submitButton
+                        .prop("disabled", true)
+                        .html(`
+                            <span class="spinner-border spinner-border-sm me-1"
+                                  role="status"
+                                  aria-hidden="true"></span>
+                            Saving...
+                        `);
+
+
+                    $.ajax({
+
+                        url:
+                            form.attr("action"),
+
+                        type:
+                            "POST",
+
+                        data:
+                            form.serialize(),
+
+                        success:
+                            function (response) {
+
+                                if (
+                                    typeof response === "string" &&
+                                    response.indexOf(
+                                        "sublocationsTable"
+                                    ) !== -1
+                                ) {
+
+                                    const modalElement =
+                                        document.getElementById(
+                                            "editSublocationModal"
+                                        );
+
+
+                                    const modal =
+                                        bootstrap.Modal
+                                            .getInstance(
+                                                modalElement
+                                            );
+
+
+                                    if (modal) {
+
+                                        modal.hide();
+
+                                    }
+
+
+                                    Swal.fire({
+
+                                        icon: "success",
+
+                                        title:
+                                            "Sublocation Updated",
+
+                                        text:
+                                            "The sublocation was updated successfully.",
+
+                                        confirmButtonColor:
+                                            "#d800b8"
+
+                                    }).then(function () {
+
+                                        window.location.replace(
+                                            "@Url.Action("Index", "Sublocation")"
+                                        );
+
+                                    });
+
+
+                                    return;
+
+                                }
+
+
+                                $("#editSublocationModalBody")
+                                    .html(response);
+
+                            },
+
+                        error:
+                            function () {
+
+                                Swal.fire({
+
+                                    icon: "error",
+
+                                    title:
+                                        "Unable to Save",
+
+                                    text:
+                                        "The sublocation could not be updated.",
+
+                                    confirmButtonColor:
+                                        "#d800b8"
+
+                                });
+
+
+                                submitButton
+                                    .prop("disabled", false)
+                                    .html(`
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Save Changes
+                                    `);
+
+                            }
+
+                    });
+
+                }
+            );
+
+
+            // =====================================================
+            // TOGGLE STATUS
+            // =====================================================
+
+            $(document).on(
+                "click",
+                ".btn-toggle-sublocation",
+                function () {
+
+                    const button =
+                        $(this);
+
+
+                    const id =
+                        button.data("id");
+
+
+                    const name =
+                        button.data("name");
+
+
+                    const status =
+                        button.data("status");
+
+
+                    const isActive =
+                        status === "active";
+
+
+                    Swal.fire({
+
+                        icon:
+                            isActive
+                                ? "warning"
+                                : "question",
+
+                        title:
+                            isActive
+                                ? "Deactivate Sublocation?"
+                                : "Activate Sublocation?",
+
+                        text:
+                            isActive
+                                ? `"${name}" will become unavailable for selection.`
+                                : `"${name}" will become available for selection.`,
+
+                        showCancelButton: true,
+
+                        confirmButtonText:
+                            isActive
+                                ? "Yes, deactivate"
+                                : "Yes, activate",
+
+                        cancelButtonText:
+                            "Cancel",
+
+                        confirmButtonColor:
+                            isActive
+                                ? "#dc3545"
+                                : "#198754",
+
+                        cancelButtonColor:
+                            "#6c757d"
+
+                    }).then(function (result) {
+
+                        if (!result.isConfirmed) {
+
+                            return;
+
+                        }
+
+
+                        const token =
+                            $('input[name="__RequestVerificationToken"]')
+                                .first()
+                                .val();
+
+
+                        $.ajax({
+
+                            url:
+                                "@Url.Action("ToggleStatus", "Sublocation")",
+
+                            type:
+                                "POST",
+
+                            data: {
+
+                                id: id,
+
+                                __RequestVerificationToken:
+                                    token
+
+                            },
+
+                            success:
+                                function (response) {
+
+                                    if (
+                                        typeof response === "string" &&
+                                        response.indexOf(
+                                            "sublocationsTable"
+                                        ) !== -1
+                                    ) {
+
+                                        Swal.fire({
+
+                                            icon: "success",
+
+                                            title:
+                                                isActive
+                                                    ? "Sublocation Deactivated"
+                                                    : "Sublocation Activated",
+
+                                            text:
+                                                isActive
+                                                    ? "The sublocation was deactivated successfully."
+                                                    : "The sublocation was activated successfully.",
+
+                                            confirmButtonColor:
+                                                "#d800b8"
+
+                                        }).then(function () {
+
+                                            window.location.replace(
+                                                "@Url.Action("Index", "Sublocation")"
+                                            );
+
+                                        });
+
+
+                                        return;
+
+                                    }
+
+
+                                    window.location.replace(
+                                        "@Url.Action("Index", "Sublocation")"
+                                    );
+
+                                },
+
+                            error:
+                                function () {
+
+                                    Swal.fire({
+
+                                        icon: "error",
+
+                                        title:
+                                            "Unable to Update",
+
+                                        text:
+                                            "The sublocation status could not be changed.",
+
+                                        confirmButtonColor:
+                                            "#d800b8"
+
+                                    });
+
+                                }
+
+                        });
+
+                    });
+
+                }
+            );
+
+
+        });
+
+    </script>
+
+}

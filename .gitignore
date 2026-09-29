@@ -1,0 +1,51 @@
+# Build output
+bin/
+obj/
+
+# Published output
+publish/
+publish-linux/
+
+# User-specific Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+
+# Local database files
+*.db
+*.db-shm
+*.db-wal
+
+# Temporary files
+*.tmp
+*.temp
+
+# Development/test artifacts
+TestResults/
+
+# Generated database scripts
+mysql-schema.sql
+
+# Sensitive local configuration
+appsettings.Local.json

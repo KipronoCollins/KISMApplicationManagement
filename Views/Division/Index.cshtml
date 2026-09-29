@@ -1,0 +1,1312 @@
+@model IEnumerable<KISMApplicationManagement.Models.Division>
+
+@{
+    ViewData["Title"] = "Division Management";
+
+    var counties =
+        ViewBag.Counties as IEnumerable<KISMApplicationManagement.Models.County>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.County>();
+
+    var subcounties =
+        ViewBag.Subcounties as IEnumerable<KISMApplicationManagement.Models.Subcounty>
+        ?? Enumerable.Empty<KISMApplicationManagement.Models.Subcounty>();
+}
+
+<style>
+    .kism-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .kism-page-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+        color: #333;
+        font-weight: 700;
+    }
+
+    .kism-page-title i {
+        color: #d800b8;
+        font-size: 1.7rem;
+    }
+
+    .btn-kism-primary {
+        background-color: #d800b8;
+        border-color: #d800b8;
+        color: #fff;
+    }
+
+    .btn-kism-primary:hover,
+    .btn-kism-primary:focus {
+        background-color: #b40099;
+        border-color: #b40099;
+        color: #fff;
+    }
+
+    .kism-filter-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .kism-filter-label {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+    }
+
+    #divisionsTable {
+        width: 100% !important;
+    }
+
+    #divisionsTable th,
+    #divisionsTable td {
+        border: 1px solid #dee2e6 !important;
+        vertical-align: middle;
+    }
+
+    #divisionsTable thead th {
+        background-color: #f8f9fa;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.65rem;
+        border-radius: 50rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+        min-width: 38px;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 0.75rem;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+        margin-bottom: 0.75rem;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 1rem;
+    }
+
+    .modal-header {
+        background-color: #d800b8;
+        color: #fff;
+    }
+
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+
+    .modal-title {
+        font-weight: 700;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="kism-page-header">
+
+        <div>
+            <h2 class="kism-page-title">
+                <i class="bi bi-diagram-3"></i>
+                Division Management
+            </h2>
+
+            <div class="text-muted mt-1">
+                Manage divisions within the KISM administrative location hierarchy.
+            </div>
+        </div>
+
+        <button type="button"
+                class="btn btn-kism-primary"
+                id="btnCreateDivision">
+
+            <i class="bi bi-plus-circle me-1"></i>
+            Add Division
+
+        </button>
+
+    </div>
+
+
+    <!-- SUCCESS MESSAGE -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-check-circle me-1"></i>
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- FILTERS -->
+    <div class="kism-filter-card">
+
+        <div class="row g-3">
+
+            <!-- COUNTY FILTER -->
+            <div class="col-md-6">
+
+                <label for="countyFilter"
+                       class="form-label kism-filter-label">
+
+                    <i class="bi bi-geo-alt me-1"></i>
+                    County
+
+                </label>
+
+                <select id="countyFilter"
+                        class="form-select">
+
+                    <option value="">
+                        All Counties
+                    </option>
+
+                    @foreach (var county in counties)
+                    {
+                        <option value="@county.CountyId"
+                                data-county-name="@county.CountyName">
+
+                            @county.CountyNumber - @county.CountyName
+
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- SUBCOUNTY FILTER -->
+            <div class="col-md-6">
+
+                <label for="subcountyFilter"
+                       class="form-label kism-filter-label">
+
+                    <i class="bi bi-diagram-2 me-1"></i>
+                    Subcounty
+
+                </label>
+
+                <select id="subcountyFilter"
+                        class="form-select"
+                        disabled>
+
+                    <option value="">
+                        Select a county first
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+    <div class="card border shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="divisionsTable"
+                       class="table table-striped table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                No.
+                            </th>
+
+                            <th>
+                                Division Name
+                            </th>
+
+                            <th>
+                                Subcounty
+                            </th>
+
+                            <th>
+                                County
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th class="text-center">
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var division in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @division.Subcounty.County.CountyNumber
+                                </td>
+
+                                <td>
+                                    @division.DivisionName
+                                </td>
+
+                                <td>
+                                    @division.Subcounty.SubcountyName
+                                </td>
+
+                                <td>
+                                    @division.Subcounty.County.CountyName
+                                </td>
+
+                                <td>
+
+                                    @if (division.IsActive)
+                                    {
+                                        <span class="status-badge status-active">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">
+                                            Inactive
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    @division.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+                                        <!-- EDIT -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary btn-edit-division"
+                                                data-id="@division.DivisionId"
+                                                title="Edit">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </button>
+
+
+                                        <!-- TOGGLE STATUS -->
+                                        <button type="button"
+                                                class="btn btn-sm @(division.IsActive ? "btn-outline-danger" : "btn-outline-success") btn-toggle-division"
+                                                data-id="@division.DivisionId"
+                                                data-name="@division.DivisionName"
+                                                data-active="@division.IsActive"
+                                                title="@(division.IsActive ? "Deactivate" : "Activate")">
+
+                                            @if (division.IsActive)
+                                            {
+                                                <i class="bi bi-toggle-on"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-toggle-off"></i>
+                                            }
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CREATE MODAL -->
+<div class="modal fade"
+     id="createDivisionModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Add Division
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="createDivisionModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         role="status">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- EDIT MODAL -->
+<div class="modal fade"
+     id="editDivisionModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit Division
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body"
+                 id="editDivisionModalBody">
+
+                <div class="text-center py-4">
+
+                    <div class="spinner-border"
+                         role="status">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+
+        $(document).ready(function () {
+
+            /*
+             * ------------------------------------------------------------
+             * DIVISION DATATABLE
+             * ------------------------------------------------------------
+             */
+
+            const divisionsTable =
+                $("#divisionsTable").DataTable({
+
+                    responsive: true,
+
+                    pageLength: 10,
+
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, "All"]
+                    ],
+
+                    order: [
+                        [0, "asc"]
+                    ],
+
+                    columnDefs: [
+                        {
+                            targets: 6,
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+
+                });
+
+
+            /*
+             * ------------------------------------------------------------
+             * STORE ALL SUBCOUNTIES IN JAVASCRIPT
+             * ------------------------------------------------------------
+             */
+
+            const allSubcounties = [
+
+                @foreach (var subcounty in subcounties)
+                {
+                    <text>
+                    {
+                        id: "@subcounty.SubcountyId",
+                        name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(subcounty.SubcountyName)),
+                        countyId: "@subcounty.CountyId"
+                    },
+                    </text>
+                }
+
+            ];
+
+
+            /*
+             * ------------------------------------------------------------
+             * COUNTY FILTER
+             * ------------------------------------------------------------
+             */
+
+            const countyFilter =
+                document.getElementById("countyFilter");
+
+            const subcountyFilter =
+                document.getElementById("subcountyFilter");
+
+
+            /*
+             * Rebuild the subcounty dropdown.
+             *
+             * This deliberately does NOT use:
+             *
+             *     option.hide()
+             *     option.show()
+             *     option.hidden
+             *
+             * because browsers can handle <option> visibility
+             * differently.
+             */
+
+            function rebuildSubcountyFilter() {
+
+                const selectedCountyId =
+                    countyFilter.value;
+
+                subcountyFilter.innerHTML = "";
+
+
+                /*
+                 * No county selected.
+                 */
+
+                if (!selectedCountyId) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = "";
+                    option.textContent =
+                        "Select a county first";
+
+                    subcountyFilter.appendChild(option);
+
+                    subcountyFilter.disabled = true;
+
+                    return;
+                }
+
+
+                /*
+                 * Default option.
+                 */
+
+                const defaultOption =
+                    document.createElement("option");
+
+                defaultOption.value = "";
+                defaultOption.textContent =
+                    "All Subcounties";
+
+                subcountyFilter.appendChild(defaultOption);
+
+
+                /*
+                 * Find subcounties belonging
+                 * to the selected county.
+                 */
+
+                const matchingSubcounties =
+                    allSubcounties.filter(function (subcounty) {
+
+                        return String(subcounty.countyId) ===
+                               String(selectedCountyId);
+
+                    });
+
+
+                /*
+                 * Add matching subcounties.
+                 */
+
+                matchingSubcounties.forEach(function (subcounty) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value =
+                        subcounty.id;
+
+                    option.textContent =
+                        subcounty.name;
+
+                    subcountyFilter.appendChild(option);
+
+                });
+
+
+                subcountyFilter.disabled =
+                    matchingSubcounties.length === 0;
+
+            }
+
+
+            /*
+             * ------------------------------------------------------------
+             * FILTER TABLE BY COUNTY
+             * ------------------------------------------------------------
+             */
+
+            function filterTableByCounty() {
+
+                const selectedCountyId =
+                    countyFilter.value;
+
+
+                /*
+                 * If no county is selected,
+                 * remove the county filter.
+                 */
+
+                if (!selectedCountyId) {
+
+                    divisionsTable
+                        .column(3)
+                        .search("")
+                        .draw();
+
+                    return;
+
+                }
+
+
+                const selectedOption =
+                    countyFilter.options[
+                        countyFilter.selectedIndex
+                    ];
+
+
+                const countyName =
+                    selectedOption.getAttribute(
+                        "data-county-name"
+                    );
+
+
+                divisionsTable
+                    .column(3)
+                    .search(
+                        "^" +
+                        $.fn.dataTable.util.escapeRegex(countyName) +
+                        "$",
+                        true,
+                        false
+                    )
+                    .draw();
+
+            }
+
+
+            /*
+             * ------------------------------------------------------------
+             * FILTER TABLE BY SUBCOUNTY
+             * ------------------------------------------------------------
+             */
+
+            function filterTableBySubcounty() {
+
+                const selectedSubcountyId =
+                    subcountyFilter.value;
+
+
+                /*
+                 * No subcounty selected.
+                 *
+                 * Restore county filter.
+                 */
+
+                if (!selectedSubcountyId) {
+
+                    filterTableByCounty();
+
+                    return;
+
+                }
+
+
+                const selectedOption =
+                    subcountyFilter.options[
+                        subcountyFilter.selectedIndex
+                    ];
+
+
+                const subcountyName =
+                    selectedOption.textContent;
+
+
+                divisionsTable
+                    .column(2)
+                    .search(
+                        "^" +
+                        $.fn.dataTable.util.escapeRegex(subcountyName) +
+                        "$",
+                        true,
+                        false
+                    )
+                    .draw();
+
+            }
+
+
+            /*
+             * ------------------------------------------------------------
+             * COUNTY CHANGE
+             * ------------------------------------------------------------
+             */
+
+            countyFilter.addEventListener(
+                "change",
+                function () {
+
+                    /*
+                     * Rebuild the child dropdown.
+                     */
+
+                    rebuildSubcountyFilter();
+
+
+                    /*
+                     * Clear any previous
+                     * subcounty table filter.
+                     */
+
+                    divisionsTable
+                        .column(2)
+                        .search("");
+
+
+                    /*
+                     * Apply county filter.
+                     */
+
+                    filterTableByCounty();
+
+                }
+            );
+
+
+            /*
+             * ------------------------------------------------------------
+             * SUBCOUNTY CHANGE
+             * ------------------------------------------------------------
+             */
+
+            subcountyFilter.addEventListener(
+                "change",
+                function () {
+
+                    /*
+                     * If a subcounty is selected,
+                     * it is more specific than county.
+                     */
+
+                    if (subcountyFilter.value) {
+
+                        /*
+                         * Keep the county filter active.
+                         */
+
+                        filterTableByCounty();
+
+
+                        /*
+                         * Then apply subcounty filter.
+                         *
+                         * Since the table is already filtered
+                         * by county, this gives:
+                         *
+                         * County + Subcounty
+                         */
+
+                        filterTableBySubcounty();
+
+                    }
+                    else {
+
+                        /*
+                         * Restore county-only filter.
+                         */
+
+                        filterTableBySubcounty();
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * ------------------------------------------------------------
+             * INITIALISE SUBCOUNTY FILTER
+             * ------------------------------------------------------------
+             */
+
+            rebuildSubcountyFilter();
+
+
+            /*
+             * ------------------------------------------------------------
+             * CREATE DIVISION
+             * ------------------------------------------------------------
+             */
+
+            $("#btnCreateDivision").on(
+                "click",
+                function () {
+
+                    $("#createDivisionModalBody").html(`
+                        <div class="text-center py-4">
+                            <div class="spinner-border"
+                                 role="status">
+                            </div>
+                        </div>
+                    `);
+
+
+                    const modal =
+                        new bootstrap.Modal(
+                            document.getElementById(
+                                "createDivisionModal"
+                            )
+                        );
+
+
+                    modal.show();
+
+
+                    $.get(
+                        "@Url.Action("Create", "Division")",
+                        function (response) {
+
+                            $("#createDivisionModalBody")
+                                .html(response);
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /*
+             * ------------------------------------------------------------
+             * EDIT DIVISION
+             * ------------------------------------------------------------
+             */
+
+            $(document).on(
+                "click",
+                ".btn-edit-division",
+                function () {
+
+                    const id =
+                        $(this).data("id");
+
+
+                    $("#editDivisionModalBody").html(`
+                        <div class="text-center py-4">
+                            <div class="spinner-border"
+                                 role="status">
+                            </div>
+                        </div>
+                    `);
+
+
+                    const modal =
+                        new bootstrap.Modal(
+                            document.getElementById(
+                                "editDivisionModal"
+                            )
+                        );
+
+
+                    modal.show();
+
+
+                    $.get(
+                        "@Url.Action("Edit", "Division")/" + id,
+                        function (response) {
+
+                            $("#editDivisionModalBody")
+                                .html(response);
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /*
+             * ------------------------------------------------------------
+             * CREATE FORM SUBMISSION
+             * ------------------------------------------------------------
+             */
+
+            $(document).on(
+                "submit",
+                "#createDivisionForm",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    const form =
+                        $(this);
+
+
+                    if (!this.checkValidity()) {
+
+                        this.classList.add(
+                            "was-validated"
+                        );
+
+                        return;
+
+                    }
+
+
+                    const submitButton =
+                        form.find(
+                            "#createDivisionSubmit"
+                        );
+
+
+                    submitButton.prop(
+                        "disabled",
+                        true
+                    );
+
+
+                    submitButton.html(`
+                        <span class="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"></span>
+                        Saving...
+                    `);
+
+
+                    $.ajax({
+
+                        url: form.attr("action"),
+
+                        type: "POST",
+
+                        data: form.serialize(),
+
+                        success: function (response) {
+
+                            /*
+                             * Successful POST redirects
+                             * to the Index page.
+                             *
+                             * The returned page contains
+                             * divisionsTable.
+                             */
+
+                            if (
+                                typeof response === "string" &&
+                                response.indexOf(
+                                    "divisionsTable"
+                                ) !== -1
+                            ) {
+
+                                window.location.replace(
+                                    "@Url.Action("Index", "Division")"
+                                );
+
+                                return;
+
+                            }
+
+
+                            /*
+                             * Validation error.
+                             */
+
+                            $("#createDivisionModalBody")
+                                .html(response);
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire({
+
+                                icon: "error",
+
+                                title: "Error",
+
+                                text:
+                                    "An unexpected error occurred while creating the division."
+
+                            });
+
+
+                            submitButton.prop(
+                                "disabled",
+                                false
+                            );
+
+                            submitButton.html(`
+                                <i class="bi bi-check-circle me-1"></i>
+                                Save Division
+                            `);
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            /*
+             * ------------------------------------------------------------
+             * EDIT FORM SUBMISSION
+             * ------------------------------------------------------------
+             */
+
+            $(document).on(
+                "submit",
+                "#editDivisionForm",
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    const form =
+                        $(this);
+
+
+                    if (!this.checkValidity()) {
+
+                        this.classList.add(
+                            "was-validated"
+                        );
+
+                        return;
+
+                    }
+
+
+                    const submitButton =
+                        form.find(
+                            "#editDivisionSubmit"
+                        );
+
+
+                    submitButton.prop(
+                        "disabled",
+                        true
+                    );
+
+
+                    submitButton.html(`
+                        <span class="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"></span>
+                        Saving...
+                    `);
+
+
+                    $.ajax({
+
+                        url: form.attr("action"),
+
+                        type: "POST",
+
+                        data: form.serialize(),
+
+                        success: function (response) {
+
+                            if (
+                                typeof response === "string" &&
+                                response.indexOf(
+                                    "divisionsTable"
+                                ) !== -1
+                            ) {
+
+                                window.location.replace(
+                                    "@Url.Action("Index", "Division")"
+                                );
+
+                                return;
+
+                            }
+
+
+                            $("#editDivisionModalBody")
+                                .html(response);
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire({
+
+                                icon: "error",
+
+                                title: "Error",
+
+                                text:
+                                    "An unexpected error occurred while updating the division."
+
+                            });
+
+
+                            submitButton.prop(
+                                "disabled",
+                                false
+                            );
+
+
+                            submitButton.html(`
+                                <i class="bi bi-check-circle me-1"></i>
+                                Save Changes
+                            `);
+
+                        }
+
+                    });
+
+                }
+            );
+
+
+            /*
+             * ------------------------------------------------------------
+             * TOGGLE STATUS
+             * ------------------------------------------------------------
+             */
+
+            $(document).on(
+                "click",
+                ".btn-toggle-division",
+                function () {
+
+                    const button =
+                        $(this);
+
+                    const id =
+                        button.data("id");
+
+                    const name =
+                        button.data("name");
+
+                    const isActive =
+                        String(
+                            button.data("active")
+                        ).toLowerCase() === "true";
+
+
+                    Swal.fire({
+
+                        icon: isActive
+                            ? "warning"
+                            : "question",
+
+                        title: isActive
+                            ? "Deactivate Division?"
+                            : "Activate Division?",
+
+                        text:
+                            "Are you sure you want to " +
+                            (isActive
+                                ? "deactivate "
+                                : "activate ") +
+                            name +
+                            "?",
+
+                        showCancelButton: true,
+
+                        confirmButtonText:
+                            isActive
+                                ? "Yes, deactivate"
+                                : "Yes, activate",
+
+                        cancelButtonText:
+                            "Cancel"
+
+                    }).then(function (result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+
+                        $.ajax({
+
+                            url:
+                                "@Url.Action("ToggleStatus", "Division")/" +
+                                id,
+
+                            type: "POST",
+
+                            data: {
+                                __RequestVerificationToken:
+                                    getAntiForgeryToken()
+                            },
+
+                            success: function () {
+
+                                window.location.replace(
+                                    "@Url.Action("Index", "Division")"
+                                );
+
+                            },
+
+                            error: function () {
+
+                                Swal.fire({
+
+                                    icon: "error",
+
+                                    title: "Error",
+
+                                    text:
+                                        "Unable to change the division status."
+
+                                });
+
+                            }
+
+                        });
+
+                    });
+
+                }
+            );
+
+
+            /*
+             * ------------------------------------------------------------
+             * ANTI-FORGERY TOKEN
+             * ------------------------------------------------------------
+             */
+
+            function getAntiForgeryToken() {
+
+                const token =
+                    document.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    );
+
+                return token
+                    ? token.value
+                    : "";
+
+            }
+
+        });
+
+    </script>
+}

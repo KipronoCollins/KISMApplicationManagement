@@ -1,0 +1,488 @@
+@model KISMApplicationManagement.Models.CommitteeSitting
+
+@{
+    var applications =
+        Model.Applications ??
+        new List<KISMApplicationManagement.Models.CommitteeSittingApplication>();
+
+    var applicationCount =
+        applications.Count;
+
+    var decisionCount =
+        applications.Count(application =>
+            application.Decision != null);
+}
+
+<div class="modal-header modal-header-kism">
+
+    <div>
+
+        <h5 class="modal-title fw-bold mb-1">
+
+            <i class="bi bi-calendar-event me-2"></i>
+
+            Committee Sitting Details
+
+        </h5>
+
+        <div class="small text-white-50">
+
+            @Model.ReferenceNumber
+
+        </div>
+
+    </div>
+
+    <button type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"></button>
+
+</div>
+
+
+<div class="modal-body">
+
+
+    <!-- =========================================================
+         Status
+         ========================================================= -->
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between
+                align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+
+            <div class="text-muted small mb-1">
+                Committee Sitting
+            </div>
+
+            <h4 class="fw-bold mb-0">
+                @Model.ReferenceNumber
+            </h4>
+
+        </div>
+
+        <div>
+
+            @if (Model.Status ==
+                KISMApplicationManagement.Constants.CommitteeSittingStatuses.Scheduled)
+            {
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+
+                    <i class="bi bi-calendar-event me-1"></i>
+
+                    Scheduled
+
+                </span>
+            }
+            else if (Model.Status ==
+                KISMApplicationManagement.Constants.CommitteeSittingStatuses.InProgress)
+            {
+                <span class="badge bg-primary fs-6 px-3 py-2">
+
+                    <i class="bi bi-play-circle me-1"></i>
+
+                    In Progress
+
+                </span>
+            }
+            else if (Model.Status ==
+                KISMApplicationManagement.Constants.CommitteeSittingStatuses.Completed)
+            {
+                <span class="badge bg-success fs-6 px-3 py-2">
+
+                    <i class="bi bi-check-circle me-1"></i>
+
+                    Completed
+
+                </span>
+            }
+            else if (Model.Status ==
+                KISMApplicationManagement.Constants.CommitteeSittingStatuses.Cancelled)
+            {
+                <span class="badge bg-secondary fs-6 px-3 py-2">
+
+                    <i class="bi bi-x-circle me-1"></i>
+
+                    Cancelled
+
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-secondary fs-6 px-3 py-2">
+
+                    @Model.Status
+
+                </span>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Information Cards
+         ========================================================= -->
+
+    <div class="row g-3 mb-4">
+
+
+        <!-- Intake -->
+
+        <div class="col-md-6">
+
+            <div class="info-card h-100">
+
+                <div class="info-icon">
+
+                    <i class="bi bi-collection"></i>
+
+                </div>
+
+                <div>
+
+                    <div class="small text-muted">
+                        Intake
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        @Model.Intake?.IntakeName
+
+                    </div>
+
+                    @if (Model.Intake != null)
+                    {
+                        <div class="small text-muted">
+
+                            @Model.Intake.AcademicYear
+                            ·
+                            @Model.Intake.IntakePeriod
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Sitting Date -->
+
+        <div class="col-md-6">
+
+            <div class="info-card h-100">
+
+                <div class="info-icon">
+
+                    <i class="bi bi-calendar3"></i>
+
+                </div>
+
+                <div>
+
+                    <div class="small text-muted">
+                        Sitting Date
+                    </div>
+
+                    <div class="fw-semibold">
+
+                        @Model.SittingDate.ToString("dd MMMM yyyy")
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Applications -->
+
+        <div class="col-md-6">
+
+            <div class="info-card h-100">
+
+                <div class="info-icon">
+
+                    <i class="bi bi-files"></i>
+
+                </div>
+
+                <div>
+
+                    <div class="small text-muted">
+                        Applications
+                    </div>
+
+                    <div class="fw-semibold fs-5">
+
+                        @applicationCount
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Decisions -->
+
+        <div class="col-md-6">
+
+            <div class="info-card h-100">
+
+                <div class="info-icon">
+
+                    <i class="bi bi-check2-square"></i>
+
+                </div>
+
+                <div>
+
+                    <div class="small text-muted">
+                        Decisions Recorded
+                    </div>
+
+                    <div class="fw-semibold fs-5">
+
+                        @decisionCount / @applicationCount
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         Remarks
+         ========================================================= -->
+
+    @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+    {
+        <div class="mb-4">
+
+            <div class="fw-semibold mb-2">
+
+                <i class="bi bi-chat-left-text me-1"
+                   style="color:#d800b8;"></i>
+
+                Remarks
+
+            </div>
+
+            <div class="border rounded p-3 bg-light">
+
+                @Model.Remarks
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         Applications
+         ========================================================= -->
+
+    <div>
+
+        <div class="d-flex justify-content-between
+                    align-items-center mb-2">
+
+            <div class="fw-semibold">
+
+                <i class="bi bi-files me-1"
+                   style="color:#d800b8;"></i>
+
+                Applications in Sitting
+
+            </div>
+
+            <span class="badge"
+                  style="background:#f4d8f0;
+                         color:#a90090;">
+
+                @applicationCount
+
+            </span>
+
+        </div>
+
+
+        @if (applicationCount == 0)
+        {
+            <div class="alert border-0"
+                 style="background:#fff8fe;">
+
+                <i class="bi bi-info-circle me-1"
+                   style="color:#d800b8;"></i>
+
+                No applications have been added to this committee sitting yet.
+
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive border rounded">
+
+                <table class="table table-sm
+                              table-hover
+                              align-middle
+                              mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Application
+                            </th>
+
+                            <th>
+                                Order
+                            </th>
+
+                            <th>
+                                Decision
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var sittingApplication in
+                            applications.OrderBy(application =>
+                                application.DisplayOrder))
+                        {
+                            <tr>
+
+                                <td>
+
+                                    @sittingApplication.DisplayOrder
+
+                                </td>
+
+                                <td>
+
+                                    <span class="fw-semibold">
+
+                                        @sittingApplication.Application
+                                            ?.ApplicationNumber
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    @sittingApplication.DisplayOrder
+
+                                </td>
+
+                                <td>
+
+                                    @if (sittingApplication.Decision != null)
+                                    {
+                                        <span class="badge bg-success">
+
+                                            <i class="bi bi-check-circle me-1"></i>
+
+                                            @sittingApplication.Decision.Decision
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+
+                                            Pending
+
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+<div class="modal-footer">
+
+    <button type="button"
+            class="btn btn-light border"
+            data-bs-dismiss="modal">
+
+        <i class="bi bi-x-lg me-1"></i>
+
+        Close
+
+    </button>
+
+</div>
+
+
+<style>
+
+    .modal-header-kism {
+        background: #d800b8;
+        color: #ffffff;
+        border-bottom: 0;
+    }
+
+    .info-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 15px;
+        border: 1px solid #eeeeee;
+        border-radius: 10px;
+        background: #ffffff;
+    }
+
+    .info-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #fff8fe;
+        color: #d800b8;
+        font-size: 1.15rem;
+    }
+
+</style>

@@ -1,0 +1,1977 @@
+@model KISMApplicationManagement.Models.ApplicantProfileViewModels.ApplicantProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container-fluid px-0">
+
+    <!-- ========================================================= -->
+    <!-- Page Header -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+        <div>
+
+            <div class="d-flex align-items-center gap-2 mb-1">
+
+                <span class="profile-page-icon">
+                    <i class="bi bi-person-vcard"></i>
+                </span>
+
+                <h1 class="h3 mb-0 fw-bold">
+                    My Profile
+                </h1>
+
+            </div>
+
+            <p class="text-muted mb-0">
+                Complete and keep your applicant information up to date.
+            </p>
+
+        </div>
+
+
+        <div class="profile-completion-card">
+
+            <div class="small text-muted">
+                Profile
+            </div>
+
+            <div class="fw-semibold">
+                Applicant Information
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <form id="applicantProfileForm"
+          method="post"
+          asp-controller="ApplicantProfile"
+          asp-action="Save">
+
+        @Html.AntiForgeryToken()
+
+
+        <!-- ===================================================== -->
+        <!-- Personal Information -->
+        <!-- ===================================================== -->
+
+        <div class="card profile-card mb-4">
+
+            <div class="card-header profile-card-header">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div class="section-icon">
+                        <i class="bi bi-person-vcard"></i>
+                    </div>
+
+                    <div>
+
+                        <h5 class="mb-0 fw-bold">
+                            Personal Information
+                        </h5>
+
+                        <small class="text-muted">
+                            Your basic personal and account information
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <span class="editable-badge">
+
+                    <i class="bi bi-pencil-fill me-1"></i>
+
+                    Editable
+
+                </span>
+
+            </div>
+
+
+            <div class="card-body p-4">
+
+                <div class="alert profile-info-alert mb-4">
+
+                    <i class="bi bi-info-circle-fill me-2"></i>
+
+                    Please make sure your name and phone number are
+                    entered correctly. This information will be used
+                    throughout your KISM application.
+
+                </div>
+
+
+                <div class="row g-4">
+
+                    <!-- First Name -->
+                    <div class="col-md-4">
+
+                        <label asp-for="FirstName"
+                               class="form-label">
+
+                            First Name
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input asp-for="FirstName"
+                               class="form-control"
+                               placeholder="Enter first name"
+                               autocomplete="given-name" />
+
+                        <span asp-validation-for="FirstName"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Middle Name -->
+                    <div class="col-md-4">
+
+                        <label asp-for="MiddleName"
+                               class="form-label">
+
+                            Middle Name
+
+                        </label>
+
+                        <input asp-for="MiddleName"
+                               class="form-control"
+                               placeholder="Enter middle name"
+                               autocomplete="additional-name" />
+
+                        <span asp-validation-for="MiddleName"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Last Name -->
+                    <div class="col-md-4">
+
+                        <label asp-for="LastName"
+                               class="form-label">
+
+                            Last Name
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input asp-for="LastName"
+                               class="form-control"
+                               placeholder="Enter last name"
+                               autocomplete="family-name" />
+
+                        <span asp-validation-for="LastName"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Phone Number -->
+                    <div class="col-md-6">
+
+                        <label asp-for="PhoneNumber"
+                               class="form-label">
+
+                            Phone Number
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text input-icon">
+
+                                <i class="bi bi-telephone"></i>
+
+                            </span>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control"
+                                   placeholder="Enter phone number"
+                                   autocomplete="tel" />
+
+                        </div>
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Email Address
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text readonly-icon">
+
+                                <i class="bi bi-envelope"></i>
+
+                            </span>
+
+                            <input type="text"
+                                   class="form-control readonly-field"
+                                   value="@Model.Email"
+                                   readonly />
+
+                        </div>
+
+                        <div class="form-text">
+                            Email is managed from Account &amp; Security.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- Additional Personal Information -->
+        <!-- ===================================================== -->
+
+        <div class="card profile-card mb-4">
+
+            <div class="card-header profile-card-header">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div class="section-icon">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h5 class="mb-0 fw-bold">
+                            Additional Personal Information
+                        </h5>
+
+                        <small class="text-muted">
+                            Information required for your application
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card-body p-4">
+
+                <div class="row g-4">
+
+                    <!-- ID / Passport -->
+                    <div class="col-md-6">
+
+                        <label asp-for="IdPassportBirthCertificateNo"
+                               class="form-label">
+
+                            ID / Passport / Birth Certificate No.
+
+                        </label>
+
+                        <input asp-for="IdPassportBirthCertificateNo"
+                               class="form-control"
+                               placeholder="Enter identification number" />
+
+                        <span asp-validation-for="IdPassportBirthCertificateNo"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Date of Birth -->
+                    <div class="col-md-3">
+
+                        <label asp-for="DateOfBirth"
+                               class="form-label">
+
+                            Date of Birth
+
+                        </label>
+
+                        <input asp-for="DateOfBirth"
+                               type="date"
+                               class="form-control" />
+
+                        <span asp-validation-for="DateOfBirth"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Marital Status -->
+                    <div class="col-md-3">
+
+                        <label asp-for="MaritalStatus"
+                               class="form-label">
+
+                            Marital Status
+
+                        </label>
+
+                        <select asp-for="MaritalStatus"
+                                class="form-select">
+
+                            <option value="">
+                                Select marital status
+                            </option>
+
+                            <option value="Single">
+                                Single
+                            </option>
+
+                            <option value="Married">
+                                Married
+                            </option>
+
+                            <option value="Divorced">
+                                Divorced
+                            </option>
+
+                            <option value="Widowed">
+                                Widowed
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="MaritalStatus"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Place of Birth -->
+                    <div class="col-md-6">
+
+                        <label asp-for="PlaceOfBirth"
+                               class="form-label">
+
+                            Place of Birth
+
+                        </label>
+
+                        <input asp-for="PlaceOfBirth"
+                               class="form-control"
+                               placeholder="Enter place of birth" />
+
+                        <span asp-validation-for="PlaceOfBirth"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- Contact Information -->
+        <!-- ===================================================== -->
+
+        <div class="card profile-card mb-4">
+
+            <div class="card-header profile-card-header">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div class="section-icon">
+                        <i class="bi bi-telephone-forward"></i>
+                    </div>
+
+                    <div>
+
+                        <h5 class="mb-0 fw-bold">
+                            Additional Contact Information
+                        </h5>
+
+                        <small class="text-muted">
+                            Additional contact details
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card-body p-4">
+
+                <div class="row g-4">
+
+                    <!-- Alternative Mobile -->
+                    <div class="col-md-6">
+
+                        <label asp-for="MobileNumber"
+                               class="form-label">
+
+                            Alternative Mobile Number
+
+                        </label>
+
+                        <input asp-for="MobileNumber"
+                               class="form-control"
+                               placeholder="Enter alternative mobile number" />
+
+                        <span asp-validation-for="MobileNumber"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Alternative Email -->
+                    <div class="col-md-6">
+
+                        <label asp-for="ContactEmail"
+                               class="form-label">
+
+                            Alternative Contact Email
+
+                        </label>
+
+                        <input asp-for="ContactEmail"
+                               class="form-control"
+                               placeholder="Enter alternative email"
+                               autocomplete="email" />
+
+                        <span asp-validation-for="ContactEmail"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Contact Address -->
+                    <div class="col-md-8">
+
+                        <label asp-for="ContactAddress"
+                               class="form-label">
+
+                            Contact Address
+
+                        </label>
+
+                        <input asp-for="ContactAddress"
+                               class="form-control"
+                               placeholder="Enter postal or physical address" />
+
+                        <span asp-validation-for="ContactAddress"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Address Code -->
+                    <div class="col-md-4">
+
+                        <label asp-for="AddressCode"
+                               class="form-label">
+
+                            Address Code
+
+                        </label>
+
+                        <input asp-for="AddressCode"
+                               class="form-control"
+                               placeholder="e.g. 20100" />
+
+                        <span asp-validation-for="AddressCode"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Town -->
+                    <div class="col-md-6">
+
+                        <label asp-for="Town"
+                               class="form-label">
+
+                            Town
+
+                        </label>
+
+                        <input asp-for="Town"
+                               class="form-control"
+                               placeholder="Enter town" />
+
+                        <span asp-validation-for="Town"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Alternative Contact -->
+                    <div class="col-md-6">
+
+                        <label asp-for="AlternativeContact"
+                               class="form-label">
+
+                            Alternative Contact
+
+                        </label>
+
+                        <input asp-for="AlternativeContact"
+                               class="form-control"
+                               placeholder="Enter alternative contact number" />
+
+                        <span asp-validation-for="AlternativeContact"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- Location Information -->
+        <!-- ===================================================== -->
+
+        <div class="card profile-card mb-4">
+
+            <div class="card-header profile-card-header">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div class="section-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h5 class="mb-0 fw-bold">
+                            Location Information
+                        </h5>
+
+                        <small class="text-muted">
+                            Select your location from the administrative hierarchy
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card-body p-4">
+
+                <div class="alert profile-info-alert mb-4">
+
+                    <i class="bi bi-diagram-3-fill me-2"></i>
+
+                    Select each location level in order.
+                    The next level will be loaded automatically.
+
+                </div>
+
+
+                <div class="row g-4">
+
+                    <!-- County -->
+                    <div class="col-md-6">
+
+                        <label asp-for="CountyId"
+                               class="form-label">
+
+                            County
+
+                        </label>
+
+                        <select asp-for="CountyId"
+                                class="form-select"
+                                id="CountyId">
+
+                            <option value="">
+                                Select county
+                            </option>
+
+                            @foreach (var county in Model.Counties)
+                            {
+                                <option value="@county.CountyId">
+                                    @county.CountyName
+                                </option>
+                            }
+
+                        </select>
+
+                        <div class="location-loading"
+                             id="countyLoading">
+
+                            <span class="spinner-border spinner-border-sm"></span>
+
+                            Loading...
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Subcounty -->
+                    <div class="col-md-6">
+
+                        <label asp-for="SubcountyId"
+                               class="form-label">
+
+                            Subcounty
+
+                        </label>
+
+                        <select asp-for="SubcountyId"
+                                class="form-select"
+                                id="SubcountyId"
+                                disabled>
+
+                            <option value="">
+                                Select subcounty
+                            </option>
+
+                        </select>
+
+                        <div class="location-loading"
+                             id="subcountyLoading">
+
+                            <span class="spinner-border spinner-border-sm"></span>
+
+                            Loading...
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Division -->
+                    <div class="col-md-6">
+
+                        <label asp-for="DivisionId"
+                               class="form-label">
+
+                            Division
+
+                        </label>
+
+                        <select asp-for="DivisionId"
+                                class="form-select"
+                                id="DivisionId"
+                                disabled>
+
+                            <option value="">
+                                Select division
+                            </option>
+
+                        </select>
+
+                        <div class="location-loading"
+                             id="divisionLoading">
+
+                            <span class="spinner-border spinner-border-sm"></span>
+
+                            Loading...
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Location -->
+                    <div class="col-md-6">
+
+                        <label asp-for="LocationId"
+                               class="form-label">
+
+                            Location
+
+                        </label>
+
+                        <select asp-for="LocationId"
+                                class="form-select"
+                                id="LocationId"
+                                disabled>
+
+                            <option value="">
+                                Select location
+                            </option>
+
+                        </select>
+
+                        <div class="location-loading"
+                             id="locationLoading">
+
+                            <span class="spinner-border spinner-border-sm"></span>
+
+                            Loading...
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Sublocation -->
+                    <div class="col-md-6">
+
+                        <label asp-for="SublocationId"
+                               class="form-label">
+
+                            Sublocation
+
+                        </label>
+
+                        <select asp-for="SublocationId"
+                                class="form-select"
+                                id="SublocationId"
+                                disabled>
+
+                            <option value="">
+                                Select sublocation
+                            </option>
+
+                        </select>
+
+                        <div class="location-loading"
+                             id="sublocationLoading">
+
+                            <span class="spinner-border spinner-border-sm"></span>
+
+                            Loading...
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- Parent / Guardian -->
+        <!-- ===================================================== -->
+
+        <div class="card profile-card mb-4">
+
+            <div class="card-header profile-card-header">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div class="section-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h5 class="mb-0 fw-bold">
+                            Parent / Guardian Information
+                        </h5>
+
+                        <small class="text-muted">
+                            Emergency and guardian contact information
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card-body p-4">
+
+                <div class="row g-4">
+
+                    <!-- Guardian Name -->
+                    <div class="col-md-6">
+
+                        <label asp-for="ParentGuardianName"
+                               class="form-label">
+
+                            Parent / Guardian Name
+
+                        </label>
+
+                        <input asp-for="ParentGuardianName"
+                               class="form-control"
+                               placeholder="Enter parent or guardian name" />
+
+                        <span asp-validation-for="ParentGuardianName"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+
+                    <!-- Guardian Mobile -->
+                    <div class="col-md-6">
+
+                        <label asp-for="ParentGuardianMobile"
+                               class="form-label">
+
+                            Parent / Guardian Mobile
+
+                        </label>
+
+                        <input asp-for="ParentGuardianMobile"
+                               class="form-control"
+                               placeholder="Enter parent or guardian mobile" />
+
+                        <span asp-validation-for="ParentGuardianMobile"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- Save -->
+        <!-- ===================================================== -->
+
+        <div class="d-flex justify-content-end mb-5">
+
+            <button type="submit"
+                    class="btn btn-kism-primary px-4"
+                    id="saveProfileButton">
+
+                <span class="save-button-content">
+
+                    <i class="bi bi-check-circle me-2"></i>
+
+                    Save Profile
+
+                </span>
+
+
+                <span class="save-button-loading d-none">
+
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+
+                    Saving...
+
+                </span>
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<style>
+
+    /* =========================================================
+       Page Header
+       ========================================================= */
+
+    .profile-page-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(216, 0, 184, 0.10);
+        color: #d800b8;
+        font-size: 20px;
+    }
+
+
+    .profile-completion-card {
+        background: #ffffff;
+        border: 1px solid #ececf2;
+        border-radius: 12px;
+        padding: 10px 16px;
+        min-width: 190px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+
+    /* =========================================================
+       Cards
+       ========================================================= */
+
+    .profile-card {
+        border: 1px solid #ececf2;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+
+    .profile-card-header {
+        background: #ffffff;
+        border-bottom: 1px solid #eeeeF3;
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+
+    .section-icon {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: rgba(216, 0, 184, 0.09);
+        color: #d800b8;
+        font-size: 19px;
+    }
+
+
+    /* =========================================================
+       Badges
+       ========================================================= */
+
+    .editable-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 30px;
+        padding: 6px 11px;
+        background: rgba(216, 0, 184, 0.09);
+        color: #d800b8;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       Alerts
+       ========================================================= */
+
+    .profile-info-alert {
+        border: 0;
+        border-radius: 10px;
+        background: rgba(216, 0, 184, 0.06);
+        color: #5d5260;
+        font-size: 14px;
+    }
+
+
+    /* =========================================================
+       Forms
+       ========================================================= */
+
+    .form-label {
+        font-weight: 600;
+        color: #363942;
+        margin-bottom: 7px;
+    }
+
+
+    .form-control,
+    .form-select {
+        min-height: 45px;
+        border-radius: 9px;
+        border-color: #dfe1e7;
+    }
+
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #d800b8;
+        box-shadow:
+            0 0 0 0.2rem
+            rgba(216, 0, 184, 0.10);
+    }
+
+
+    .input-group-text {
+        border-radius: 9px 0 0 9px;
+    }
+
+
+    .input-icon {
+        background: #ffffff;
+        border-color: #dfe1e7;
+        color: #777c86;
+    }
+
+
+    .readonly-field {
+        background-color: #f6f7f9 !important;
+        border-color: #e3e5e9;
+        color: #555a65;
+        cursor: not-allowed;
+    }
+
+
+    .readonly-icon {
+        background: #f6f7f9;
+        border-color: #e3e5e9;
+        color: #777c86;
+    }
+
+
+    /* =========================================================
+       Save Button
+       ========================================================= */
+
+    .btn-kism-primary {
+        background: #d800b8;
+        border-color: #d800b8;
+        color: #ffffff;
+        min-height: 45px;
+        border-radius: 9px;
+        font-weight: 600;
+        box-shadow:
+            0 4px 10px
+            rgba(216, 0, 184, 0.18);
+    }
+
+
+    .btn-kism-primary:hover,
+    .btn-kism-primary:focus {
+        background: #ad0093;
+        border-color: #ad0093;
+        color: #ffffff;
+    }
+
+
+    .btn-kism-primary:disabled {
+        background: #d800b8;
+        border-color: #d800b8;
+        opacity: 0.7;
+    }
+
+
+    /* =========================================================
+       Location Loading
+       ========================================================= */
+
+    .location-loading {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+        color: #777;
+        font-size: 12px;
+    }
+
+
+    .location-loading .spinner-border {
+        color: #d800b8;
+    }
+
+
+    /* =========================================================
+       Responsive
+       ========================================================= */
+
+    @@media (max-width: 767.98px) {
+
+        .profile-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+
+        .editable-badge {
+            margin-left: 55px;
+        }
+
+
+        .profile-completion-card {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            const form =
+                $('#applicantProfileForm');
+
+            const saveButton =
+                $('#saveProfileButton');
+
+
+            // =====================================================
+            // Location controls
+            // =====================================================
+
+            const countySelect =
+                $('#CountyId');
+
+            const subcountySelect =
+                $('#SubcountyId');
+
+            const divisionSelect =
+                $('#DivisionId');
+
+            const locationSelect =
+                $('#LocationId');
+
+            const sublocationSelect =
+                $('#SublocationId');
+
+
+            // =====================================================
+            // Saved location values
+            // =====================================================
+
+            const originalCountyId =
+                '@(Model.CountyId?.ToString() ?? "")';
+
+            const originalSubcountyId =
+                '@(Model.SubcountyId?.ToString() ?? "")';
+
+            const originalDivisionId =
+                '@(Model.DivisionId?.ToString() ?? "")';
+
+            const originalLocationId =
+                '@(Model.LocationId?.ToString() ?? "")';
+
+            const originalSublocationId =
+                '@(Model.SublocationId?.ToString() ?? "")';
+
+
+            // =====================================================
+            // Reset select
+            // =====================================================
+
+            function resetSelect(
+                select,
+                placeholder,
+                disabled = true) {
+
+                select.empty();
+
+                select.append(
+                    $('<option>', {
+                        value: '',
+                        text: placeholder
+                    })
+                );
+
+                select.prop(
+                    'disabled',
+                    disabled
+                );
+            }
+
+
+            // =====================================================
+            // Loading indicators
+            // =====================================================
+
+            function showLoading(id) {
+
+                $('#' + id)
+                    .css('display', 'flex');
+
+            }
+
+
+            function hideLoading(id) {
+
+                $('#' + id)
+                    .hide();
+
+            }
+
+
+            // =====================================================
+            // Populate select
+            // =====================================================
+
+            function populateSelect(
+                select,
+                items,
+                placeholder) {
+
+                select.empty();
+
+                select.append(
+                    $('<option>', {
+                        value: '',
+                        text: placeholder
+                    })
+                );
+
+
+                $.each(
+                    items,
+                    function (_, item) {
+
+                        select.append(
+                            $('<option>', {
+                                value: item.id,
+                                text: item.name
+                            })
+                        );
+
+                    }
+                );
+
+
+                select.prop(
+                    'disabled',
+                    items.length === 0
+                );
+
+            }
+
+
+            // =====================================================
+            // Load subcounties
+            // =====================================================
+
+            function loadSubcounties(
+                countyId,
+                selectedId = '') {
+
+                resetSelect(
+                    subcountySelect,
+                    'Select subcounty'
+                );
+
+                resetSelect(
+                    divisionSelect,
+                    'Select division'
+                );
+
+                resetSelect(
+                    locationSelect,
+                    'Select location'
+                );
+
+                resetSelect(
+                    sublocationSelect,
+                    'Select sublocation'
+                );
+
+
+                if (!countyId) {
+
+                    return $.Deferred()
+                        .resolve()
+                        .promise();
+
+                }
+
+
+                showLoading(
+                    'subcountyLoading'
+                );
+
+
+                return $.ajax({
+
+                    url:
+                        '@Url.Action("GetSubcounties", "ApplicantProfile")',
+
+                    type:
+                        'GET',
+
+                    data: {
+                        countyId:
+                            countyId
+                    }
+
+                })
+
+
+                .done(function (items) {
+
+                    populateSelect(
+                        subcountySelect,
+                        items,
+                        'Select subcounty'
+                    );
+
+
+                    if (selectedId) {
+
+                        subcountySelect.val(
+                            selectedId
+                        );
+
+                    }
+
+                })
+
+
+                .fail(function () {
+
+                    Swal.fire({
+
+                        icon:
+                            'error',
+
+                        title:
+                            'Unable to load subcounties',
+
+                        text:
+                            'Please try again.',
+
+                        confirmButtonColor:
+                            '#d800b8'
+
+                    });
+
+                })
+
+
+                .always(function () {
+
+                    hideLoading(
+                        'subcountyLoading'
+                    );
+
+                });
+
+            }
+
+
+            // =====================================================
+            // Load divisions
+            // =====================================================
+
+            function loadDivisions(
+                subcountyId,
+                selectedId = '') {
+
+                resetSelect(
+                    divisionSelect,
+                    'Select division'
+                );
+
+                resetSelect(
+                    locationSelect,
+                    'Select location'
+                );
+
+                resetSelect(
+                    sublocationSelect,
+                    'Select sublocation'
+                );
+
+
+                if (!subcountyId) {
+
+                    return $.Deferred()
+                        .resolve()
+                        .promise();
+
+                }
+
+
+                showLoading(
+                    'divisionLoading'
+                );
+
+
+                return $.ajax({
+
+                    url:
+                        '@Url.Action("GetDivisions", "ApplicantProfile")',
+
+                    type:
+                        'GET',
+
+                    data: {
+                        subcountyId:
+                            subcountyId
+                    }
+
+                })
+
+
+                .done(function (items) {
+
+                    populateSelect(
+                        divisionSelect,
+                        items,
+                        'Select division'
+                    );
+
+
+                    if (selectedId) {
+
+                        divisionSelect.val(
+                            selectedId
+                        );
+
+                    }
+
+                })
+
+
+                .fail(function () {
+
+                    Swal.fire({
+
+                        icon:
+                            'error',
+
+                        title:
+                            'Unable to load divisions',
+
+                        text:
+                            'Please try again.',
+
+                        confirmButtonColor:
+                            '#d800b8'
+
+                    });
+
+                })
+
+
+                .always(function () {
+
+                    hideLoading(
+                        'divisionLoading'
+                    );
+
+                });
+
+            }
+
+
+            // =====================================================
+            // Load locations
+            // =====================================================
+
+            function loadLocations(
+                divisionId,
+                selectedId = '') {
+
+                resetSelect(
+                    locationSelect,
+                    'Select location'
+                );
+
+                resetSelect(
+                    sublocationSelect,
+                    'Select sublocation'
+                );
+
+
+                if (!divisionId) {
+
+                    return $.Deferred()
+                        .resolve()
+                        .promise();
+
+                }
+
+
+                showLoading(
+                    'locationLoading'
+                );
+
+
+                return $.ajax({
+
+                    url:
+                        '@Url.Action("GetLocations", "ApplicantProfile")',
+
+                    type:
+                        'GET',
+
+                    data: {
+                        divisionId:
+                            divisionId
+                    }
+
+                })
+
+
+                .done(function (items) {
+
+                    populateSelect(
+                        locationSelect,
+                        items,
+                        'Select location'
+                    );
+
+
+                    if (selectedId) {
+
+                        locationSelect.val(
+                            selectedId
+                        );
+
+                    }
+
+                })
+
+
+                .fail(function () {
+
+                    Swal.fire({
+
+                        icon:
+                            'error',
+
+                        title:
+                            'Unable to load locations',
+
+                        text:
+                            'Please try again.',
+
+                        confirmButtonColor:
+                            '#d800b8'
+
+                    });
+
+                })
+
+
+                .always(function () {
+
+                    hideLoading(
+                        'locationLoading'
+                    );
+
+                });
+
+            }
+
+
+            // =====================================================
+            // Load sublocations
+            // =====================================================
+
+            function loadSublocations(
+                locationId,
+                selectedId = '') {
+
+                resetSelect(
+                    sublocationSelect,
+                    'Select sublocation'
+                );
+
+
+                if (!locationId) {
+
+                    return $.Deferred()
+                        .resolve()
+                        .promise();
+
+                }
+
+
+                showLoading(
+                    'sublocationLoading'
+                );
+
+
+                return $.ajax({
+
+                    url:
+                        '@Url.Action("GetSublocations", "ApplicantProfile")',
+
+                    type:
+                        'GET',
+
+                    data: {
+                        locationId:
+                            locationId
+                    }
+
+                })
+
+
+                .done(function (items) {
+
+                    populateSelect(
+                        sublocationSelect,
+                        items,
+                        'Select sublocation'
+                    );
+
+
+                    if (selectedId) {
+
+                        sublocationSelect.val(
+                            selectedId
+                        );
+
+                    }
+
+                })
+
+
+                .fail(function () {
+
+                    Swal.fire({
+
+                        icon:
+                            'error',
+
+                        title:
+                            'Unable to load sublocations',
+
+                        text:
+                            'Please try again.',
+
+                        confirmButtonColor:
+                            '#d800b8'
+
+                    });
+
+                })
+
+
+                .always(function () {
+
+                    hideLoading(
+                        'sublocationLoading'
+                    );
+
+                });
+
+            }
+
+
+            // =====================================================
+            // County changed
+            // =====================================================
+
+            countySelect.on(
+                'change',
+                function () {
+
+                    const countyId =
+                        $(this).val();
+
+                    loadSubcounties(
+                        countyId
+                    );
+
+                }
+            );
+
+
+            // =====================================================
+            // Subcounty changed
+            // =====================================================
+
+            subcountySelect.on(
+                'change',
+                function () {
+
+                    const subcountyId =
+                        $(this).val();
+
+                    loadDivisions(
+                        subcountyId
+                    );
+
+                }
+            );
+
+
+            // =====================================================
+            // Division changed
+            // =====================================================
+
+            divisionSelect.on(
+                'change',
+                function () {
+
+                    const divisionId =
+                        $(this).val();
+
+                    loadLocations(
+                        divisionId
+                    );
+
+                }
+            );
+
+
+            // =====================================================
+            // Location changed
+            // =====================================================
+
+            locationSelect.on(
+                'change',
+                function () {
+
+                    const locationId =
+                        $(this).val();
+
+                    loadSublocations(
+                        locationId
+                    );
+
+                }
+            );
+
+
+            // =====================================================
+            // Restore saved location hierarchy
+            // =====================================================
+
+            if (originalCountyId) {
+
+                countySelect.val(
+                    originalCountyId
+                );
+
+
+                loadSubcounties(
+                    originalCountyId,
+                    originalSubcountyId
+                )
+                .done(function () {
+
+                    if (originalSubcountyId) {
+
+                        loadDivisions(
+                            originalSubcountyId,
+                            originalDivisionId
+                        )
+                        .done(function () {
+
+                            if (originalDivisionId) {
+
+                                loadLocations(
+                                    originalDivisionId,
+                                    originalLocationId
+                                )
+                                .done(function () {
+
+                                    if (originalLocationId) {
+
+                                        loadSublocations(
+                                            originalLocationId,
+                                            originalSublocationId
+                                        );
+
+                                    }
+
+                                });
+
+                            }
+
+                        });
+
+                    }
+
+                });
+
+            }
+
+
+            // =====================================================
+            // Save Profile
+            // =====================================================
+
+            form.on(
+                'submit',
+                function (event) {
+
+                    event.preventDefault();
+
+
+                    if (!form[0].checkValidity()) {
+
+                        form[0].reportValidity();
+
+                        return;
+
+                    }
+
+
+                    saveButton.prop(
+                        'disabled',
+                        true
+                    );
+
+
+                    $('.save-button-content')
+                        .addClass('d-none');
+
+
+                    $('.save-button-loading')
+                        .removeClass('d-none');
+
+
+                    const formData =
+                        form.serialize();
+
+
+                    $.ajax({
+
+                        url:
+                            form.attr('action'),
+
+                        type:
+                            'POST',
+
+                        data:
+                            formData
+
+                    })
+
+
+                    .done(function (response) {
+
+                        if (response.success) {
+
+                            Swal.fire({
+
+                                icon:
+                                    'success',
+
+                                title:
+                                    'Profile Saved',
+
+                                text:
+                                    response.message,
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                        }
+                        else {
+
+                            Swal.fire({
+
+                                icon:
+                                    'error',
+
+                                title:
+                                    'Unable to save',
+
+                                text:
+                                    response.message ||
+                                    'Unable to save your profile.',
+
+                                confirmButtonColor:
+                                    '#d800b8'
+
+                            });
+
+                        }
+
+                    })
+
+
+                    .fail(function (xhr) {
+
+                        let message =
+                            'Unable to save your profile. Please check the information and try again.';
+
+
+                        if (
+                            xhr.responseJSON &&
+                            xhr.responseJSON.message
+                        ) {
+
+                            message =
+                                xhr.responseJSON.message;
+
+                        }
+
+
+                        Swal.fire({
+
+                            icon:
+                                'error',
+
+                            title:
+                                'Save Failed',
+
+                            text:
+                                message,
+
+                            confirmButtonColor:
+                                '#d800b8'
+
+                        });
+
+                    })
+
+
+                    .always(function () {
+
+                        saveButton.prop(
+                            'disabled',
+                            false
+                        );
+
+
+                        $('.save-button-content')
+                            .removeClass('d-none');
+
+
+                        $('.save-button-loading')
+                            .addClass('d-none');
+
+                    });
+
+                }
+            );
+
+        });
+
+    </script>
+}

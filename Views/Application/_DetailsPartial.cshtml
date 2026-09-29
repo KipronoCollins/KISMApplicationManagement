@@ -1,0 +1,947 @@
+@model KISMApplicationManagement.Models.ApplicationViewModels.ApplicationDetailsViewModel
+
+@using KISMApplicationManagement.Constants
+
+@{
+    var statusClass = "kism-status-default";
+    var statusIcon = "bi-info-circle";
+    var statusDescription = "Application status information.";
+
+    switch (Model.Status)
+    {
+        case ApplicationStatuses.Draft:
+            statusClass = "kism-status-draft";
+            statusIcon = "bi-pencil-square";
+            statusDescription =
+                "This application is still a draft and can be edited before submission.";
+            break;
+
+        case ApplicationStatuses.PendingReview:
+            statusClass = "kism-status-pending";
+            statusIcon = "bi-hourglass-split";
+            statusDescription =
+                "This application has been submitted and is awaiting review.";
+            break;
+
+        case ApplicationStatuses.Passed:
+            statusClass = "kism-status-passed";
+            statusIcon = "bi-check-circle";
+            statusDescription =
+                "This application has been marked as passed by the committee.";
+            break;
+
+        case ApplicationStatuses.Failed:
+            statusClass = "kism-status-failed";
+            statusIcon = "bi-x-circle";
+            statusDescription =
+                "This application has been marked as failed by the committee.";
+            break;
+    }
+}
+
+
+<div class="kism-details-wrapper">
+
+
+    <!-- =========================================================
+         APPLICATION HEADER
+         ========================================================= -->
+
+    <div class="kism-details-header mb-4">
+
+        <div class="d-flex flex-column flex-sm-row
+            justify-content-between
+            align-items-sm-center gap-3">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="kism-details-icon">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+
+                <div>
+
+                    <div class="text-muted small">
+                        Application Number
+                    </div>
+
+                    <div class="application-number">
+                        @Model.ApplicationNumber
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="text-sm-end">
+
+                <span class="badge rounded-pill
+                    @statusClass kism-large-status-badge">
+
+                    <i class="bi @statusIcon me-1"></i>
+
+                    @Model.Status
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         STATUS INFORMATION
+         ========================================================= -->
+
+    <div class="kism-status-information mb-4">
+
+        <div class="d-flex align-items-start gap-3">
+
+            <div class="kism-status-information-icon">
+                <i class="bi @statusIcon"></i>
+            </div>
+
+            <div>
+
+                <div class="fw-semibold mb-1">
+                    @Model.Status
+                </div>
+
+                <div class="small text-muted">
+                    @statusDescription
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         APPLICATION INFORMATION
+         ========================================================= -->
+
+    <div class="kism-details-section mb-4">
+
+        <div class="kism-details-section-header">
+
+            <div class="kism-section-icon">
+                <i class="bi bi-info-circle"></i>
+            </div>
+
+            <div>
+
+                <h6 class="fw-bold mb-0">
+                    Application Information
+                </h6>
+
+                <div class="text-muted small">
+                    General information about this application.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3 mt-1">
+
+            <div class="col-md-6">
+
+                <div class="kism-detail-item">
+
+                    <div class="detail-label">
+                        Applicant
+                    </div>
+
+                    <div class="detail-value">
+                        @Model.ApplicantName
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="kism-detail-item">
+
+                    <div class="detail-label">
+                        Application Number
+                    </div>
+
+                    <div class="detail-value">
+                        @Model.ApplicationNumber
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="kism-detail-item">
+
+                    <div class="detail-label">
+                        Academic Year
+                    </div>
+
+                    <div class="detail-value">
+                        @Model.AcademicYear
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="kism-detail-item">
+
+                    <div class="detail-label">
+                        Intake Period
+                    </div>
+
+                    <div class="detail-value">
+                        @Model.IntakePeriod
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="kism-detail-item">
+
+                    <div class="detail-label">
+                        Intake
+                    </div>
+
+                    <div class="detail-value">
+                        @Model.IntakeName
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         PROGRAMME CHOICES
+         ========================================================= -->
+
+    <div class="kism-details-section mb-4">
+
+        <div class="kism-details-section-header">
+
+            <div class="kism-section-icon">
+                <i class="bi bi-mortarboard"></i>
+            </div>
+
+            <div>
+
+                <h6 class="fw-bold mb-0">
+                    Programme Choices
+                </h6>
+
+                <div class="text-muted small">
+                    Your selected programmes in order of preference.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3 mt-1">
+
+            <!-- First Choice -->
+
+            <div class="col-md-6">
+
+                <div class="programme-detail-card">
+
+                    <div class="programme-choice-number">
+                        1
+                    </div>
+
+                    <div class="programme-detail-content">
+
+                        <div class="programme-choice-label">
+                            First Choice
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.FirstChoiceProgramme))
+                        {
+                            <div class="programme-name">
+                                @Model.FirstChoiceProgramme
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">
+                                Not selected
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Second Choice -->
+
+            <div class="col-md-6">
+
+                <div class="programme-detail-card">
+
+                    <div class="programme-choice-number">
+                        2
+                    </div>
+
+                    <div class="programme-detail-content">
+
+                        <div class="programme-choice-label">
+                            Second Choice
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                            Model.SecondChoiceProgramme))
+                        {
+                            <div class="programme-name">
+                                @Model.SecondChoiceProgramme
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">
+                                Not selected
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         INTAKE DATES
+         ========================================================= -->
+
+    <div class="kism-details-section mb-4">
+
+        <div class="kism-details-section-header">
+
+            <div class="kism-section-icon">
+                <i class="bi bi-calendar3"></i>
+            </div>
+
+            <div>
+
+                <h6 class="fw-bold mb-0">
+                    Intake Dates
+                </h6>
+
+                <div class="text-muted small">
+                    Application period for the selected intake.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3 mt-1">
+
+            <div class="col-md-6">
+
+                <div class="date-detail-card">
+
+                    <div class="date-icon">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="detail-label">
+                            Application Opens
+                        </div>
+
+                        <div class="detail-value">
+                            @Model.ApplicationOpeningDate
+                            .ToString("dd MMMM yyyy")
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="date-detail-card">
+
+                    <div class="date-icon">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="detail-label">
+                            Application Closes
+                        </div>
+
+                        <div class="detail-value">
+                            @Model.ApplicationClosingDate
+                            .ToString("dd MMMM yyyy")
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         APPLICATION TIMELINE
+         ========================================================= -->
+
+    <div class="kism-details-section mb-4">
+
+        <div class="kism-details-section-header">
+
+            <div class="kism-section-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+
+            <div>
+
+                <h6 class="fw-bold mb-0">
+                    Application Timeline
+                </h6>
+
+                <div class="text-muted small">
+                    Important application dates.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="kism-timeline mt-4">
+
+            <!-- Created -->
+
+            <div class="timeline-item completed">
+
+                <div class="timeline-marker">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+
+                <div class="timeline-content">
+
+                    <div class="timeline-title">
+                        Application Created
+                    </div>
+
+                    <div class="timeline-date">
+                        @Model.CreatedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, hh:mm tt")
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Submitted -->
+
+            <div class="timeline-item
+                @(Model.SubmittedAtUtc.HasValue
+ ? "completed"
+ : "")">
+
+                <div class="timeline-marker">
+
+                    @if (Model.SubmittedAtUtc.HasValue)
+                    {
+                        <i class="bi bi-send"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-hourglass"></i>
+                    }
+
+                </div>
+
+                <div class="timeline-content">
+
+                    <div class="timeline-title">
+                        Application Submitted
+                    </div>
+
+                    @if (Model.SubmittedAtUtc.HasValue)
+                    {
+                        <div class="timeline-date">
+                            @Model.SubmittedAtUtc.Value.ToLocalTime().ToString("dd MMMM yyyy, hh:mm tt")
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="timeline-pending">
+                            Not yet submitted
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- Current Status -->
+
+            <div class="timeline-item
+                @(Model.Status != ApplicationStatuses.Draft
+ ? "completed"
+ : "current")">
+
+                <div class="timeline-marker">
+
+                    @if (Model.Status == ApplicationStatuses.Passed)
+                    {
+                        <i class="bi bi-check-lg"></i>
+                    }
+                    else if (Model.Status == ApplicationStatuses.Failed)
+                    {
+                        <i class="bi bi-x-lg"></i>
+                    }
+                    else if (Model.Status == ApplicationStatuses.PendingReview)
+                    {
+                        <i class="bi bi-hourglass-split"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-pencil-square"></i>
+                    }
+
+                </div>
+
+                <div class="timeline-content">
+
+                    <div class="timeline-title">
+                        Current Status
+                    </div>
+
+                    <div class="timeline-status">
+                        @Model.Status
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         LAST UPDATED
+         ========================================================= -->
+
+    @if (Model.UpdatedAtUtc.HasValue)
+    {
+        <div class="small text-muted text-end mb-3">
+
+            <i class="bi bi-arrow-clockwise me-1"></i>
+
+            Last updated:
+            @Model.UpdatedAtUtc.Value.ToLocalTime().ToString("dd MMMM yyyy, hh:mm tt")
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+
+    <div class="d-flex justify-content-end
+        pt-3 border-top">
+
+        <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">
+
+            <i class="bi bi-x-circle me-1"></i>
+            Close
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<style>
+    /* =============================================================
+       DETAILS HEADER
+       ============================================================= */
+
+    .kism-details-header {
+        background: #fff8fe;
+        border-left: 4px solid #d800b8;
+        border-radius: 0.75rem;
+        padding: 1rem 1.1rem;
+    }
+
+    .kism-details-icon {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        background: #d800b8;
+        color: #ffffff;
+        font-size: 1.2rem;
+    }
+
+    .application-number {
+        color: #d800b8;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+
+    /* =============================================================
+       STATUS
+       ============================================================= */
+
+    .kism-large-status-badge {
+        padding: 0.55rem 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .kism-status-default {
+        background: #e9ecef;
+        color: #495057;
+    }
+
+    .kism-status-draft {
+        background: #f1f3f5;
+        color: #495057;
+    }
+
+    .kism-status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .kism-status-passed {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .kism-status-failed {
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .kism-status-information {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+
+    .kism-status-information-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(216, 0, 184, 0.08);
+        color: #d800b8;
+    }
+
+
+    /* =============================================================
+       DETAILS SECTIONS
+       ============================================================= */
+
+    .kism-details-section {
+        border: 1px solid #edf0f2;
+        border-radius: 0.85rem;
+        padding: 1.1rem;
+        background: #ffffff;
+    }
+
+    .kism-details-section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .kism-section-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.6rem;
+        background: #fff8fe;
+        color: #d800b8;
+        border: 1px solid rgba(216, 0, 184, 0.12);
+    }
+
+
+    /* =============================================================
+       DETAIL ITEMS
+       ============================================================= */
+
+    .kism-detail-item {
+        background: #fafafa;
+        border: 1px solid #edf0f2;
+        border-radius: 0.65rem;
+        padding: 0.75rem 0.85rem;
+        height: 100%;
+    }
+
+    .detail-label {
+        color: #6c757d;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        color: #212529;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+
+    /* =============================================================
+       PROGRAMMES
+       ============================================================= */
+
+    .programme-detail-card {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        height: 100%;
+        padding: 0.9rem;
+        border: 1px solid #e8eaed;
+        border-radius: 0.75rem;
+        background: #ffffff;
+    }
+
+    .programme-choice-number {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.65rem;
+        background: #fff8fe;
+        color: #d800b8;
+        border: 1px solid rgba(216, 0, 184, 0.15);
+        font-weight: 800;
+    }
+
+    .programme-detail-content {
+        min-width: 0;
+    }
+
+    .programme-choice-label {
+        color: #6c757d;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+    }
+
+    .programme-name {
+        color: #212529;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+
+    /* =============================================================
+       DATES
+       ============================================================= */
+
+    .date-detail-card {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        height: 100%;
+        padding: 0.9rem;
+        background: #fafafa;
+        border: 1px solid #edf0f2;
+        border-radius: 0.75rem;
+    }
+
+    .date-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.6rem;
+        background: #fff8fe;
+        color: #d800b8;
+    }
+
+
+    /* =============================================================
+       TIMELINE
+       ============================================================= */
+
+    .kism-timeline {
+        position: relative;
+        padding-left: 0.35rem;
+    }
+
+    .timeline-item {
+        position: relative;
+        display: flex;
+        gap: 1rem;
+        padding-bottom: 1.35rem;
+    }
+
+    .timeline-item:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 17px;
+        top: 36px;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+
+    .timeline-item.completed:not(:last-child)::before {
+        background: rgba(216, 0, 184, 0.25);
+    }
+
+    .timeline-marker {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f3f5;
+        color: #6c757d;
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 0 1px #dee2e6;
+        position: relative;
+        z-index: 1;
+        font-size: 0.85rem;
+    }
+
+    .timeline-item.completed .timeline-marker {
+        background: #d800b8;
+        color: #ffffff;
+        box-shadow: 0 0 0 1px #d800b8;
+    }
+
+    .timeline-item.current .timeline-marker {
+        background: #fff8fe;
+        color: #d800b8;
+        box-shadow: 0 0 0 2px rgba(216, 0, 184, 0.25);
+    }
+
+    .timeline-content {
+        padding-top: 0.25rem;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .timeline-date {
+        color: #6c757d;
+        font-size: 0.78rem;
+        margin-top: 0.2rem;
+    }
+
+    .timeline-pending {
+        color: #6c757d;
+        font-size: 0.78rem;
+        margin-top: 0.2rem;
+        font-style: italic;
+    }
+
+    .timeline-status {
+        color: #d800b8;
+        font-size: 0.82rem;
+        font-weight: 700;
+        margin-top: 0.2rem;
+    }
+
+
+    /* =============================================================
+       RESPONSIVE
+       ============================================================= */
+
+    @@media (max-width: 575.98px) {
+
+        .kism-details-section {
+            padding: 0.9rem;
+        }
+
+        .kism-details-header {
+            padding: 0.9rem;
+        }
+
+        .kism-large-status-badge {
+            align-self: flex-start;
+        }
+
+        .timeline-item {
+            gap: 0.75rem;
+        }
+
+    }
+</style>

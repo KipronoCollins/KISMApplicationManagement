@@ -1,0 +1,1946 @@
+@model KISMApplicationManagement.Models.CommitteeSittingViewModels.CommitteeWorkbenchViewModel
+
+@{
+    ViewData["Title"] = "Committee Workbench";
+}
+
+<div class="container-fluid px-0 committee-workbench">
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+
+                <a asp-controller="CommitteeSittings"
+                   asp-action="Manage"
+                   asp-route-id="@Model.CommitteeSittingId"
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Back
+                </a>
+
+                <span class="badge status-badge">
+                    <i class="bi bi-broadcast-pin me-1"></i>
+                    Committee In Progress
+                </span>
+
+            </div>
+
+            <h2 class="page-title mb-1">
+                Committee Workbench
+            </h2>
+
+            <div class="text-muted">
+                @Model.ReferenceNumber
+                <span class="mx-2">•</span>
+                @Model.IntakeName
+                <span class="mx-2">•</span>
+                @Model.SittingDate.ToString("dd MMM yyyy")
+            </div>
+        </div>
+
+        <div class="application-counter">
+
+            <div class="small text-muted">
+                APPLICATION
+            </div>
+
+            <div class="counter-number">
+                @Model.CurrentPosition
+                <span>/ @Model.TotalApplications</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         APPLICANT HEADER
+         ========================================================= -->
+
+    <div class="card border-0 shadow-sm mb-4 applicant-header-card">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="applicant-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <div class="small text-muted mb-1">
+                                APPLICATION NUMBER
+                            </div>
+
+                            <h3 class="mb-1 applicant-name">
+                                @Model.Applicant.FullName
+                            </h3>
+
+                            <div class="application-number">
+                                @Model.ApplicationNumber
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4 mt-3 mt-lg-0">
+
+                    <div class="text-lg-end">
+
+                        <div class="small text-muted">
+                            COMMITTEE PROGRESS
+                        </div>
+
+                        <div class="progress committee-progress mt-2">
+
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: @((Model.CurrentPosition * 100.0 / Model.TotalApplications).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%">
+                            </div>
+
+                        </div>
+
+                        <div class="small text-muted mt-1">
+                            @Model.CurrentPosition of @Model.TotalApplications applications
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- =====================================================
+             LEFT SIDE
+             ===================================================== -->
+
+        <div class="col-xl-8">
+
+            <!-- =================================================
+                 APPLICANT INFORMATION
+                 ================================================= -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header kism-card-header">
+
+                    <div>
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-vcard me-2"></i>
+                            Applicant Information
+                        </h5>
+
+                        <small>
+                            Personal information submitted with the application
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                Full Name
+                            </div>
+
+                            <div class="info-value">
+                                @Model.Applicant.FullName
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                ID / Passport / Birth Certificate
+                            </div>
+
+                            <div class="info-value">
+                                @(Model.Applicant.IdPassportBirthCertificateNo ?? "Not provided")
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                Mobile Number
+                            </div>
+
+                            <div class="info-value">
+                                @(Model.Applicant.MobileNumber ?? "Not provided")
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                Email
+                            </div>
+
+                            <div class="info-value">
+                                @(Model.Applicant.ContactEmail ?? "Not provided")
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                Date of Birth
+                            </div>
+
+                            <div class="info-value">
+                                @(Model.Applicant.DateOfBirth?.ToString("dd MMM yyyy") ?? "Not provided")
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                Place of Birth
+                            </div>
+
+                            <div class="info-value">
+                                @(Model.Applicant.PlaceOfBirth ?? "Not provided")
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                Town
+                            </div>
+
+                            <div class="info-value">
+                                @(Model.Applicant.Town ?? "Not provided")
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="info-label">
+                                County
+                            </div>
+
+                            <div class="info-value">
+                                @(Model.Applicant.CountyName ?? "Not provided")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 QUALIFICATIONS
+                 ================================================= -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header kism-card-header">
+
+                    <div>
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-mortarboard-fill me-2"></i>
+                            Academic Qualifications
+                        </h5>
+
+                        <small>
+                            Qualifications submitted by the applicant
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body">
+
+                    @if (Model.Qualifications.Any())
+                    {
+                        foreach (var qualification in Model.Qualifications)
+                        {
+                            <div class="qualification-card mb-3">
+
+                                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+
+                                    <div>
+
+                                        <span class="route-badge">
+                                            @qualification.QualificationRoute
+                                        </span>
+
+                                        <strong class="ms-2">
+                                            @qualification.QualificationYear
+                                        </strong>
+
+                                    </div>
+
+                                    <span class="verification-badge">
+                                        @qualification.VerificationStatus
+                                    </span>
+
+                                </div>
+
+
+                                <div class="row g-3 mb-3">
+
+                                    @if (!string.IsNullOrWhiteSpace(qualification.ExaminationIndexNumber))
+                                    {
+                                        <div class="col-md-6">
+
+                                            <div class="info-label">
+                                                Examination Index Number
+                                            </div>
+
+                                            <div class="info-value">
+                                                @qualification.ExaminationIndexNumber
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(qualification.MeanGrade))
+                                    {
+                                        <div class="col-md-6">
+
+                                            <div class="info-label">
+                                                Mean Grade
+                                            </div>
+
+                                            <div class="info-value">
+                                                @qualification.MeanGrade
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(qualification.QualificationType))
+                                    {
+                                        <div class="col-md-6">
+
+                                            <div class="info-label">
+                                                Qualification Type
+                                            </div>
+
+                                            <div class="info-value">
+                                                @qualification.QualificationType
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(qualification.InstitutionName))
+                                    {
+                                        <div class="col-md-6">
+
+                                            <div class="info-label">
+                                                Institution
+                                            </div>
+
+                                            <div class="info-value">
+                                                @qualification.InstitutionName
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(qualification.FieldOfStudy))
+                                    {
+                                        <div class="col-md-6">
+
+                                            <div class="info-label">
+                                                Field of Study
+                                            </div>
+
+                                            <div class="info-value">
+                                                @qualification.FieldOfStudy
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(qualification.CertificateNumber))
+                                    {
+                                        <div class="col-md-6">
+
+                                            <div class="info-label">
+                                                Certificate Number
+                                            </div>
+
+                                            <div class="info-value">
+                                                @qualification.CertificateNumber
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+
+                                @if (qualification.Subjects.Any())
+                                {
+                                    <div class="table-responsive">
+
+                                        <table class="table table-sm qualification-table mb-0">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Subject</th>
+                                                    <th>Code</th>
+                                                    <th>Grade</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var subject in qualification.Subjects)
+                                                {
+                                                    <tr>
+
+                                                        <td>
+                                                            @subject.SubjectName
+                                                        </td>
+
+                                                        <td>
+                                                            @(subject.SubjectCode ?? "-")
+                                                        </td>
+
+                                                        <td>
+
+                                                            <span class="grade-badge">
+                                                                @subject.Grade
+                                                            </span>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+                                }
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+
+                            <i class="bi bi-mortarboard"></i>
+
+                            <div>
+
+                                <strong>
+                                    No qualifications recorded
+                                </strong>
+
+                                <div class="text-muted small">
+                                    No academic qualifications were found for this applicant.
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ORIGINAL PROGRAMME CHOICES
+                 ================================================= -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header kism-card-header">
+
+                    <div>
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-check me-2"></i>
+                            Original Programme Choices
+                        </h5>
+
+                        <small>
+                            Programmes originally selected by the applicant
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <div class="card-body">
+
+                    @if (Model.ProgrammeChoices.Any())
+                    {
+                        <div class="row g-3">
+
+                            @foreach (var choice in Model.ProgrammeChoices)
+                            {
+                                <div class="col-md-6">
+
+                                    <div class="programme-choice-card">
+
+                                        <div class="choice-number">
+                                            Choice @choice.ChoiceNumber
+                                        </div>
+
+                                        <div class="programme-code">
+                                            @choice.ProgrammeCode
+                                        </div>
+
+                                        <div class="programme-name">
+                                            @choice.ProgrammeName
+                                        </div>
+
+                                        <div class="programme-meta">
+
+                                            @choice.AwardType
+
+                                            <span class="mx-1">
+                                                •
+                                            </span>
+
+                                            @choice.DurationYears year(s)
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+
+                            <i class="bi bi-journal-x"></i>
+
+                            <div>
+                                <strong>
+                                    No programme choices found
+                                </strong>
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             RIGHT SIDE — DECISION
+             ===================================================== -->
+
+        <div class="col-xl-4">
+
+            <div class="card border-0 shadow-sm decision-card sticky-xl-top">
+
+                <div class="card-header decision-header">
+
+                    <div>
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-clipboard2-check-fill me-2"></i>
+                            Committee Decision
+                        </h5>
+
+                        <small>
+                            Record the collective committee decision
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <form id="committeeDecisionForm">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               id="committeeSittingId"
+                               value="@Model.CommitteeSittingId" />
+
+                        <input type="hidden"
+                               id="committeeSittingApplicationId"
+                               value="@Model.CommitteeSittingApplicationId" />
+
+                        <input type="hidden"
+                               id="position"
+                               value="@Model.CurrentPosition" />
+
+
+                        <!-- =================================================
+                             DECISION
+                             ================================================= -->
+
+                        <div class="mb-4">
+
+                            <label for="Decision"
+                                   class="form-label fw-semibold">
+
+                                Decision
+                                <span class="text-danger">*</span>
+
+                            </label>
+
+                            <select id="Decision"
+                                    name="Decision"
+                                    class="form-select form-select-lg">
+
+                                <option value="">
+                                    Select committee decision
+                                </option>
+
+                                @if (Model.Decision.Decision == "Recommended for Admission")
+                                {
+                                    <option value="Recommended for Admission" selected>
+                                        Recommended for Admission
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="Recommended for Admission">
+                                        Recommended for Admission
+                                    </option>
+                                }
+
+                                @if (Model.Decision.Decision == "Not Recommended")
+                                {
+                                    <option value="Not Recommended" selected>
+                                        Not Recommended
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="Not Recommended">
+                                        Not Recommended
+                                    </option>
+                                }
+
+                                @if (Model.Decision.Decision == "Deferred")
+                                {
+                                    <option value="Deferred" selected>
+                                        Deferred
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="Deferred">
+                                        Deferred
+                                    </option>
+                                }
+
+                            </select>
+
+                            <div class="form-text">
+                                The decision represents the collective committee position.
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             ASSIGNED PROGRAMME
+                             ================================================= -->
+
+                        <div class="mb-4"
+                             id="assignedProgrammeContainer">
+
+                            <label for="AssignedProgrammeId"
+                                   class="form-label fw-semibold">
+
+                                Assigned Programme
+
+                                <span id="assignedProgrammeRequired"
+                                      class="text-danger">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <select id="AssignedProgrammeId"
+                                    name="AssignedProgrammeId"
+                                    class="form-select">
+
+                                <option value="">
+                                    Select programme
+                                </option>
+
+                                @foreach (var programme in Model.AvailableProgrammes)
+                                {
+                                    if (Model.Decision.AssignedProgrammeId == programme.ProgrammeId)
+                                    {
+                                        <option value="@programme.ProgrammeId" selected>
+                                            @programme.ProgrammeCode -
+                                            @programme.ProgrammeName
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@programme.ProgrammeId">
+                                            @programme.ProgrammeCode -
+                                            @programme.ProgrammeName
+                                        </option>
+                                    }
+                                }
+
+                            </select>
+
+                            <div class="form-text">
+                                The committee may assign any active programme.
+                                It does not have to be one of the applicant's original choices.
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             REMARKS
+                             ================================================= -->
+
+                        <div class="mb-4">
+
+                            <label for="Remarks"
+                                   class="form-label fw-semibold">
+
+                                Committee Remarks
+
+                            </label>
+
+                            <textarea id="Remarks"
+                                      name="Remarks"
+                                      class="form-control"
+                                      rows="5"
+                                      maxlength="2000"
+                                      placeholder="Enter any remarks or observations...">@Model.Decision.Remarks</textarea>
+
+                            <div class="form-text">
+                                Optional. Maximum 2,000 characters.
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             DECISION RULE
+                             ================================================= -->
+
+                        <div id="decisionRuleAlert"
+                             class="decision-rule-alert mb-4">
+
+                            <i class="bi bi-info-circle-fill me-2"></i>
+
+                            <span>
+                                Select a decision to continue.
+                            </span>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             SAVE
+                             ================================================= -->
+
+                        <button type="button"
+                                id="saveDecisionButton"
+                                class="btn btn-outline-kism w-100 mb-2">
+
+                            <span class="button-spinner spinner-border spinner-border-sm d-none me-2"></span>
+
+                            <i class="bi bi-save me-1"></i>
+
+                            Save Decision
+
+                        </button>
+
+
+                        <!-- =================================================
+                             SAVE & NEXT
+                             ================================================= -->
+
+                        <button type="button"
+                                id="saveNextButton"
+                                class="btn btn-kism w-100">
+
+                            <span class="next-spinner spinner-border spinner-border-sm d-none me-2"></span>
+
+                            <i class="bi bi-arrow-right-circle me-1"></i>
+
+                            Save & Next
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         NAVIGATION
+         ========================================================= -->
+
+    <div class="workbench-navigation mt-4">
+
+        <div>
+
+            @if (Model.HasPrevious)
+            {
+                <a asp-controller="CommitteeWorkbench"
+                   asp-action="Index"
+                   asp-route-committeeSittingId="@Model.CommitteeSittingId"
+                   asp-route-position="@(Model.CurrentPosition - 1)"
+                   class="btn btn-outline-secondary">
+
+                    <i class="bi bi-chevron-left"></i>
+                    Previous
+
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        disabled>
+
+                    <i class="bi bi-chevron-left"></i>
+                    Previous
+
+                </button>
+            }
+
+        </div>
+
+
+        <div class="navigation-progress">
+
+            @for (var i = 1; i <= Model.TotalApplications; i++)
+            {
+                if (i == Model.CurrentPosition)
+                {
+                    <span class="progress-dot active"
+                          title="Application @i">
+                    </span>
+                }
+                else if (i < Model.CurrentPosition)
+                {
+                    <span class="progress-dot completed"
+                          title="Application @i">
+                    </span>
+                }
+                else
+                {
+                    <span class="progress-dot"
+                          title="Application @i">
+                    </span>
+                }
+            }
+
+        </div>
+
+
+        <div>
+
+            @if (Model.HasNext)
+            {
+                <a asp-controller="CommitteeWorkbench"
+                   asp-action="Index"
+                   asp-route-committeeSittingId="@Model.CommitteeSittingId"
+                   asp-route-position="@(Model.CurrentPosition + 1)"
+                   class="btn btn-outline-kism">
+
+                    Next
+                    <i class="bi bi-chevron-right"></i>
+
+                </a>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        disabled>
+
+                    Next
+                    <i class="bi bi-chevron-right"></i>
+
+                </button>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    :root {
+        --kism-magenta: #d800b8;
+        --kism-magenta-dark: #ad0093;
+        --kism-yellow: #edff0f;
+        --kism-light: #fff8fe;
+    }
+
+    .committee-workbench {
+        padding-bottom: 50px;
+    }
+
+    .page-title {
+        font-weight: 700;
+        color: #252525;
+    }
+
+    .status-badge {
+        background: var(--kism-light);
+        color: var(--kism-magenta);
+        border: 1px solid rgba(216, 0, 184, .15);
+        padding: 7px 11px;
+    }
+
+    .application-counter {
+        background: var(--kism-light);
+        border: 1px solid rgba(216, 0, 184, .12);
+        border-radius: 12px;
+        padding: 10px 18px;
+        min-width: 110px;
+        text-align: center;
+    }
+
+    .counter-number {
+        color: var(--kism-magenta);
+        font-size: 28px;
+        line-height: 1;
+        font-weight: 800;
+    }
+
+    .counter-number span {
+        color: #777;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .applicant-header-card {
+        border-left: 5px solid var(--kism-magenta) !important;
+    }
+
+    .applicant-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--kism-light);
+        color: var(--kism-magenta);
+        font-size: 30px;
+    }
+
+    .applicant-name {
+        font-weight: 750;
+        color: #252525;
+    }
+
+    .application-number {
+        color: var(--kism-magenta);
+        font-weight: 600;
+    }
+
+    .committee-progress {
+        height: 7px;
+        background: #eee;
+    }
+
+    .committee-progress .progress-bar {
+        background: var(--kism-magenta);
+    }
+
+    .kism-card-header {
+        background: var(--kism-light);
+        border-bottom: 1px solid rgba(216, 0, 184, .10);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .kism-card-header h5 {
+        color: var(--kism-magenta);
+        font-weight: 700;
+    }
+
+    .kism-card-header small {
+        color: #777;
+    }
+
+    .info-label {
+        color: #777;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        margin-bottom: 3px;
+    }
+
+    .info-value {
+        color: #242424;
+        font-weight: 600;
+        word-break: break-word;
+    }
+
+    .qualification-card {
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 16px;
+    }
+
+    .route-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: var(--kism-light);
+        color: var(--kism-magenta);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .verification-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #f1f1f1;
+        color: #555;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .qualification-table th {
+        background: #fafafa;
+        color: #666;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    .qualification-table td {
+        vertical-align: middle;
+    }
+
+    .grade-badge {
+        display: inline-block;
+        min-width: 38px;
+        text-align: center;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: var(--kism-light);
+        color: var(--kism-magenta);
+        font-weight: 700;
+    }
+
+    .programme-choice-card {
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 16px;
+        height: 100%;
+    }
+
+    .choice-number {
+        color: #777;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .programme-code {
+        color: var(--kism-magenta);
+        font-weight: 800;
+        margin-top: 8px;
+    }
+
+    .programme-name {
+        font-weight: 700;
+        margin-top: 2px;
+    }
+
+    .programme-meta {
+        color: #777;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+
+    .decision-card {
+        border-top: 5px solid var(--kism-magenta) !important;
+    }
+
+    .decision-header {
+        background: var(--kism-light);
+        padding: 17px 20px;
+    }
+
+    .decision-header h5 {
+        color: var(--kism-magenta);
+        font-weight: 750;
+    }
+
+    .form-select,
+    .form-control {
+        border-radius: 8px;
+        border-color: #ddd;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+        border-color: var(--kism-magenta);
+        box-shadow: 0 0 0 .2rem rgba(216, 0, 184, .10);
+    }
+
+    .btn-kism {
+        background: var(--kism-magenta);
+        border-color: var(--kism-magenta);
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .btn-kism:hover {
+        background: var(--kism-magenta-dark);
+        border-color: var(--kism-magenta-dark);
+        color: #fff;
+    }
+
+    .btn-outline-kism {
+        border-color: var(--kism-magenta);
+        color: var(--kism-magenta);
+        font-weight: 600;
+    }
+
+    .btn-outline-kism:hover {
+        background: var(--kism-magenta);
+        color: #fff;
+    }
+
+    .decision-rule-alert {
+        background: var(--kism-light);
+        color: #555;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    .decision-rule-alert i {
+        color: var(--kism-magenta);
+    }
+
+    .empty-state {
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: #777;
+        text-align: center;
+    }
+
+    .empty-state > i {
+        font-size: 28px;
+        color: var(--kism-magenta);
+    }
+
+    .workbench-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 18px 0;
+    }
+
+    .navigation-progress {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        max-width: 65%;
+        overflow: hidden;
+    }
+
+    .progress-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #ddd;
+        flex-shrink: 0;
+    }
+
+    .progress-dot.completed {
+        background: var(--kism-magenta);
+        opacity: .45;
+    }
+
+    .progress-dot.active {
+        width: 10px;
+        height: 10px;
+        background: var(--kism-magenta);
+        box-shadow: 0 0 0 3px rgba(216, 0, 184, .12);
+    }
+
+    @@media (min-width: 1200px) {
+
+        .sticky-xl-top {
+            position: sticky;
+            top: 20px;
+            z-index: 10;
+        }
+
+    }
+
+    @@media (max-width: 767px) {
+
+        .application-counter {
+            width: 100%;
+        }
+
+        .workbench-navigation {
+            flex-wrap: wrap;
+        }
+
+        .navigation-progress {
+            order: 3;
+            width: 100%;
+            max-width: 100%;
+        }
+
+    }
+
+</style>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /*
+         * ============================================================
+         * ELEMENTS
+         * ============================================================
+         */
+
+        const form =
+            document.getElementById('committeeDecisionForm');
+
+        const decision =
+            document.getElementById('Decision');
+
+        const assignedProgramme =
+            document.getElementById('AssignedProgrammeId');
+
+        const remarks =
+            document.getElementById('Remarks');
+
+        const sittingId =
+            document.getElementById('committeeSittingId');
+
+        const sittingApplicationId =
+            document.getElementById('committeeSittingApplicationId');
+
+        const position =
+            document.getElementById('position');
+
+        const saveDecisionButton =
+            document.getElementById('saveDecisionButton');
+
+        const saveNextButton =
+            document.getElementById('saveNextButton');
+
+        const decisionRuleAlert =
+            document.getElementById('decisionRuleAlert');
+
+        const assignedProgrammeRequired =
+            document.getElementById('assignedProgrammeRequired');
+
+        const requestVerificationToken =
+            form.querySelector(
+                'input[name="__RequestVerificationToken"]'
+            );
+
+
+        /*
+         * ============================================================
+         * BASIC ELEMENT CHECK
+         * ============================================================
+         */
+
+        if (!form ||
+            !decision ||
+            !assignedProgramme ||
+            !remarks ||
+            !sittingId ||
+            !sittingApplicationId ||
+            !position ||
+            !saveDecisionButton ||
+            !saveNextButton) {
+
+            console.error(
+                'Committee Workbench: Required form elements were not found.'
+            );
+
+            return;
+        }
+
+
+        /*
+         * ============================================================
+         * DECISION STATE
+         * ============================================================
+         */
+
+        function updateDecisionState() {
+
+            const selectedDecision =
+                decision.value;
+
+            if (selectedDecision === 'Recommended for Admission') {
+
+                assignedProgrammeRequired.classList.remove('d-none');
+
+                decisionRuleAlert.innerHTML =
+                    '<i class="bi bi-check-circle-fill me-2"></i>' +
+                    '<span>' +
+                    'Assigned Programme is required for admission recommendations.' +
+                    '</span>';
+
+            }
+            else if (selectedDecision === 'Not Recommended') {
+
+                assignedProgrammeRequired.classList.add('d-none');
+
+                assignedProgramme.value = '';
+
+                decisionRuleAlert.innerHTML =
+                    '<i class="bi bi-x-circle-fill me-2"></i>' +
+                    '<span>' +
+                    'No programme will be assigned because the application is not recommended.' +
+                    '</span>';
+
+            }
+            else if (selectedDecision === 'Deferred') {
+
+                assignedProgrammeRequired.classList.add('d-none');
+
+                decisionRuleAlert.innerHTML =
+                    '<i class="bi bi-clock-fill me-2"></i>' +
+                    '<span>' +
+                    'Programme assignment is optional for a deferred application.' +
+                    '</span>';
+
+            }
+            else {
+
+                assignedProgrammeRequired.classList.add('d-none');
+
+                decisionRuleAlert.innerHTML =
+                    '<i class="bi bi-info-circle-fill me-2"></i>' +
+                    '<span>' +
+                    'Select a decision to continue.' +
+                    '</span>';
+            }
+        }
+
+
+        decision.addEventListener(
+            'change',
+            updateDecisionState
+        );
+
+
+        updateDecisionState();
+
+
+        /*
+         * ============================================================
+         * SWEETALERT HELPER
+         * ============================================================
+         */
+
+        function showAlert(
+            icon,
+            title,
+            text
+        ) {
+
+            if (typeof Swal !== 'undefined') {
+
+                Swal.fire({
+                    icon: icon,
+                    title: title,
+                    text: text,
+                    confirmButtonColor: '#d800b8'
+                });
+
+                return;
+            }
+
+            alert(
+                title + '\n\n' + text
+            );
+        }
+
+
+        /*
+         * ============================================================
+         * BUTTON STATE
+         * ============================================================
+         */
+
+        function setButtonLoading(
+            button,
+            loading
+        ) {
+
+            const spinner =
+                button.querySelector('.spinner-border');
+
+            if (loading) {
+
+                button.disabled = true;
+
+                if (spinner) {
+                    spinner.classList.remove('d-none');
+                }
+
+            }
+            else {
+
+                button.disabled = false;
+
+                if (spinner) {
+                    spinner.classList.add('d-none');
+                }
+
+            }
+
+        }
+
+
+        /*
+         * ============================================================
+         * SUBMIT DECISION
+         * ============================================================
+         */
+
+        async function submitDecision(
+            goToNext,
+            button
+        ) {
+
+            const selectedDecision =
+                decision.value;
+
+            const selectedProgramme =
+                assignedProgramme.value;
+
+            const committeeRemarks =
+                remarks.value;
+
+
+            /*
+             * --------------------------------------------------------
+             * CLIENT VALIDATION
+             * --------------------------------------------------------
+             */
+
+            if (!selectedDecision) {
+
+                showAlert(
+                    'warning',
+                    'Decision Required',
+                    'Please select the committee decision.'
+                );
+
+                decision.focus();
+
+                return;
+            }
+
+
+            if (
+                selectedDecision === 'Recommended for Admission' &&
+                !selectedProgramme
+            ) {
+
+                showAlert(
+                    'warning',
+                    'Programme Required',
+                    'Please select the programme recommended for admission.'
+                );
+
+                assignedProgramme.focus();
+
+                return;
+            }
+
+
+            /*
+             * --------------------------------------------------------
+             * ANTIFORGERY TOKEN
+             * --------------------------------------------------------
+             */
+
+            if (!requestVerificationToken) {
+
+                showAlert(
+                    'error',
+                    'Security Token Missing',
+                    'The security token could not be found. Please refresh the page and try again.'
+                );
+
+                return;
+            }
+
+
+            /*
+             * --------------------------------------------------------
+             * DISABLE BUTTON
+             * --------------------------------------------------------
+             */
+
+            setButtonLoading(
+                button,
+                true
+            );
+
+
+            /*
+             * --------------------------------------------------------
+             * URL
+             * --------------------------------------------------------
+             */
+
+            const url =
+                goToNext
+                    ? '@Url.Action("SaveAndNext", "CommitteeWorkbench")'
+                    : '@Url.Action("SaveDecision", "CommitteeWorkbench")';
+
+
+            /*
+             * --------------------------------------------------------
+             * FORM DATA
+             * --------------------------------------------------------
+             */
+
+            const data =
+                new URLSearchParams();
+
+            data.append(
+                '__RequestVerificationToken',
+                requestVerificationToken.value
+            );
+
+            data.append(
+                'committeeSittingId',
+                sittingId.value
+            );
+
+            data.append(
+                'committeeSittingApplicationId',
+                sittingApplicationId.value
+            );
+
+            data.append(
+                'position',
+                position.value
+            );
+
+            data.append(
+                'Decision',
+                selectedDecision
+            );
+
+            if (selectedProgramme) {
+
+                data.append(
+                    'AssignedProgrammeId',
+                    selectedProgramme
+                );
+
+            }
+
+            data.append(
+                'Remarks',
+                committeeRemarks
+            );
+
+
+            /*
+             * --------------------------------------------------------
+             * SEND REQUEST
+             * --------------------------------------------------------
+             */
+
+            try {
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method: 'POST',
+
+                            credentials: 'same-origin',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/x-www-form-urlencoded; charset=UTF-8',
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest'
+                            },
+
+                            body:
+                                data.toString()
+                        }
+                    );
+
+
+                /*
+                 * ----------------------------------------------------
+                 * READ RESPONSE
+                 * ----------------------------------------------------
+                 */
+
+                const responseText =
+                    await response.text();
+
+
+                let result = null;
+
+
+                try {
+
+                    result =
+                        JSON.parse(responseText);
+
+                }
+                catch (parseError) {
+
+                    console.error(
+                        'Committee Workbench returned non-JSON response:',
+                        responseText
+                    );
+
+                }
+
+
+                /*
+                 * ----------------------------------------------------
+                 * HTTP ERROR
+                 * ----------------------------------------------------
+                 */
+
+                if (!response.ok) {
+
+                    let errorMessage =
+                        'The server could not save the committee decision.';
+
+                    if (response.status === 400) {
+
+                        errorMessage =
+                            'The request was rejected by the server. The page may have expired. Please refresh the page and try again.';
+
+                    }
+                    else if (response.status === 401) {
+
+                        errorMessage =
+                            'Your session has expired. Please sign in again.';
+
+                    }
+                    else if (response.status === 403) {
+
+                        errorMessage =
+                            'You are not authorized to record committee decisions.';
+
+                    }
+                    else if (
+                        result &&
+                        result.message
+                    ) {
+
+                        errorMessage =
+                            result.message;
+                    }
+
+                    showAlert(
+                        'error',
+                        'Save Failed',
+                        errorMessage
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * ----------------------------------------------------
+                 * INVALID SERVER RESPONSE
+                 * ----------------------------------------------------
+                 */
+
+                if (!result) {
+
+                    showAlert(
+                        'error',
+                        'Save Failed',
+                        'The server returned an unexpected response. Check the browser console for details.'
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * ----------------------------------------------------
+                 * APPLICATION ERROR
+                 * ----------------------------------------------------
+                 */
+
+                if (!result.success) {
+
+                    showAlert(
+                        'error',
+                        'Unable to Save',
+                        result.message ||
+                        'Unable to save the committee decision.'
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * ----------------------------------------------------
+                 * SAVE & NEXT
+                 * ----------------------------------------------------
+                 */
+
+                if (
+                    goToNext &&
+                    !result.completed
+                ) {
+
+                    const nextPosition =
+                        result.nextPosition;
+
+                    if (!nextPosition) {
+
+                        showAlert(
+                            'error',
+                            'Navigation Error',
+                            'The decision was saved, but the next application could not be determined.'
+                        );
+
+                        return;
+                    }
+
+
+                    /*
+                     * Use the current sitting ID directly.
+                     */
+
+                    const nextUrl =
+                        '@Url.Action("Index", "CommitteeWorkbench")' +
+                        '?committeeSittingId=' +
+                        encodeURIComponent(sittingId.value) +
+                        '&position=' +
+                        encodeURIComponent(nextPosition);
+
+
+                    window.location.href =
+                        nextUrl;
+
+                    return;
+                }
+
+
+                /*
+                 * ----------------------------------------------------
+                 * LAST APPLICATION
+                 * ----------------------------------------------------
+                 */
+
+                if (
+                    goToNext &&
+                    result.completed
+                ) {
+
+                    if (typeof Swal !== 'undefined') {
+
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Decision Saved',
+                            text:
+                                result.message ||
+                                'Decision saved. You have reached the last application.',
+                            confirmButtonColor: '#d800b8'
+                        });
+
+                    }
+                    else {
+
+                        alert(
+                            result.message ||
+                            'Decision saved. You have reached the last application.'
+                        );
+
+                    }
+
+                    return;
+                }
+
+
+                /*
+                 * ----------------------------------------------------
+                 * NORMAL SAVE
+                 * ----------------------------------------------------
+                 */
+
+                if (typeof Swal !== 'undefined') {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved',
+                        text:
+                            result.message ||
+                            'Committee decision saved successfully.',
+                        timer: 1600,
+                        showConfirmButton: false
+                    });
+
+                }
+                else {
+
+                    alert(
+                        result.message ||
+                        'Committee decision saved successfully.'
+                    );
+
+                }
+
+            }
+            catch (error) {
+
+                console.error(
+                    'Committee Workbench save error:',
+                    error
+                );
+
+                showAlert(
+                    'error',
+                    'Connection Error',
+                    'The decision could not be saved. Please check your connection and try again.'
+                );
+
+            }
+            finally {
+
+                setButtonLoading(
+                    button,
+                    false
+                );
+
+            }
+
+        }
+
+
+        /*
+         * ============================================================
+         * SAVE DECISION
+         * ============================================================
+         */
+
+        saveDecisionButton.addEventListener(
+            'click',
+            function () {
+
+                submitDecision(
+                    false,
+                    saveDecisionButton
+                );
+
+            }
+        );
+
+
+        /*
+         * ============================================================
+         * SAVE & NEXT
+         * ============================================================
+         */
+
+        saveNextButton.addEventListener(
+            'click',
+            function () {
+
+                submitDecision(
+                    true,
+                    saveNextButton
+                );
+
+            }
+        );
+
+    });
+
+</script>

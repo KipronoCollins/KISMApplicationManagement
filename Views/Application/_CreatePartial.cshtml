@@ -1,0 +1,758 @@
+@model KISMApplicationManagement.Models.ApplicationViewModels.ApplicationCreateViewModel
+
+@using KISMApplicationManagement.Models
+
+@{
+    var availableIntakes =
+        ViewBag.AvailableIntakes as List<Intake>
+        ?? new List<Intake>();
+
+    var availableProgrammes =
+        ViewBag.AvailableProgrammes as List<Programme>
+        ?? new List<Programme>();
+}
+
+<form asp-controller="Application"
+      asp-action="Create"
+      method="post"
+      id="createApplicationForm"
+      class="needs-validation"
+      novalidate>
+
+    @Html.AntiForgeryToken()
+
+    <!-- =========================================================
+         FORM INTRODUCTION
+         ========================================================= -->
+
+    <div class="kism-form-intro mb-4">
+        <div class="d-flex align-items-start gap-3">
+
+            <div class="kism-form-icon">
+                <i class="bi bi-file-earmark-plus"></i>
+            </div>
+
+            <div>
+                <h6 class="fw-bold mb-1">
+                    Create Application
+                </h6>
+
+                <p class="text-muted small mb-0">
+                    Select the intake you wish to apply for and choose
+                    your two preferred programmes.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- =========================================================
+         VALIDATION SUMMARY
+         ========================================================= -->
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger border-0 rounded-3 small"
+         role="alert">
+    </div>
+
+
+    <!-- =========================================================
+         STEP 1 — INTAKE
+         ========================================================= -->
+
+    <div class="kism-form-section mb-4">
+
+        <div class="kism-section-heading">
+            <div class="kism-section-number">
+                1
+            </div>
+
+            <div>
+                <h6 class="fw-bold mb-0">
+                    Select Intake
+                </h6>
+
+                <div class="text-muted small">
+                    Choose the intake for this application.
+                </div>
+            </div>
+        </div>
+
+
+        <div class="mt-3">
+
+            <label asp-for="IntakeId"
+                   class="form-label fw-semibold">
+                Intake
+                <span class="text-danger">*</span>
+            </label>
+
+            @if (availableIntakes.Any())
+            {
+                <select asp-for="IntakeId"
+                        class="form-select form-select-lg"
+                        required>
+
+                    <option value="">
+                        -- Select Intake --
+                    </option>
+
+                    @foreach (var intake in availableIntakes)
+                    {
+                        <option value="@intake.IntakeId">
+                            @intake.IntakeName
+                            — @intake.AcademicYear
+                            — @intake.IntakePeriod
+                        </option>
+                    }
+
+                </select>
+
+                <div class="invalid-feedback">
+                    Please select an intake.
+                </div>
+
+                <span asp-validation-for="IntakeId"
+                      class="text-danger small">
+                </span>
+
+                <div class="form-text">
+                    Only intakes currently accepting applications are
+                    displayed.
+                </div>
+            }
+            else
+            {
+                <div class="alert kism-no-intake-alert border-0 rounded-3 mb-0">
+                    <div class="d-flex align-items-start gap-2">
+
+                        <i class="bi bi-calendar-x fs-5"
+                           style="color: #d800b8;">
+                        </i>
+
+                        <div>
+                            <div class="fw-semibold">
+                                No applications currently open
+                            </div>
+
+                            <div class="small text-muted mt-1">
+                                There are currently no active intakes
+                                accepting applications.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         STEP 2 — PROGRAMME CHOICES
+         ========================================================= -->
+
+    <div class="kism-form-section mb-4">
+
+        <div class="kism-section-heading">
+            <div class="kism-section-number">
+                2
+            </div>
+
+            <div>
+                <h6 class="fw-bold mb-0">
+                    Programme Choices
+                </h6>
+
+                <div class="text-muted small">
+                    Select two different programmes in your preferred order.
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row g-4 mt-1">
+
+            <!-- FIRST CHOICE -->
+
+            <div class="col-md-6">
+
+                <div class="choice-card">
+
+                    <div class="choice-card-header">
+
+                        <div class="choice-number">
+                            1
+                        </div>
+
+                        <div>
+                            <div class="fw-bold">
+                                First Choice
+                            </div>
+
+                            <div class="text-muted small">
+                                Your preferred programme
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-3">
+
+                        <label asp-for="FirstChoiceProgrammeId"
+                               class="form-label fw-semibold">
+                            Programme
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        @if (availableProgrammes.Any())
+                        {
+                            <select asp-for="FirstChoiceProgrammeId"
+                                    class="form-select"
+                                    id="firstChoiceProgramme"
+                                    required>
+
+                                <option value="">
+                                    -- Select First Choice --
+                                </option>
+
+                                @foreach (var programme in availableProgrammes)
+                                {
+                                    <option value="@programme.ProgrammeId">
+                                        @programme.ProgrammeCode
+                                        — @programme.ProgrammeName
+                                    </option>
+                                }
+
+                            </select>
+
+                            <div class="invalid-feedback">
+                                Please select your first programme choice.
+                            </div>
+
+                            <span asp-validation-for="FirstChoiceProgrammeId"
+                                  class="text-danger small">
+                            </span>
+                        }
+                        else
+                        {
+                            <div class="alert alert-light border small mb-0">
+                                No active programmes are currently available.
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SECOND CHOICE -->
+
+            <div class="col-md-6">
+
+                <div class="choice-card">
+
+                    <div class="choice-card-header">
+
+                        <div class="choice-number">
+                            2
+                        </div>
+
+                        <div>
+                            <div class="fw-bold">
+                                Second Choice
+                            </div>
+
+                            <div class="text-muted small">
+                                Your alternative programme
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-3">
+
+                        <label asp-for="SecondChoiceProgrammeId"
+                               class="form-label fw-semibold">
+                            Programme
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        @if (availableProgrammes.Any())
+                        {
+                            <select asp-for="SecondChoiceProgrammeId"
+                                    class="form-select"
+                                    id="secondChoiceProgramme"
+                                    required>
+
+                                <option value="">
+                                    -- Select Second Choice --
+                                </option>
+
+                                @foreach (var programme in availableProgrammes)
+                                {
+                                    <option value="@programme.ProgrammeId">
+                                        @programme.ProgrammeCode
+                                        — @programme.ProgrammeName
+                                    </option>
+                                }
+
+                            </select>
+
+                            <div class="invalid-feedback">
+                                Please select your second programme choice.
+                            </div>
+
+                            <span asp-validation-for="SecondChoiceProgrammeId"
+                                  class="text-danger small">
+                            </span>
+                        }
+                        else
+                        {
+                            <div class="alert alert-light border small mb-0">
+                                No active programmes are currently available.
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Duplicate choice warning -->
+
+        <div id="duplicateProgrammeWarning"
+             class="alert alert-warning border-0 rounded-3 mt-3 d-none">
+
+            <div class="d-flex align-items-start gap-2">
+
+                <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+
+                <div>
+                    <div class="fw-semibold">
+                        Programme choices must be different
+                    </div>
+
+                    <div class="small">
+                        Please select a different programme for your
+                        second choice.
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         APPLICATION PROCESS INFORMATION
+         ========================================================= -->
+
+    <div class="kism-process-alert mb-4">
+
+        <div class="d-flex align-items-start gap-3">
+
+            <div class="kism-process-icon">
+                <i class="bi bi-info-circle-fill"></i>
+            </div>
+
+            <div>
+
+                <div class="fw-semibold mb-1">
+                    Before you continue
+                </div>
+
+                <ul class="small text-muted mb-0 ps-3">
+
+                    <li>
+                        Creating this form will create an
+                        <strong>application draft</strong>.
+                    </li>
+
+                    <li>
+                        You can review and change your programme choices
+                        while the application remains a draft.
+                    </li>
+
+                    <li>
+                        You must submit the application separately after
+                        creating the draft.
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         FORM ACTIONS
+         ========================================================= -->
+
+    <div class="d-flex flex-column-reverse flex-sm-row
+                justify-content-end gap-2 pt-3 border-top">
+
+        <button type="button"
+                class="btn btn-light border px-4"
+                data-bs-dismiss="modal">
+
+            <i class="bi bi-x-circle me-1"></i>
+            Cancel
+
+        </button>
+
+
+        <button type="submit"
+                class="btn kism-submit-btn px-4"
+                id="btnCreateApplicationSubmit"
+                @(availableIntakes.Any() && availableProgrammes.Count >= 2
+                    ? null
+                    : "disabled")>
+
+            <i class="bi bi-check-circle me-1"></i>
+            Create Draft
+
+        </button>
+
+    </div>
+
+</form>
+
+
+<style>
+
+    /* =============================================================
+       KISM FORM
+       ============================================================= */
+
+    .kism-form-intro {
+        background: #fff8fe;
+        border-left: 4px solid #d800b8;
+        border-radius: 0.75rem;
+        padding: 1rem 1.1rem;
+    }
+
+    .kism-form-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.7rem;
+        background: rgba(216, 0, 184, 0.10);
+        color: #d800b8;
+        font-size: 1.15rem;
+    }
+
+
+    /* =============================================================
+       SECTION HEADINGS
+       ============================================================= */
+
+    .kism-form-section {
+        border: 1px solid #edf0f2;
+        border-radius: 0.85rem;
+        padding: 1.1rem;
+        background: #ffffff;
+    }
+
+    .kism-section-heading {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .kism-section-number {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #d800b8;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+
+    /* =============================================================
+       FORM CONTROLS
+       ============================================================= */
+
+    #createApplicationForm .form-label {
+        font-size: 0.88rem;
+        color: #343a40;
+    }
+
+    #createApplicationForm .form-select {
+        border-color: #dee2e6;
+        border-radius: 0.6rem;
+        min-height: 44px;
+    }
+
+    #createApplicationForm .form-select:focus {
+        border-color: #d800b8;
+        box-shadow: 0 0 0 0.18rem rgba(216, 0, 184, 0.12);
+    }
+
+    #createApplicationForm .form-select.is-invalid:focus {
+        box-shadow: 0 0 0 0.18rem rgba(220, 53, 69, 0.12);
+    }
+
+
+    /* =============================================================
+       PROGRAMME CHOICE CARDS
+       ============================================================= */
+
+    .choice-card {
+        height: 100%;
+        border: 1px solid #e8eaed;
+        border-radius: 0.8rem;
+        padding: 1rem;
+        background: #ffffff;
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .choice-card:hover {
+        border-color: rgba(216, 0, 184, 0.35);
+        box-shadow: 0 0.25rem 0.9rem rgba(0, 0, 0, 0.05);
+    }
+
+    .choice-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .choice-number {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.65rem;
+        background: #fff8fe;
+        color: #d800b8;
+        border: 1px solid rgba(216, 0, 184, 0.15);
+        font-weight: 800;
+    }
+
+
+    /* =============================================================
+       NO INTAKE
+       ============================================================= */
+
+    .kism-no-intake-alert {
+        background: #fff8fe;
+        border-left: 3px solid #d800b8 !important;
+    }
+
+
+    /* =============================================================
+       PROCESS INFORMATION
+       ============================================================= */
+
+    .kism-process-alert {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+
+    .kism-process-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(216, 0, 184, 0.08);
+        color: #d800b8;
+    }
+
+
+    /* =============================================================
+       SUBMIT BUTTON
+       ============================================================= */
+
+    .kism-submit-btn {
+        background: #d800b8;
+        border-color: #d800b8;
+        color: #ffffff;
+        font-weight: 600;
+        border-radius: 0.6rem;
+        min-width: 145px;
+    }
+
+    .kism-submit-btn:hover,
+    .kism-submit-btn:focus {
+        background: #b8009c;
+        border-color: #b8009c;
+        color: #ffffff;
+    }
+
+    .kism-submit-btn:disabled {
+        background: #d800b8;
+        border-color: #d800b8;
+        color: #ffffff;
+        opacity: 0.55;
+    }
+
+
+    /* =============================================================
+       RESPONSIVE
+       ============================================================= */
+
+    @@media (max-width: 575.98px) {
+
+        .kism-form-section {
+            padding: 0.9rem;
+        }
+
+        .choice-card {
+            padding: 0.9rem;
+        }
+
+        .kism-process-alert {
+            padding: 0.85rem;
+        }
+
+    }
+
+</style>
+
+
+<script>
+
+    (function () {
+
+        const firstChoice =
+            document.getElementById('firstChoiceProgramme');
+
+        const secondChoice =
+            document.getElementById('secondChoiceProgramme');
+
+        const warning =
+            document.getElementById('duplicateProgrammeWarning');
+
+        const submitButton =
+            document.getElementById('btnCreateApplicationSubmit');
+
+
+        if (!firstChoice || !secondChoice) {
+            return;
+        }
+
+
+        function validateProgrammeChoices() {
+
+            const firstValue = firstChoice.value;
+            const secondValue = secondChoice.value;
+
+            const duplicate =
+                firstValue !== '' &&
+                secondValue !== '' &&
+                firstValue === secondValue;
+
+
+            if (duplicate) {
+
+                warning.classList.remove('d-none');
+
+                secondChoice.classList.add('is-invalid');
+
+                return false;
+            }
+
+
+            warning.classList.add('d-none');
+
+            secondChoice.classList.remove('is-invalid');
+
+            return true;
+        }
+
+
+        firstChoice.addEventListener(
+            'change',
+            validateProgrammeChoices
+        );
+
+
+        secondChoice.addEventListener(
+            'change',
+            validateProgrammeChoices
+        );
+
+
+        const form =
+            document.getElementById('createApplicationForm');
+
+
+        if (form) {
+
+            form.addEventListener(
+                'submit',
+                function (event) {
+
+                    if (!validateProgrammeChoices()) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        return;
+                    }
+
+                    if (!form.checkValidity()) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        form.classList.add('was-validated');
+
+                        return;
+                    }
+
+                    if (submitButton) {
+
+                        submitButton.disabled = true;
+
+                        submitButton.innerHTML = `
+                            <span class="spinner-border spinner-border-sm me-2"
+                                  role="status"
+                                  aria-hidden="true"></span>
+                            Creating...
+                        `;
+                    }
+
+                }
+            );
+
+        }
+
+    })();
+
+</script>
