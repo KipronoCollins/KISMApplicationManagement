@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace KISMApplicationManagement.Data
 {
@@ -9,15 +10,32 @@ namespace KISMApplicationManagement.Data
         public ApplicationDbContext CreateDbContext(
             string[] args)
         {
+            var basePath = Directory.GetCurrentDirectory();
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(basePath)
+                .AddJsonFile(
+                    "appsettings.json",
+                    optional: false,
+                    reloadOnChange: false)
+                .AddJsonFile(
+                    "appsettings.Development.json",
+                    optional: true,
+                    reloadOnChange: false)
+                .AddUserSecrets<ApplicationDbContextFactory>(
+                    optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             var connectionString =
-                Environment.GetEnvironmentVariable(
-                    "KISM_MYSQL_CONNECTION");
+                configuration.GetConnectionString(
+                    "DefaultConnection");
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new InvalidOperationException(
-                    "KISM_MYSQL_CONNECTION environment variable " +
-                    "is not configured.");
+                    "Connection string 'DefaultConnection' " +
+                    "was not found.");
             }
 
             var optionsBuilder =
