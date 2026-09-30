@@ -14,7 +14,7 @@ permissions:
 jobs:
   stage:
     name: Build and stage release
-    runs-on: [self-hosted, linux, x64, kism-production-runner]
+    runs-on: [self-hosted, linux, x64]
 
     steps:
       - name: Validate requested commit
