@@ -1,0 +1,156 @@
+name: KISM Stage Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: "Exact 40-character commit SHA to stage"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    name: Build and stage release
+    runs-on: [self-hosted, linux, x64, kism-production-runner]
+
+    steps:
+      - name: Validate requested commit
+        shell: bash
+        env:
+          REQUESTED_SHA: ${{ inputs.commit_sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$REQUESTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "ERROR: commit_sha must be exactly 40 lowercase hexadecimal characters."
+            exit 1
+          fi
+
+          echo "Requested commit: $REQUESTED_SHA"
+
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit_sha }}
+          fetch-depth: 0
+
+      - name: Verify commit is trusted main history
+        shell: bash
+        env:
+          REQUESTED_SHA: ${{ inputs.commit_sha }}
+        run: |
+          set -euo pipefail
+
+          git fetch origin main --force
+
+          if ! git merge-base --is-ancestor "$REQUESTED_SHA" "origin/main"; then
+            echo "ERROR: Requested commit is not part of origin/main history."
+            echo "Only commits reachable from main may be staged on the production runner."
+            exit 1
+          fi
+
+          echo "Trusted main-history check: PASS"
+
+      - name: Verify checked-out commit
+        shell: bash
+        env:
+          REQUESTED_SHA: ${{ inputs.commit_sha }}
+        run: |
+          set -euo pipefail
+
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+
+          echo "Requested SHA: $REQUESTED_SHA"
+          echo "Actual SHA:    $ACTUAL_SHA"
+
+          if [[ "$ACTUAL_SHA" != "$REQUESTED_SHA" ]]; then
+            echo "ERROR: Checked-out commit does not match requested commit."
+            exit 1
+          fi
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Publish
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf ./publish
+
+          dotnet publish \
+            -c Release \
+            --no-restore \
+            --no-build \
+            -o ./publish
+
+      - name: Prepare staging release
+        shell: bash
+        env:
+          REQUESTED_SHA: ${{ inputs.commit_sha }}
+        run: |
+          set -euo pipefail
+
+          STAGING_ROOT="/var/lib/kism-deploy/staging"
+          STAGED_RELEASE="$STAGING_ROOT/$REQUESTED_SHA"
+
+          if [[ -e "$STAGED_RELEASE" ]]; then
+            echo "ERROR: Staging directory already exists:"
+            echo "  $STAGED_RELEASE"
+            echo "Refusing to overwrite it."
+            exit 1
+          fi
+
+          mkdir -p "$STAGED_RELEASE"
+
+          cp -a ./publish/. "$STAGED_RELEASE/"
+
+          printf '%s\n' "$REQUESTED_SHA" > "$STAGED_RELEASE/COMMIT_SHA"
+
+          chmod 644 "$STAGED_RELEASE/COMMIT_SHA"
+
+          test -f "$STAGED_RELEASE/KISMApplicationManagement.dll"
+          test "$(tr -d '[:space:]' < "$STAGED_RELEASE/COMMIT_SHA")" = "$REQUESTED_SHA"
+
+          echo
+          echo "=== STAGED RELEASE ==="
+          echo "Commit:  $REQUESTED_SHA"
+          echo "Path:    $STAGED_RELEASE"
+          echo
+          echo "Files:"
+          find "$STAGED_RELEASE" -maxdepth 1 -type f -printf '%f\n' | sort
+
+      - name: Verify staging release
+        shell: bash
+        env:
+          REQUESTED_SHA: ${{ inputs.commit_sha }}
+        run: |
+          set -euo pipefail
+
+          STAGED_RELEASE="/var/lib/kism-deploy/staging/$REQUESTED_SHA"
+
+          echo "Verifying staged release..."
+
+          test -d "$STAGED_RELEASE"
+          test -f "$STAGED_RELEASE/KISMApplicationManagement.dll"
+          test -f "$STAGED_RELEASE/COMMIT_SHA"
+
+          STAGED_SHA="$(tr -d '[:space:]' < "$STAGED_RELEASE/COMMIT_SHA")"
+
+          if [[ "$STAGED_SHA" != "$REQUESTED_SHA" ]]; then
+            echo "ERROR: Staged COMMIT_SHA mismatch."
+            exit 1
+          fi
+
+          echo "Staging verification: PASS"
+          echo
+          echo "Production has NOT been changed."
+          echo "Database migrations have NOT been run."
+          echo "KISM service has NOT been restarted."
+          echo "Current production release has NOT been changed."
