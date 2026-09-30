@@ -49,3 +49,6 @@ mysql-schema.sql
 
 # Sensitive local configuration
 appsettings.Local.json
+
+README.md
+

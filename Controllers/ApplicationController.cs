@@ -34,7 +34,7 @@ namespace KISMApplicationManagement.Controllers
 
             if (applicantProfile == null)
             {
-                return NotFound("Your applicant profile could not be found.");
+                return RedirectToAction("Index", "ApplicantProfile");
             }
 
             var applications = await _context.Applications
@@ -1019,3 +1019,4 @@ namespace KISMApplicationManagement.Controllers
         }
     }
 }
+
