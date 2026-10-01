@@ -1,8 +1,401 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid px-0">
+
+<!-- Programmes -->
+<section class="py-5">
+    <div class="container">
+
+        <div class="row g-4">
+
+            <!-- Land Survey -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+
+                        <div class="avatar-lg rounded-3 d-flex align-items-center justify-content-center mb-4"
+                             style="background-color: rgba(214, 0, 121, 0.10);">
+                            <i class="mdi mdi-map-marker-radius fs-2"
+                               style="color: #d60079;"></i>
+                        </div>
+
+                        <span class="badge rounded-pill px-3 py-2 mb-2"
+                              style="background-color: rgba(214, 0, 121, 0.10); color: #d60079;">
+                            Diploma
+                        </span>
+
+                        <h4 class="mt-2">
+                            Land Survey
+                        </h4>
+
+                        <p class="text-muted">
+                            Develop professional skills in land surveying,
+                            measurement and spatial data collection.
+                        </p>
+
+                        <a href="#"
+                           class="fw-semibold text-decoration-none"
+                           style="color: #d60079;">
+                            View Programme
+                            <i class="mdi mdi-arrow-right ms-1"></i>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Photogrammetry -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+
+                        <div class="avatar-lg rounded-3 d-flex align-items-center justify-content-center mb-4"
+                             style="background-color: rgba(214, 0, 121, 0.10);">
+                            <i class="mdi mdi-satellite-variant fs-2"
+                               style="color: #d60079;"></i>
+                        </div>
+
+                        <span class="badge rounded-pill px-3 py-2 mb-2"
+                              style="background-color: rgba(214, 0, 121, 0.10); color: #d60079;">
+                            Diploma
+                        </span>
+
+                        <h4 class="mt-2">
+                            Photogrammetry &amp; Remote Sensing
+                        </h4>
+
+                        <p class="text-muted">
+                            Learn modern techniques for aerial photography,
+                            remote sensing and geospatial data analysis.
+                        </p>
+
+                        <a href="#"
+                           class="fw-semibold text-decoration-none"
+                           style="color: #d60079;">
+                            View Programme
+                            <i class="mdi mdi-arrow-right ms-1"></i>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Cartography -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+
+                        <div class="avatar-lg rounded-3 d-flex align-items-center justify-content-center mb-4"
+                             style="background-color: rgba(214, 0, 121, 0.10);">
+                            <i class="mdi mdi-map-outline fs-2"
+                               style="color: #d60079;"></i>
+                        </div>
+
+                        <span class="badge rounded-pill px-3 py-2 mb-2"
+                              style="background-color: rgba(214, 0, 121, 0.10); color: #d60079;">
+                            Diploma
+                        </span>
+
+                        <h4 class="mt-2">
+                            Cartography
+                        </h4>
+
+                        <p class="text-muted">
+                            Build expertise in map production, cartographic
+                            design and geographic information representation.
+                        </p>
+
+                        <a href="#"
+                           class="fw-semibold text-decoration-none"
+                           style="color: #d60079;">
+                            View Programme
+                            <i class="mdi mdi-arrow-right ms-1"></i>
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-controller="Programmes"
+               asp-action="Index"
+               class="btn px-4 text-white"
+               style="background-color: #d60079; border-color: #d60079;">
+                View All Programmes
+                <i class="mdi mdi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- How To Apply -->
+<section class="py-5 bg-light">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <span class="fw-semibold"
+                  style="color: #d60079;">
+                SIMPLE APPLICATION PROCESS
+            </span>
+
+            <h2 class="fw-bold mt-2">
+                How to Apply
+            </h2>
+
+            <p class="text-muted">
+                Follow these simple steps to submit your application online.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Step 1 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+
+                    <div class="avatar-lg rounded-circle text-white mx-auto mb-3
+                                d-flex align-items-center justify-content-center"
+                         style="background-color: #d60079;">
+                        <span class="fs-4 fw-bold">1</span>
+                    </div>
+
+                    <h5>Register</h5>
+
+                    <p class="text-muted mb-0">
+                        Create your applicant account using your email
+                        and password.
+                    </p>
+
+                </div>
+            </div>
+
+
+            <!-- Step 2 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+
+                    <div class="avatar-lg rounded-circle text-white mx-auto mb-3
+                                d-flex align-items-center justify-content-center"
+                         style="background-color: #d60079;">
+                        <span class="fs-4 fw-bold">2</span>
+                    </div>
+
+                    <h5>Complete Profile</h5>
+
+                    <p class="text-muted mb-0">
+                        Provide your personal and contact information.
+                    </p>
+
+                </div>
+            </div>
+
+
+            <!-- Step 3 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+
+                    <div class="avatar-lg rounded-circle text-white mx-auto mb-3
+                                d-flex align-items-center justify-content-center"
+                         style="background-color: #d60079;">
+                        <span class="fs-4 fw-bold">3</span>
+                    </div>
+
+                    <h5>Add Qualifications</h5>
+
+                    <p class="text-muted mb-0">
+                        Enter your academic qualifications and subjects.
+                    </p>
+
+                </div>
+            </div>
+
+
+            <!-- Step 4 -->
+            <div class="col-lg-3 col-md-6">
+                <div class="text-center">
+
+                    <div class="avatar-lg rounded-circle text-white mx-auto mb-3
+                                d-flex align-items-center justify-content-center"
+                         style="background-color: #d60079;">
+                        <span class="fs-4 fw-bold">4</span>
+                    </div>
+
+                    <h5>Submit Application</h5>
+
+                    <p class="text-muted mb-0">
+                        Select your preferred programmes and submit
+                        your application.
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- Portal Features -->
+<section class="py-5">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <span class="fw-semibold"
+                  style="color: #d60079;">
+                KISM APPLICATION PORTAL
+            </span>
+
+            <h2 class="fw-bold mt-2">
+                Everything You Need in One Place
+            </h2>
+
+            <p class="text-muted mx-auto"
+               style="max-width: 650px;">
+                Manage your application from registration through
+                submission using the KISM online application portal.
+            </p>
+        </div>
+
+
+        <div class="row g-4">
+
+            <!-- Online Application -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 h-100 shadow-sm text-center">
+
+                    <div class="card-body p-4">
+
+                        <i class="mdi mdi-laptop fs-1"
+                           style="color: #d60079;"></i>
+
+                        <h5 class="mt-3">
+                            Apply Online
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Complete your application conveniently
+                            from anywhere.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Secure -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 h-100 shadow-sm text-center">
+
+                    <div class="card-body p-4">
+
+                        <i class="mdi mdi-shield-check fs-1"
+                           style="color: #d60079;"></i>
+
+                        <h5 class="mt-3">
+                            Secure
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Your application information is securely
+                            managed.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Track -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 h-100 shadow-sm text-center">
+
+                    <div class="card-body p-4">
+
+                        <i class="mdi mdi-file-document-check fs-1"
+                           style="color: #d60079;"></i>
+
+                        <h5 class="mt-3">
+                            Track Progress
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Keep track of your application and
+                            its current status.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Programme Selection -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 h-100 shadow-sm text-center">
+
+                    <div class="card-body p-4">
+
+                        <i class="mdi mdi-school fs-1"
+                           style="color: #d60079;"></i>
+
+                        <h5 class="mt-3">
+                            Choose Your Programme
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Explore available programmes and make
+                            your choices.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- Call To Action -->
+<section class="py-5">
+    <div class="container">
+
+        <div class="card border-0 text-white shadow-lg"
+             style="background-color: #d60079;">
+
+            <div class="card-body p-5 text-center">
+
+                <i class="mdi mdi-school-outline display-4"></i>
+
+                <h2 class="fw-bold mt-3">
+                    Ready to Start Your Application?
+                </h2>
+
+                <p class="lead opacity-75">
+                    Create your account and begin your KISM application today.
+                </p>
+
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="btn btn-light btn-lg px-5">
+                    <i class="mdi mdi-account-plus me-1"></i>
+                    Create Applicant Account
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
 </div>
