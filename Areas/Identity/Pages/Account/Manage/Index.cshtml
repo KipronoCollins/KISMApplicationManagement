@@ -1,0 +1,284 @@
+﻿@page
+@model IndexModel
+
+@{
+ViewData["Title"] = "Profile";
+ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="kism-profile-page">
+
+```
+<div class="kism-profile-title">
+    <h2>Profile</h2>
+
+    <p>
+        Manage your basic account information.
+    </p>
+</div>
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="kism-profile-section">
+
+    <div class="kism-profile-section-heading">
+
+        <div class="kism-profile-icon">
+            <i class="bi bi-person"></i>
+        </div>
+
+        <div>
+            <h3>Account information</h3>
+
+            <p>
+                Review your username and update your phone number.
+            </p>
+        </div>
+
+    </div>
+
+    <form id="profile-form" method="post">
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3"
+             role="alert">
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-12 col-lg-6">
+
+                <label asp-for="Username"
+                       class="kism-profile-label">
+                </label>
+
+                <input asp-for="Username"
+                       class="form-control kism-profile-input"
+                       placeholder="Your username"
+                       disabled />
+
+                <div class="kism-profile-help">
+                    Your username is managed by the system and cannot be changed here.
+                </div>
+
+            </div>
+
+            <div class="col-12 col-lg-6">
+
+                <label asp-for="Input.PhoneNumber"
+                       class="kism-profile-label">
+                </label>
+
+                <input asp-for="Input.PhoneNumber"
+                       class="form-control kism-profile-input"
+                       placeholder="Enter your phone number" />
+
+                <span asp-validation-for="Input.PhoneNumber"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="kism-profile-actions">
+
+            <button id="update-profile-button"
+                    type="submit"
+                    class="btn btn-kism-primary">
+
+                <i class="bi bi-check2-circle me-1"></i>
+
+                Save changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+```
+
+</div>
+
+<style>
+
+    .kism-profile-page {
+        width: 100%;
+    }
+
+    .kism-profile-title {
+        margin-bottom: 28px;
+    }
+
+    .kism-profile-title h2 {
+        margin: 0;
+
+        color: var(--kism-text);
+
+        font-size: 1.35rem;
+        font-weight: 750;
+    }
+
+    .kism-profile-title p {
+        margin: 6px 0 0;
+
+        color: var(--kism-muted);
+
+        font-size: 0.88rem;
+    }
+
+    /* =========================================================
+       PROFILE SECTION
+       ========================================================= */
+
+    .kism-profile-section {
+        width: 100%;
+    }
+
+    .kism-profile-section-heading {
+        display: flex;
+        align-items: center;
+
+        gap: 13px;
+
+        padding-bottom: 22px;
+        margin-bottom: 26px;
+
+        border-bottom: 1px solid var(--kism-border);
+    }
+
+    .kism-profile-icon {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: rgba(216, 0, 184, 0.10);
+        color: var(--kism-primary);
+
+        font-size: 1.2rem;
+    }
+
+    .kism-profile-section-heading h3 {
+        margin: 0;
+
+        color: var(--kism-text);
+
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .kism-profile-section-heading p {
+        margin: 3px 0 0;
+
+        color: var(--kism-muted);
+
+        font-size: 0.82rem;
+    }
+
+    /* =========================================================
+       FORM
+       ========================================================= */
+
+    .kism-profile-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: var(--kism-text);
+
+        font-size: 0.84rem;
+        font-weight: 700;
+    }
+
+    .kism-profile-input {
+        min-height: 46px;
+
+        border: 1px solid var(--kism-border);
+        border-radius: 9px;
+
+        color: var(--kism-text);
+
+        background: #ffffff;
+    }
+
+    .kism-profile-input:focus {
+        border-color: var(--kism-primary);
+
+        box-shadow:
+            0 0 0 0.2rem rgba(216, 0, 184, 0.12);
+    }
+
+    .kism-profile-input:disabled {
+        background: #f3f4f7;
+        color: var(--kism-muted);
+        opacity: 1;
+    }
+
+    .kism-profile-help {
+        margin-top: 7px;
+
+        color: var(--kism-muted);
+
+        font-size: 0.76rem;
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .kism-profile-actions {
+        display: flex;
+        justify-content: flex-end;
+
+        margin-top: 30px;
+        padding-top: 22px;
+
+        border-top: 1px solid var(--kism-border);
+    }
+
+    .kism-profile-actions .btn-kism-primary {
+        min-height: 44px;
+
+        padding: 9px 22px;
+
+        border-radius: 9px;
+
+        font-weight: 600;
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @@media (max-width: 575.98px) {
+
+        .kism-profile-title {
+            margin-bottom: 22px;
+        }
+
+        .kism-profile-section-heading {
+            align-items: flex-start;
+        }
+
+        .kism-profile-actions {
+            justify-content: stretch;
+        }
+
+        .kism-profile-actions .btn-kism-primary {
+            width: 100%;
+        }
+    }
+
+</style>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" />
+}
